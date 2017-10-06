@@ -1,3 +1,4 @@
+#undef NDEBUG
 #include "Common.h"
 #include <CrioLinux.h>
 
