@@ -66,3 +66,14 @@ set_target_properties(CrioLinux PROPERTIES VERSION 0.1.0 SOVERSION 0)
 ########################################
 install(TARGETS CrioLinux DESTINATION ${CMAKE_INSTALL_LIBDIR})
 install(FILES include/CrioLinux.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+
+########################################
+# Final log
+########################################
+message("")
+message("===============================================================================")
+message("")
+show_target(CrioLinux)
+message("")
+message("===============================================================================")
+message("")
