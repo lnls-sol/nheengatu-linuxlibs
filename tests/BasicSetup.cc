@@ -4,7 +4,7 @@
 
 int main(void) {
     CrioSession Session;
-    Res = CrioSetup(&Session);
+    auto Res = CrioSetup(&Session);
     assert(Res == 0);
 
     cout << "Session opened.\n";
