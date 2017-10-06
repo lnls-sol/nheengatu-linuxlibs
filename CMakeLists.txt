@@ -61,6 +61,7 @@ file(GLOB LIB_SOURCE "src/*.cc")
 add_library(CrioLinux SHARED ${LIB_SOURCE})
 target_link_libraries(CrioLinux ${NIFPGAHELPER_LIBRARIES})
 set_target_properties(CrioLinux PROPERTIES VERSION 0.1.0 SOVERSION 0)
+set_target_properties(CrioLinux PROPERTIES CXX_VISIBILITY_PRESET hidden)
 
 ########################################
 # Installation
