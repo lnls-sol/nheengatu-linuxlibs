@@ -1,8 +1,9 @@
 #include "Common.h"
 #include "CrioLinux.h"
 
-// FIXME: Make these configurable
-static const string BITFILE_PATH = "/usr/local/lib/crio-linux-libs/";
+static const string BITFILE_PATH = BUILD_CRIO_LINUX_LIBDIR;
+
+// FIXME: Make configurable
 static const string CRIO_URI = "rio://NI-cRIO-9039-01BF96B4-DCM/RIO0";
 
 int CrioSetup(CrioSession *Session) {

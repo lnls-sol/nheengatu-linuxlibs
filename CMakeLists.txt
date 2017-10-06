@@ -22,6 +22,7 @@ set(CMAKE_CXX_EXTENSIONS NO)
 
 set(CRIO_LINUX_LIBDIR ${CMAKE_INSTALL_FULL_LIBDIR}/crio-linux-libs CACHE STRING
     "Location of cRIO Linux LabView FPGA generated files")
+add_definitions(-DBUILD_CRIO_LINUX_LIBDIR=\"${CRIO_LINUX_LIBDIR}/\")
 
 ########################################
 # External modules
