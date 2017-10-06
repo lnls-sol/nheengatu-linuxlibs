@@ -53,6 +53,12 @@ function(check_module_no_pkg PREFIX INC_NAME LIB_NAME)
     find_path(${PREFIX}_INCLUDE_DIRS ${INC_NAME} HINTS ENV CPATH ENV C_INCLUDE_PATH)
 endfunction()
 
+function(add_simple_test NAME SOURCE)
+    add_executable(${NAME} ${SOURCE})
+    target_link_libraries(${NAME} CrioLinux)
+    add_test(${NAME} ${NAME})
+endfunction()
+
 function(join OUTPUT SEPARATOR)
     if(ARGC LESS 3)
         set("${OUTPUT}" "")

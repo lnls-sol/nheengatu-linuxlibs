@@ -5,6 +5,7 @@ cmake_minimum_required(VERSION 2.6)
 cmake_policy(VERSION 3.4)
 
 project(CrioLinux)
+enable_testing()
 
 ########################################
 # Build includes
@@ -68,6 +69,12 @@ set_target_properties(CrioLinux PROPERTIES CXX_VISIBILITY_PRESET hidden)
 ########################################
 install(TARGETS CrioLinux DESTINATION ${CMAKE_INSTALL_LIBDIR})
 install(FILES include/CrioLinux.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+
+########################################
+# Tests
+########################################
+add_simple_test(TestBasicBI tests/BasicBI.cc)
+add_simple_test(TestBasicSetup tests/BasicSetup.cc)
 
 ########################################
 # Final log
