@@ -31,6 +31,22 @@ find_path(NIFPGA_CRIOLINUX_INCLUDE_DIR NiFpga_CrioLinux.h HINTS ENV CPATH ENV C_
     ${CRIO_LINUX_LIBDIR})
 
 ########################################
+# Compiler flags
+########################################
+add_compiler_flags(-Wall -Wextra -Werror -Wmissing-declarations -Wno-maybe-uninitialized
+    -Wno-missing-field-initializers -Wno-unused-parameter -fdata-sections -ffunction-sections)
+add_linker_flags(-Wl,--as-needed -Wl,--gc-sections)
+add_double_flags(-fsanitize=undefined)
+
+if (NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
+    add_double_flags(-flto)
+
+    if (CMAKE_BUILD_TYPE STREQUAL "Release")
+        add_linker_flags(-s)
+    endif()
+endif()
+
+########################################
 # Include files
 ########################################
 include_directories(include)

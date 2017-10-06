@@ -1,3 +1,5 @@
+include(CheckCXXCompilerFlag)
+
 function(set_default_build_type BUILD_TYPE)
     if(NOT CMAKE_BUILD_TYPE)
         message(STATUS "Setting default build type to '${BUILD_TYPE}'.")
@@ -5,6 +7,45 @@ function(set_default_build_type BUILD_TYPE)
         set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release"
                 "MinSizeRel" "RelWithDebInfo")
     endif()
+endfunction()
+
+function(add_compiler_flags)
+    foreach(COMPILER_FLAG ${ARGV})
+        string(REGEX REPLACE "[+=-]" "_" ESCAPED ${COMPILER_FLAG})
+        check_cxx_compiler_flag(${COMPILER_FLAG} HAVE_CXX_${ESCAPED})
+
+        if (${HAVE_CXX_${ESCAPED}})
+            add_compile_options(${COMPILER_FLAG})
+        endif()
+    endforeach(COMPILER_FLAG)
+endfunction()
+
+function(add_double_flags)
+    foreach(DOUBLE_FLAG ${ARGV})
+        string(REGEX REPLACE "[+=-]" "_" ESCAPED ${DOUBLE_FLAG})
+        set(CMAKE_REQUIRED_FLAGS ${DOUBLE_FLAG})
+        check_cxx_compiler_flag("" HAVE_CXX_${ESCAPED})
+
+        if (${HAVE_CXX_${ESCAPED}})
+            set(CXX_FLAGS "${CXX_FLAGS} ${DOUBLE_FLAG}")
+        endif()
+    endforeach(DOUBLE_FLAG)
+
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}${CXX_FLAGS}" PARENT_SCOPE)
+endfunction()
+
+function(add_linker_flags)
+    foreach(LINKER_FLAG ${ARGV})
+        string(REGEX REPLACE "[+=-]" "_" ESCAPED ${LINKER_FLAG})
+        set(CMAKE_REQUIRED_FLAGS ${LINKER_FLAG})
+        check_cxx_compiler_flag("" HAVE_${ESCAPED})
+
+        if (${HAVE_${ESCAPED}})
+            set(FLAGS "${FLAGS} ${LINKER_FLAG}")
+        endif(${HAVE_${ESCAPED}})
+    endforeach(LINKER_FLAG)
+
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS}${FLAGS}" PARENT_SCOPE)
 endfunction()
 
 function(check_module_no_pkg PREFIX INC_NAME LIB_NAME)
