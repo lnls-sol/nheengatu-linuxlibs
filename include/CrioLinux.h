@@ -54,6 +54,7 @@ typedef	unsigned int CrioSession;
 void CrioCleanup(CrioSession Session);
 int CrioReadBIArray(CrioSession Session, uint64_t *Output);
 int CrioGetBIArrayItemName(CrioSession Session, unsigned Item, const char **Name);
+int CrioGetBIArrayItemNumber(CrioSession Session, const char *Text, unsigned *Number);
 int CrioSetup(CrioSession *Session);
 
 #ifdef __cplusplus

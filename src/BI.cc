@@ -1,4 +1,7 @@
 #include "Common.h"
+
+#include <ctype.h>
+#include <errno.h>
 #include <stdexcept>
 
 #include <boost/bimap.hpp>
@@ -59,6 +62,55 @@ int CrioGetBIArrayItemName(CrioSession Session, unsigned Item, const char **Name
 
     try {
         *Name = NAME_BIMAP.left.at(Item).c_str();
+        return 0;
+    }
+    catch (out_of_range) {
+        return -1;
+    }
+}
+
+static int ParseNumberStrict(const char *Text, unsigned *Value) {
+    char *End;
+    long long Val;
+
+    /* Blank string returns error */
+    while (*Text != '\0' && isspace(*Text)) Text++;
+    if (*Text == '\0') return -1;
+
+    /* Use signed parsing to avoid implicit modular conversion */
+    errno = 0;
+    Val = strtoll(Text, &End, 0);
+    if (errno != 0) return -1;
+
+    /* Trailing text returns error */
+    while (*End != '\0' && isspace(*End)) End++;
+    if (*End != '\0') return -1;
+
+    /* Handle unsigned range errors */
+    if (Val < 0) return -1;
+    if (Val > (long long)UINT_MAX) return -1;
+
+    *Value = Val;
+
+    return 0;
+}
+
+int CrioGetBIArrayItemNumber(CrioSession Session, const char *Text, unsigned *Number) {
+    assert(NAME_BIMAP.size() == CRIO_BI_ARRAY_COUNT);
+
+    unsigned Val;
+
+    if (ParseNumberStrict(Text, &Val) == 0) {
+        if (Val >= CRIO_BI_ARRAY_COUNT) return -1;
+
+        *Number = Val;
+
+        return 0;
+    }
+
+    try {
+        *Number = NAME_BIMAP.right.at(Text);
+
         return 0;
     }
     catch (out_of_range) {
