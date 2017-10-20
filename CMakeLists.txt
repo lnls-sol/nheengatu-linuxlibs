@@ -28,6 +28,7 @@ add_definitions(-DBUILD_CRIO_LINUX_LIBDIR=\"${CRIO_LINUX_LIBDIR}/\")
 ########################################
 # External modules
 ########################################
+find_package(Boost 1.35.0 REQUIRED)
 check_module_no_pkg(NIFPGAHELPER NiFpga.h NiFpgaHelper)
 find_path(NIFPGA_CRIOLINUX_INCLUDE_DIR NiFpga_CrioLinux.h HINTS ENV CPATH ENV C_INCLUDE_PATH
     ${CRIO_LINUX_LIBDIR})
@@ -54,6 +55,7 @@ endif()
 include_directories(include)
 include_directories(${NIFPGAHELPER_INCLUDE_DIRS})
 include_directories(${NIFPGA_CRIOLINUX_INCLUDE_DIR})
+include_directories(${Boost_INCLUDE_DIRS})
 
 ########################################
 # Main target: CrioLinux
