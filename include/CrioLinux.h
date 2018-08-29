@@ -43,7 +43,7 @@ extern "C" {
 #define CRIO_BI_ARRAY_MOD5_DIO5		CRIO_BI_ARRAY_BIT(27)
 #define CRIO_BI_ARRAY_MOD5_DIO6		CRIO_BI_ARRAY_BIT(28)
 #define CRIO_BI_ARRAY_MOD5_DIO7		CRIO_BI_ARRAY_BIT(29)
-#define CRIO_BI_ARRAY_COUNT 30
+#define CRIO_BI_ARRAY_COUNT 32
 
 /* Type definitions */
 typedef	unsigned int CrioSession;
