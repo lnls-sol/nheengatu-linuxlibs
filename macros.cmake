@@ -59,6 +59,14 @@ function(add_simple_test NAME SOURCE)
     add_test(${NAME} ${NAME})
 endfunction()
 
+
+function(add_eval NAME)
+    list(REMOVE_AT ARGV 0)
+    add_executable(${NAME} ${ARGV})
+    target_link_libraries(${NAME} CrioLinux)
+    add_test(${NAME} ${NAME})
+endfunction()
+
 function(join OUTPUT SEPARATOR)
     if(ARGC LESS 3)
         set("${OUTPUT}" "")

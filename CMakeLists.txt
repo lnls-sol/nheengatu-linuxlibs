@@ -32,6 +32,7 @@ find_package(Boost 1.35.0 REQUIRED)
 check_module_no_pkg(NIFPGAHELPER NiFpga.h NiFpgaHelper)
 find_path(NIFPGA_CRIOLINUX_INCLUDE_DIR NiFpga_CrioLinux.h HINTS ENV CPATH ENV C_INCLUDE_PATH
     ${CRIO_LINUX_LIBDIR})
+find_package (Threads)
 
 ########################################
 # Compiler flags
@@ -62,7 +63,7 @@ include_directories(${Boost_INCLUDE_DIRS})
 ########################################
 file(GLOB LIB_SOURCE "src/*.cc")
 add_library(CrioLinux SHARED ${LIB_SOURCE})
-target_link_libraries(CrioLinux ${NIFPGAHELPER_LIBRARIES})
+target_link_libraries(CrioLinux ${NIFPGAHELPER_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} -lrt)
 set_target_properties(CrioLinux PROPERTIES VERSION 0.1.0 SOVERSION 0)
 set_target_properties(CrioLinux PROPERTIES CXX_VISIBILITY_PRESET hidden)
 
@@ -72,10 +73,18 @@ set_target_properties(CrioLinux PROPERTIES CXX_VISIBILITY_PRESET hidden)
 install(TARGETS CrioLinux DESTINATION ${CMAKE_INSTALL_LIBDIR})
 install(FILES include/CrioLinux.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
+
+########################################
+# Evals
+########################################
+add_eval(readTime eval/readSpeed.cc)
+add_eval(sharedMutex eval/mutex.cc eval/shared_mutex.cc)
+
 ########################################
 # Tests
 ########################################
 add_simple_test(TestBasicBI tests/BasicBI.cc)
+add_simple_test(TestBasicBI2 tests/BasicBI2.cc)
 add_simple_test(TestBasicSetup tests/BasicSetup.cc)
 
 ########################################

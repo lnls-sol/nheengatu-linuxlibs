@@ -56,6 +56,9 @@ int CrioReadBIArray(CrioSession Session, uint64_t *Output);
 int CrioGetBIArrayItemName(CrioSession Session, unsigned Item, const char **Name);
 int CrioGetBIArrayItemNumber(CrioSession Session, const char *Text, unsigned *Number);
 int CrioSetup(CrioSession *Session);
+int CrioGetBIArrayItemByName(CrioSession Session, const char *Name, bool *Item); 
+int CrioGetBIArrayItemByIndex(CrioSession Session, bool *Item, uint32_t Index);
+bool getBI(CrioSession Session, uint32_t Index);
 
 #ifdef __cplusplus
 }

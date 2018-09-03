@@ -3,20 +3,38 @@
 #include <ctype.h>
 #include <errno.h>
 #include <stdexcept>
-
+#include <time.h>
 #include <boost/bimap.hpp>
 
 #include "CrioLinux.h"
+
+#define CACHE_TIMEOUT_US 500
+#define DEBUG 1
 
 using boost::bimap;
 
 typedef bimap<unsigned, string> NameBimap;
 
 int CrioReadBIArray(CrioSession Session, uint64_t *Output) {
-    auto Res = NiFpga_ReadU64(NiFpga_Session(Session),
+    static clock_t start = clock();
+    static bool readOnce = false;
+    clock_t delta = clock() - start;
+    static uint64_t cached = 0;
+    if (delta*(1000000.0/CLOCKS_PER_SEC) < CACHE_TIMEOUT_US && readOnce == true)
+    {
+        *Output = cached;
+//printf("Using cached  ");         
+    } 
+    else 
+    {
+        auto Res = NiFpga_ReadU64(NiFpga_Session(Session),
             NiFpga_CrioLinux_IndicatorU64_BIArray, Output);
-    if (NiFpga_IsError(Res)) return -1;
-
+        if (NiFpga_IsError(Res)) return -1;
+        cached = *Output;
+        start = clock();
+        readOnce = true;
+        //printf("Fetching data ");         
+    } 
     return 0;
 }
 
@@ -64,6 +82,38 @@ int CrioGetBIArrayItemName(CrioSession Session, unsigned Item, const char **Name
 
     try {
         *Name = NAME_BIMAP.left.at(Item).c_str();
+        return 0;
+    }
+    catch (out_of_range) {
+        return -1;
+    }
+}
+
+bool getBI(CrioSession Session, uint32_t Index){
+    uint64_t Output;
+    CrioReadBIArray(Session, &Output); 
+    return (bool) (Output & (0x1UL << Index));
+}
+
+int CrioGetBIArrayItemByIndex(CrioSession Session, bool *Item, uint32_t Index) {
+    assert(NAME_BIMAP.size() == CRIO_BI_ARRAY_COUNT);
+    try {
+        NAME_BIMAP.left.at(Index).c_str();
+        *Item = getBI(Session, Index);
+        return 0;
+    }
+    catch (out_of_range) {
+        return -1;
+    }
+}
+
+int CrioGetBIArrayItemByName(CrioSession Session, const char *Name, bool *Item) {
+    assert(NAME_BIMAP.size() == CRIO_BI_ARRAY_COUNT);
+    uint64_t Index;
+
+    try {
+        Index = NAME_BIMAP.right.at(Name);
+        *Item = getBI(Session, Index);
         return 0;
     }
     catch (out_of_range) {
