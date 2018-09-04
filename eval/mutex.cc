@@ -12,8 +12,8 @@ int main() {
     CrioSession Session;
     clock_t start, stop, diff;
     uint64_t Output;
+    int ret;
     uint64_t reads=10000;
-    int ret = 0;
     auto Res = CrioSetup(&Session);
     assert(Res == 0);
     pthread_mutex_t mutex_dummy;
@@ -30,14 +30,19 @@ int main() {
     }
 
     //Read X time and calculate time
-    pthread_mutex_unlock(mutex.ptr);
     start = clock();
     for (uint64_t i = 0; i < reads; i++)
     {
         ret = pthread_mutex_lock(mutex.ptr);
+        if (ret == EOWNERDEAD)
+        {
+            pthread_mutex_consistent(mutex.ptr);
+            printf("Mutex status inconsistent. Correcting\n" );
+        }
         if (ret == ENOTRECOVERABLE)
         {
-            printf("Mutex status not recoverable detected\n" );
+            printf("Mutex status not recoverable detected. Deleting shared memory.\n" );
+            shared_mutex_destroy(mutex);
             return -1;
         }
         Res = CrioReadBIArray(Session, &Output);
@@ -52,7 +57,12 @@ int main() {
     start = clock();
     for (uint64_t i = 0; i < reads; i++)
     {
-        pthread_mutex_lock(mutex.ptr);
+        ret = pthread_mutex_lock(mutex.ptr);
+        if (ret == EOWNERDEAD)
+        {
+            pthread_mutex_consistent(mutex.ptr);
+            printf("Mutex status inconsistent. Correcting\n" );
+        }
         Res = Output;
         pthread_mutex_unlock(mutex.ptr);
     }
@@ -83,7 +93,12 @@ int main() {
     printf ("It took %ld clicks (%f seconds) for %lu subtractions (%f subtractions/ms).\n",diff,((float)diff)/CLOCKS_PER_SEC, reads, reads/(((float)diff * 1000)/CLOCKS_PER_SEC));
 
     
-    pthread_mutex_lock(mutex.ptr);
+    ret = pthread_mutex_lock(mutex.ptr);
+    if (ret == EOWNERDEAD)
+    {
+        pthread_mutex_consistent(mutex.ptr);
+        printf("Mutex status inconsistent. Correcting\n" );
+    }
     printf("Press any key to unlock the mutex");
     getchar();
     pthread_mutex_unlock(mutex.ptr);
