@@ -1,10 +1,12 @@
 #include "Common.h"
 #include "CrioLinux.h"
 
+struct crio_ctx ctx;
+
 static const string BITFILE_PATH = BUILD_CRIO_LINUX_LIBDIR;
 
 // FIXME: Make configurable
-static const string CRIO_URI = "rio://10.2.104.32/RIO0";
+static const string CRIO_URI = "rio://127.0.0.1/RIO0";
 
 int CrioSetup(CrioSession *Session) {
     auto Res = NiFpga_Initialize();
@@ -19,6 +21,17 @@ int CrioSetup(CrioSession *Session) {
     }
 
     *Session = (CrioSession)NiSession;
+
+    /* Initialize context */
+    ctx.session = *Session;
+    ctx.session_open = true;
+    Res = pthread_mutex_init(&ctx.bi_mutex,NULL);
+    if (Res != 0)
+    {
+        perror("pthread_mutex_init");
+        return -1;
+    }
+
     return 0;
 }
 

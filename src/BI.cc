@@ -12,29 +12,30 @@
 #define DEBUG 1
 
 using boost::bimap;
-
+extern struct crio_ctx ctx;
+static bool getBI(CrioSession Session, uint32_t Index);
 typedef bimap<unsigned, string> NameBimap;
 
 int CrioReadBIArray(CrioSession Session, uint64_t *Output) {
-    static clock_t start = clock();
-    static bool readOnce = false;
-    clock_t delta = clock() - start;
-    static uint64_t cached = 0;
-    if (delta*(1000000.0/CLOCKS_PER_SEC) < CACHE_TIMEOUT_US && readOnce == true)
+
+    pthread_mutex_lock(&ctx.bi_mutex);
+    clock_t delta = clock() - ctx.bi_sample_time;
+    if (delta*(1000000.0/CLOCKS_PER_SEC) < CACHE_TIMEOUT_US && ctx.bi_cache_valid == true)
     {
-        *Output = cached;
-//printf("Using cached  ");         
+        *Output = ctx.bi_cache;
+        printf("Using cached  ");         
     } 
     else 
     {
         auto Res = NiFpga_ReadU64(NiFpga_Session(Session),
             NiFpga_CrioLinux_IndicatorU64_BIArray, Output);
         if (NiFpga_IsError(Res)) return -1;
-        cached = *Output;
-        start = clock();
-        readOnce = true;
-        //printf("Fetching data ");         
-    } 
+        ctx.bi_cache = *Output;
+        ctx.bi_cache_valid = true;
+        ctx.bi_sample_time = clock();
+        printf("Fetching data ");         
+    }
+    pthread_mutex_unlock(&ctx.bi_mutex); 
     return 0;
 }
 
@@ -89,7 +90,7 @@ int CrioGetBIArrayItemName(CrioSession Session, unsigned Item, const char **Name
     }
 }
 
-bool getBI(CrioSession Session, uint32_t Index){
+static bool getBI(CrioSession Session, uint32_t Index){
     uint64_t Output;
     CrioReadBIArray(Session, &Output); 
     return (bool) (Output & (0x1UL << Index));
