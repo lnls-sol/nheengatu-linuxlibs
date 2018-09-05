@@ -3,13 +3,13 @@
 #include <CrioLinux.h>
 
 int main(void) {
-    CrioSession Session;
-    auto Res = CrioSetup(&Session);
+    struct crio_context ctx;
+    auto Res = CrioSetup(&ctx);
     assert(Res == 0);
 
     cout << "Session opened.\n";
 
-    CrioCleanup(Session);
+    CrioCleanup(&ctx);
 
     cout << "Session closed.\n";
 

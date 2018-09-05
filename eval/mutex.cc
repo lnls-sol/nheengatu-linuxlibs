@@ -9,12 +9,12 @@ int main() {
     // Init shared mutex by a name, which can be used by
     // any other process to access the mutex.
     // This function both creates new and opens an existing mutex.
-    CrioSession Session;
+    struct crio_context ctx;
     clock_t start, stop, diff;
     uint64_t Output;
     int ret;
     uint64_t reads=10000;
-    auto Res = CrioSetup(&Session);
+    auto Res = CrioSetup(&ctx);
     assert(Res == 0);
     pthread_mutex_t mutex_dummy;
 
@@ -45,12 +45,12 @@ int main() {
             shared_mutex_destroy(mutex);
             return -1;
         }
-        Res = CrioReadBIArray(Session, &Output);
+        Res = CrioReadBIArray(&ctx, &Output);
         ret = pthread_mutex_unlock(mutex.ptr);
     }
     stop = clock();
     diff = stop - start;
-    printf ("It took %ld clicks (%f seconds) for %lu reads (%f read/ms).\n",diff,((float)diff)/CLOCKS_PER_SEC, reads, reads/(((float)diff * 1000)/CLOCKS_PER_SEC));
+    printf ("It took %ld ticks (%f seconds) for %lu FPGA with shared mutex (%f read+shared mutex/ms).\n",diff,((float)diff)/CLOCKS_PER_SEC, reads, reads/(((float)diff * 1000)/CLOCKS_PER_SEC));
 
 
 
@@ -68,7 +68,7 @@ int main() {
     }
     stop = clock();
     diff = stop - start;
-    printf ("It took %ld clicks (%f seconds) for %lu assignments (%f shared mutex locks/ms).\n",diff,((float)diff)/CLOCKS_PER_SEC, reads, reads/(((float)diff * 1000)/CLOCKS_PER_SEC));
+    printf ("It took %ld ticks (%f seconds) for %lu assignments (cache) (%f shared mutex locks/ms).\n",diff,((float)diff)/CLOCKS_PER_SEC, reads, reads/(((float)diff * 1000)/CLOCKS_PER_SEC));
 
 
     start = clock();
@@ -80,7 +80,7 @@ int main() {
     }
     stop = clock();
     diff = stop - start;
-    printf ("It took %ld clicks (%f seconds) for %lu assignments (%f dummy mutex locks/ms).\n",diff,((float)diff)/CLOCKS_PER_SEC, reads, reads/(((float)diff * 1000)/CLOCKS_PER_SEC));
+    printf ("It took %ld ticks (%f seconds) for %lu assignments (%f dummy mutex locks/ms).\n",diff,((float)diff)/CLOCKS_PER_SEC, reads, reads/(((float)diff * 1000)/CLOCKS_PER_SEC));
 
   
     start = clock();
@@ -90,7 +90,7 @@ int main() {
     }
     stop = clock();
     diff = stop - start;
-    printf ("It took %ld clicks (%f seconds) for %lu subtractions (%f subtractions/ms).\n",diff,((float)diff)/CLOCKS_PER_SEC, reads, reads/(((float)diff * 1000)/CLOCKS_PER_SEC));
+    printf ("It took %ld ticks (%f seconds) for %lu subtractions (time passed evaluation) (%f subtractions/ms).\n",diff,((float)diff)/CLOCKS_PER_SEC, reads, reads/(((float)diff * 1000)/CLOCKS_PER_SEC));
 
     
     ret = pthread_mutex_lock(mutex.ptr);

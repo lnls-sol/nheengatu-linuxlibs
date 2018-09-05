@@ -17,27 +17,28 @@ extern "C" {
 typedef	unsigned int CrioSession;
 
 /* Structures */
-struct crio_ctx {
+struct crio_context {
     CrioSession      session;
     bool             session_open;
     clock_t          bi_sample_time;
     uint64_t         bi_cache;
     bool             bi_cache_valid;
     pthread_mutex_t  bi_mutex;
+    void           * bi_map;
 };
 
 
+/* Available Functions */
+int  CrioSetup(struct crio_context*);
+void CrioCleanup(struct crio_context*);
+int CrioReadBIArray(struct crio_context*, uint64_t *output);
+int  CrioGetBIArrayItemByName(struct crio_context*, const char *name, bool *item);
+int  CrioGetBIArrayItemByIndex(struct crio_context*, bool *item, uint32_t index);
+
+
 /* Functions - to be depricated */
-int CrioReadBIArray(CrioSession Session, uint64_t *Output);
 int CrioGetBIArrayItemName(CrioSession Session, unsigned Item, const char **Name);
 int CrioGetBIArrayItemNumber(CrioSession Session, const char *Text, unsigned *Number);
-
-/* Functions */
-int  CrioSetup(CrioSession *Session);
-void CrioCleanup(CrioSession Session);
-int  CrioGetBIArrayItemByName(CrioSession Session, const char *Name, bool *Item); 
-int  CrioGetBIArrayItemByIndex(CrioSession Session, bool *Item, uint32_t Index);
-
 #ifdef __cplusplus
 }
 #endif

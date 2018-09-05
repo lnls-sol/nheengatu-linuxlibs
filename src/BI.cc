@@ -8,34 +8,39 @@
 
 #include "CrioLinux.h"
 
-#define CACHE_TIMEOUT_US 500
+#define CACHE_TIMEOUT_US 1000
 #define DEBUG 1
 
+/* boost namespace */
 using boost::bimap;
-extern struct crio_ctx ctx;
-static bool getBI(CrioSession Session, uint32_t Index);
+
+/* typedefs */
 typedef bimap<unsigned, string> NameBimap;
 
-int CrioReadBIArray(CrioSession Session, uint64_t *Output) {
+/* prototypes */
+static bool getBI(struct crio_context *ctx, uint32_t Index);
 
-    pthread_mutex_lock(&ctx.bi_mutex);
-    clock_t delta = clock() - ctx.bi_sample_time;
-    if (delta*(1000000.0/CLOCKS_PER_SEC) < CACHE_TIMEOUT_US && ctx.bi_cache_valid == true)
+
+int CrioReadBIArray(struct crio_context *ctx, uint64_t *Output) {
+
+    pthread_mutex_lock(&ctx->bi_mutex);
+    clock_t delta = clock() - ctx->bi_sample_time;
+    if (delta*(1000000.0/CLOCKS_PER_SEC) < CACHE_TIMEOUT_US && ctx->bi_cache_valid == true)
     {
-        *Output = ctx.bi_cache;
-        printf("Using cached  ");         
+        *Output = ctx->bi_cache;
+        //printf("Using cached  ");
     } 
     else 
     {
-        auto Res = NiFpga_ReadU64(NiFpga_Session(Session),
+        auto Res = NiFpga_ReadU64(NiFpga_Session(ctx->session),
             NiFpga_CrioLinux_IndicatorU64_BIArray, Output);
         if (NiFpga_IsError(Res)) return -1;
-        ctx.bi_cache = *Output;
-        ctx.bi_cache_valid = true;
-        ctx.bi_sample_time = clock();
-        printf("Fetching data ");         
+        ctx->bi_cache = *Output;
+        ctx->bi_cache_valid = true;
+        ctx->bi_sample_time = clock();
+        //printf("Fetching data ");
     }
-    pthread_mutex_unlock(&ctx.bi_mutex); 
+    pthread_mutex_unlock(&ctx->bi_mutex);
     return 0;
 }
 
@@ -78,6 +83,40 @@ static const NameBimap NAME_BIMAP = MakeNameBimap({
     {31, "USER Push Button"},
 });
 
+static bool getBI(struct crio_context *ctx, uint32_t Index){
+    uint64_t output;
+    CrioReadBIArray(ctx, &output);
+    return (bool) (output & (0x1UL << Index));
+}
+
+int CrioGetBIArrayItemByIndex(struct crio_context *ctx, bool *Item, uint32_t Index) {
+    assert(NAME_BIMAP.size() == CRIO_BI_ARRAY_COUNT);
+    try {
+        NAME_BIMAP.left.at(Index).c_str();
+        *Item = getBI(ctx, Index);
+        return 0;
+    }
+    catch (out_of_range) {
+        return -1;
+    }
+}
+
+int CrioGetBIArrayItemByName(struct crio_context *ctx, const char *Name, bool *Item) {
+    assert(NAME_BIMAP.size() == CRIO_BI_ARRAY_COUNT);
+    uint64_t Index;
+
+    try {
+        Index = NAME_BIMAP.right.at(Name);
+        *Item = getBI(ctx, Index);
+        return 0;
+    }
+    catch (out_of_range) {
+        return -1;
+    }
+}
+
+
+// -------------Functions from here downwards will be depricated------------- //
 int CrioGetBIArrayItemName(CrioSession Session, unsigned Item, const char **Name) {
     assert(NAME_BIMAP.size() == CRIO_BI_ARRAY_COUNT);
 
@@ -90,37 +129,6 @@ int CrioGetBIArrayItemName(CrioSession Session, unsigned Item, const char **Name
     }
 }
 
-static bool getBI(CrioSession Session, uint32_t Index){
-    uint64_t Output;
-    CrioReadBIArray(Session, &Output); 
-    return (bool) (Output & (0x1UL << Index));
-}
-
-int CrioGetBIArrayItemByIndex(CrioSession Session, bool *Item, uint32_t Index) {
-    assert(NAME_BIMAP.size() == CRIO_BI_ARRAY_COUNT);
-    try {
-        NAME_BIMAP.left.at(Index).c_str();
-        *Item = getBI(Session, Index);
-        return 0;
-    }
-    catch (out_of_range) {
-        return -1;
-    }
-}
-
-int CrioGetBIArrayItemByName(CrioSession Session, const char *Name, bool *Item) {
-    assert(NAME_BIMAP.size() == CRIO_BI_ARRAY_COUNT);
-    uint64_t Index;
-
-    try {
-        Index = NAME_BIMAP.right.at(Name);
-        *Item = getBI(Session, Index);
-        return 0;
-    }
-    catch (out_of_range) {
-        return -1;
-    }
-}
 
 static int ParseNumberStrict(const char *Text, unsigned *Value) {
     char *End;
