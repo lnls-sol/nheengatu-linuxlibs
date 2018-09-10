@@ -5,18 +5,41 @@
 cfg_parser::cfg_parser()
 {
     boost::property_tree::ini_parser::read_ini("cfg/cfg.ini", tree);
-    //std::cout << tree.get <std::string>("Bitstream.Destination Crio IP") << std::endl;
-    //std::cout << tree.get <std::string>("Bitstream.Path") << std::endl;
-    //std::cout << tree.get <std::string>("BI.0") << std::endl;
 }
 
 cfg_parser::~cfg_parser()
 {
 }
 
-int cfg_parser::get_bimap(bm_type *map)
+int cfg_parser::get_settings(std::string &ip, std::string &path, std::string &fileName, std::string &signature)
 {
-    for (const std::pair<std::string, boost::property_tree::ptree> &p : tree.get_child("BI"))
-        map->insert( bm_type::value_type( atol(p.first.c_str()) , p.second.get_value<std::string>() ));
+    try
+    {
+        ip = tree.get <std::string>("Settings.Destination Crio IP");
+        path = tree.get <std::string>("Settings.Path");
+        fileName = tree.get <std::string>("Settings.Bitfile Name");
+        signature = tree.get <std::string>("Settings.Signature");
+    }
+    catch(const boost::property_tree::ptree_error &e)
+    {
+        cout << e.what() << endl;
+        return -1;
+    }
+    return 0;
+}
+
+int cfg_parser::get_bimaps(bm_type *bi_map, bm_address_type * bi_address_map)
+{
+    for (const std::pair<std::string, boost::property_tree::ptree> &bi_address_tree : tree.get_child("BIAddresses"))
+    {
+        bi_address_map->insert( bm_address_type::value_type( (bi_address_tree.first.c_str()) , bi_address_tree.second.get_value<unsigned>() ));
+        for (const std::pair<std::string, boost::property_tree::ptree> &bi : tree.get_child(bi_address_tree.first))
+            bi_map->insert( bm_type::value_type( atol(bi.first.c_str()) , bi.second.get_value<std::string>() ));
+    }
+
+    /* Print bimap
+    for( bm_type::const_iterator iter = myBimap->begin(), iend = myBimap->end(); iter != iend; ++iter )
+        std::cout << iter->left << " <--> " << iter->right << std::endl; */
+
     return 0;
 }

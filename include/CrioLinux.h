@@ -11,7 +11,6 @@
 extern "C" {
 #endif
 
-#define CRIO_BI_ARRAY_COUNT 32
 
 /* Type definitions */
 typedef	unsigned int CrioSession;
@@ -25,20 +24,19 @@ struct crio_context {
     bool             bi_cache_valid;
     pthread_mutex_t  bi_mutex;
     void           * bi_map;
+    void           * bi_addresses;
 };
 
 
 /* Available Functions */
 int  CrioSetup(struct crio_context*);
 void CrioCleanup(struct crio_context*);
-int CrioReadBIArray(struct crio_context*, uint64_t *output);
-int  CrioGetBIArrayItemByName(struct crio_context*, const char *name, bool *item);
+int CrioReadBIArray(struct crio_context*, uint64_t *output, uint64_t address);
+int CrioGetBIArrayItemByName(struct crio_context *ctx, bool *Item, const char *Name);
 int  CrioGetBIArrayItemByIndex(struct crio_context*, bool *item, uint32_t index);
-
-
-/* Functions - to be depricated */
-int CrioGetBIArrayItemName(CrioSession Session, unsigned Item, const char **Name);
-int CrioGetBIArrayItemNumber(CrioSession Session, const char *Text, unsigned *Number);
+int CrioGetBIArraySize(struct crio_context *ctx, uint32_t *size);
+int CrioGetBIArrayItemName(struct crio_context *ctx, unsigned Item, const char **Name);
+int CrioGetBIArrayItemNumber(struct crio_context *ctx, const char *Text, unsigned *Number);
 #ifdef __cplusplus
 }
 #endif

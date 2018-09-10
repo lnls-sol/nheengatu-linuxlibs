@@ -2,26 +2,28 @@
 #include "Common.h"
 #include <CrioLinux.h>
 
+
+
 int main(void) {
     struct crio_context ctx;
+    unsigned Size;
     auto Res = CrioSetup(&ctx);
+    const char *Name;
+    bool Item;
     assert(Res == 0);
+    cout << "Binary input values:" << "\n";
+    CrioGetBIArraySize(&ctx, &Size);
 
-    uint64_t Output;
-    Res = CrioReadBIArray(&ctx, &Output);
-    assert(Res == 0);
-
-    cout << "Binary input values:\n";
-    for (unsigned I = 0; I < CRIO_BI_ARRAY_COUNT; I++) {
-	    const char *Name;
-        bool Item;
-        Res = CrioGetBIArrayItemName(ctx.session, I, &Name);
+    for (unsigned I = 0; I < Size; I++) {
+        Res = CrioGetBIArrayItemName(&ctx, I, &Name);
+        assert(Res == 0);
         Res = CrioGetBIArrayItemByIndex(&ctx, &Item, I);
-	    assert(Res == 0);
+        assert(Res == 0);
 
-	    cout << Name << ": " << Item  << '\n';
+        cout << Name << ": " << Item  << '\n';
     }
     cout << '\n';
+
 
     CrioCleanup(&ctx);
     cout << "FINISHED.\n";

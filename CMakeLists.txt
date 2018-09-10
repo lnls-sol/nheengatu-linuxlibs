@@ -30,8 +30,7 @@ add_definitions(-DBUILD_CRIO_LINUX_LIBDIR=\"${CRIO_LINUX_LIBDIR}/\")
 ########################################
 find_package(Boost 1.35.0 REQUIRED)
 check_module_no_pkg(NIFPGAHELPER NiFpga.h NiFpgaHelper)
-find_path(NIFPGA_CRIOLINUX_INCLUDE_DIR NiFpga_CrioLinux.h HINTS ENV CPATH ENV C_INCLUDE_PATH
-    ${CRIO_LINUX_LIBDIR})
+#find_path(NIFPGA_CRIOLINUX_INCLUDE_DIR NiFpga_CrioLinux.h HINTS ENV CPATH ENV C_INCLUDE_PATH ${CRIO_LINUX_LIBDIR})
 find_package (Threads)
 
 ########################################
@@ -83,7 +82,7 @@ add_eval(sharedMutex eval/mutex.cc eval/shared_mutex.cc)
 ########################################
 # Tests
 ########################################
-add_simple_test(TestBasicBI tests/BasicBI.cc)
+#add_simple_test(TestBasicBI tests/BasicBI.cc)
 add_simple_test(TestBasicBI2 tests/BasicBI2.cc)
 add_simple_test(TestBasicSetup tests/BasicSetup.cc)
 

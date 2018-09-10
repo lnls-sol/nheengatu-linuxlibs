@@ -4,18 +4,38 @@
 
 static const string BITFILE_PATH = BUILD_CRIO_LINUX_LIBDIR;
 
-// FIXME: Make configurable
-static const string CRIO_URI = "rio://127.0.0.1/RIO0";
-
 
 
 int CrioSetup(struct crio_context *ctx) {
+    string ip = "";
+    string path = "";
+    string url = "";
+    string bitfile = "";
+    string fileName = "";
+    string signature = "";
+
+    /* Read cfg file */
+    cfg_parser parser;
+    bm_type * myBimap = new bm_type;
+    ctx->bi_map = (void *) myBimap;
+
+    bm_address_type * bi_addresses = new bm_address_type;
+    ctx->bi_addresses = (void *) bi_addresses;
+
+    /* Fill in map */
+    parser.get_bimaps((bm_type*) ctx->bi_map, (bm_address_type *)ctx->bi_addresses);
+
+    /* Get settings from configuration file */
+    parser.get_settings(ip, path, fileName, signature);
+
+    url = "rio://" + ip + "/RIO0";
+    bitfile = path + "/" + fileName;
+
     auto Res = NiFpga_Initialize();
     if (NiFpga_IsError(Res)) return -1;
 
-    auto Path = BITFILE_PATH + NiFpga_CrioLinux_Bitfile;
     NiFpga_Session NiSession;
-    Res = NiFpga_Open(Path.c_str(), NiFpga_CrioLinux_Signature, CRIO_URI.c_str(), 0, &NiSession);
+    Res = NiFpga_Open(bitfile.c_str(), signature.c_str(), url.c_str(), 0, &NiSession);
     if (NiFpga_IsError(Res)) {
         NiFpga_Finalize();
         return -2;
@@ -30,18 +50,6 @@ int CrioSetup(struct crio_context *ctx) {
         perror("pthread_mutex_init");
         return -1;
     }
-
-    /* Read cfg file */
-    cfg_parser parser;
-    bm_type * myBimap = new bm_type;
-    ctx->bi_map = (void *) myBimap;
-
-    /* Fill in map */
-    parser.get_bimap((bm_type *)ctx->bi_map);
-
-    /* Print bimap
-    for( bm_type::const_iterator iter = myBimap->begin(), iend = myBimap->end(); iter != iend; ++iter )
-        std::cout << iter->left << " <--> " << iter->right << std::endl;*/
 
     return 0;
 }

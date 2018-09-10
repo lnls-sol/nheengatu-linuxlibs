@@ -13,7 +13,7 @@ int main(void) {
 
     start = clock();
     for (uint64_t i = 0; i < reads; i++)
-        Res = CrioReadBIArray(&ctx, &Output);
+        Res = CrioReadBIArray(&ctx, &Output, 0x18000);
     stop = clock();
     diff = stop - start;
     printf ("It took %ld ticks (%f seconds) for %lu reads (%f read/ms).\n",diff,((float)diff)/CLOCKS_PER_SEC, reads, reads/(((float)diff * 1000)/CLOCKS_PER_SEC));

@@ -6,9 +6,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string>
-
+ #include<unistd.h>
 #include <NiFpga.h>
-#include <NiFpga_CrioLinux.h>
 
 using namespace std;
 

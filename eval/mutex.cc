@@ -45,7 +45,7 @@ int main() {
             shared_mutex_destroy(mutex);
             return -1;
         }
-        Res = CrioReadBIArray(&ctx, &Output);
+        Res = CrioReadBIArray(&ctx, &Output, 0x18000);
         ret = pthread_mutex_unlock(mutex.ptr);
     }
     stop = clock();

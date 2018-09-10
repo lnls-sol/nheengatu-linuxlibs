@@ -15,13 +15,14 @@
 using boost::bimap;
 
 /* typedefs */
-typedef bimap<unsigned, string> NameBimap;
+typedef bimap< unsigned, std::string > bm_type;
+typedef bimap< std::string, unsigned > bm_address_type;
 
 /* prototypes */
-static bool getBI(struct crio_context *ctx, uint32_t Index);
+static bool getBI(struct crio_context *ctx, uint32_t Index, uint64_t address);
 
 
-int CrioReadBIArray(struct crio_context *ctx, uint64_t *Output) {
+int CrioReadBIArray(struct crio_context *ctx, uint64_t *Output, uint64_t address) {
 
     pthread_mutex_lock(&ctx->bi_mutex);
     clock_t delta = clock() - ctx->bi_sample_time;
@@ -32,8 +33,7 @@ int CrioReadBIArray(struct crio_context *ctx, uint64_t *Output) {
     } 
     else 
     {
-        auto Res = NiFpga_ReadU64(NiFpga_Session(ctx->session),
-            NiFpga_CrioLinux_IndicatorU64_BIArray, Output);
+        auto Res = NiFpga_ReadU64(NiFpga_Session(ctx->session), address, Output);
         if (NiFpga_IsError(Res)) return -1;
         ctx->bi_cache = *Output;
         ctx->bi_cache_valid = true;
@@ -44,56 +44,18 @@ int CrioReadBIArray(struct crio_context *ctx, uint64_t *Output) {
     return 0;
 }
 
-static NameBimap MakeNameBimap(initializer_list<NameBimap::value_type> List) {
-    return NameBimap(begin(List), end(List));
-}
 
-static const NameBimap NAME_BIMAP = MakeNameBimap({
-    {0, "Mod3/DIO0"},
-    {1, "Mod3/DIO1"},
-    {2, "Mod3/DIO2"},
-    {3, "Mod3/DIO3"},
-    {4, "Mod3/DIO4"},
-    {5, "Mod3/DIO5"},
-    {6, "Mod3/DIO6"},
-    {7, "Mod3/DIO7"},
-    {8, "Mod3/DIO8"},
-    {9, "Mod3/DIO9"},
-    {10, "Mod3/DI10"},
-    {11, "Mod3/DI11"},
-    {12, "Mod3/DI12"},
-    {13, "Mod3/DI13"},
-    {14, "Mod3/DI14"},
-    {15, "Mod3/DI15"},
-    {16, "Mod3/DI16"},
-    {17, "Mod3/DI17"},
-    {18, "Mod3/DI18"},
-    {19, "Mod3/DI19"},
-    {20, "Mod3/DI20"},
-    {21, "Mod3/DI21"},
-    {22, "Mod3/DI22"},
-    {23, "Mod3/DI23"},
-    {24, "Mod3/DI24"},
-    {25, "Mod3/DI25"},
-    {26, "Mod3/DI26"},
-    {27, "Mod3/DI27"},
-    {28, "Mod3/DI28"},
-    {29, "Mod3/DI29"},
-    {30, "Mod3/DI30"},
-    {31, "USER Push Button"},
-});
 
-static bool getBI(struct crio_context *ctx, uint32_t Index){
+static bool getBI(struct crio_context *ctx, uint32_t index, uint64_t address){
     uint64_t output;
-    CrioReadBIArray(ctx, &output);
-    return (bool) (output & (0x1UL << Index));
+    CrioReadBIArray(ctx, &output, address);
+    return (bool) (output & (0x1UL << index));
 }
 
 int CrioGetBIArrayItemByIndex(struct crio_context *ctx, bool *Item, uint32_t Index) {
-    assert(NAME_BIMAP.size() == CRIO_BI_ARRAY_COUNT);
     try {
-        NAME_BIMAP.left.at(Index).c_str();
-        *Item = getBI(ctx, Index);
+        ((bm_type *)ctx->bi_map)->left.at(Index).c_str();
+        *Item = getBI(ctx, Index, ((bm_address_type *)ctx->bi_addresses)->left.at("BI0") );
         return 0;
     }
     catch (out_of_range) {
@@ -101,13 +63,18 @@ int CrioGetBIArrayItemByIndex(struct crio_context *ctx, bool *Item, uint32_t Ind
     }
 }
 
-int CrioGetBIArrayItemByName(struct crio_context *ctx, const char *Name, bool *Item) {
-    assert(NAME_BIMAP.size() == CRIO_BI_ARRAY_COUNT);
+int CrioGetBIArraySize(struct crio_context *ctx, unsigned *size) {
+    bm_type * x = (bm_type *)ctx->bi_map;
+    *size = (*x).size();
+    return 0;
+}
+
+int CrioGetBIArrayItemByName(struct crio_context *ctx, bool *Item, const char *Name) {
     uint64_t Index;
 
     try {
-        Index = NAME_BIMAP.right.at(Name);
-        *Item = getBI(ctx, Index);
+        Index = ((bm_type *)ctx->bi_map)->right.at(Name);
+        *Item = getBI(ctx, Index, ((bm_address_type *)ctx->bi_addresses)->left.at("BI0"));
         return 0;
     }
     catch (out_of_range) {
@@ -116,12 +83,10 @@ int CrioGetBIArrayItemByName(struct crio_context *ctx, const char *Name, bool *I
 }
 
 
-// -------------Functions from here downwards will be depricated------------- //
-int CrioGetBIArrayItemName(CrioSession Session, unsigned Item, const char **Name) {
-    assert(NAME_BIMAP.size() == CRIO_BI_ARRAY_COUNT);
+int CrioGetBIArrayItemName(struct crio_context *ctx, unsigned Item, const char **Name) {
 
     try {
-        *Name = NAME_BIMAP.left.at(Item).c_str();
+        *Name = ((bm_type *)ctx->bi_map)->left.at(Item).c_str();
         return 0;
     }
     catch (out_of_range) {
@@ -156,13 +121,12 @@ static int ParseNumberStrict(const char *Text, unsigned *Value) {
     return 0;
 }
 
-int CrioGetBIArrayItemNumber(CrioSession Session, const char *Text, unsigned *Number) {
-    assert(NAME_BIMAP.size() == CRIO_BI_ARRAY_COUNT);
+int CrioGetBIArrayItemNumber(struct crio_context *ctx, const char *Text, unsigned *Number) {
 
     unsigned Val;
 
     if (ParseNumberStrict(Text, &Val) == 0) {
-        if (Val >= CRIO_BI_ARRAY_COUNT) return -1;
+        if (Val >= 32) return -1;
 
         *Number = Val;
 
@@ -170,7 +134,7 @@ int CrioGetBIArrayItemNumber(CrioSession Session, const char *Text, unsigned *Nu
     }
 
     try {
-        *Number = NAME_BIMAP.right.at(Text);
+        *Number = ((bm_type *)ctx->bi_map)->right.at(Text);
 
         return 0;
     }
