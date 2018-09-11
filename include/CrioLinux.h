@@ -25,6 +25,7 @@ struct crio_context {
     pthread_mutex_t  bi_mutex;
     void           * bi_map;
     void           * bi_addresses;
+    void           * bo_addresses;
 };
 
 
@@ -133,7 +134,8 @@ int crioGetBIArrayItemNumber(struct crio_context *ctx, const char *name, unsigne
 
 
 /* ------------------------------------- BO functions ------------------------------------- */
-
+int crioGetBOArraySize(struct crio_context *ctx, unsigned *size);
+int crioSetBOItem(struct crio_context *ctx, const char *name, bool value);
 
 #ifdef __cplusplus
 }

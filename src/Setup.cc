@@ -32,11 +32,15 @@ int crioSetup(struct crio_context *ctx) {
             return -2;
         }
 
-        /* Fill in binary input maps from the configuration file */
+        /* Fill in binary maps from the configuration file */
         ctx->bi_map = (void *) new bim_type;
         ctx->bi_addresses = (void *) new bm_address_type;
+        ctx->bo_addresses = (void *) new bm_address_type;
 
-        Res = parser.get_bimaps((bim_type*) ctx->bi_map, (bm_address_type *)ctx->bi_addresses);
+        Res = parser.get_bi_maps((bim_type*) ctx->bi_map, (bm_address_type *)ctx->bi_addresses);
+        if (Res != 0)  return -1;
+
+        Res = parser.get_bo_maps((bm_address_type *)ctx->bo_addresses);
         if (Res != 0)  return -1;
 
         /* Initialize context */
@@ -58,7 +62,7 @@ void crioCleanup(struct crio_context *ctx) {
         NiFpga_Close(ctx->session, NiFpga_CloseAttribute_NoResetIfLastSession);
         NiFpga_Finalize();
         ctx->session_open = false;
-        /* Fixme: Delete immediately after crioSetup causes segmentation fault */
+        /* Fixme: crioCleanup immediately after crioSetup causes segmentation fault. */
         delete((bm_address_type *)ctx->bi_addresses);
         delete((bim_type * )ctx->bi_map);
         pthread_mutex_destroy(&ctx->bi_mutex);
