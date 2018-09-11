@@ -30,17 +30,24 @@ int cfg_parser::get_settings(std::string &ip, std::string &path, std::string &fi
 
 int cfg_parser::get_bimaps(bim_type *bi_map, bm_address_type * bi_address_map)
 {
-    for (const std::pair<std::string, boost::property_tree::ptree> &bi_address_tree : tree.get_child("BIAddresses"))
+    try
     {
-        bi_address_map->insert( bm_address_type::value_type( (bi_address_tree.first.c_str()) ,
-                                                              strtoul(bi_address_tree.second.get_value<std::string>().c_str(), NULL, 16) ));
-        for (const std::pair<std::string, boost::property_tree::ptree> &bi : tree.get_child(bi_address_tree.first))
-            bi_map->insert( bim_type::value_type( atol(bi.first.c_str()) , bi.second.get_value<std::string>() ));
+        for (const std::pair<std::string, boost::property_tree::ptree> &bi_address_tree : tree.get_child("BIAddresses"))
+        {
+            bi_address_map->insert( bm_address_type::value_type( (bi_address_tree.first.c_str()) ,
+                                                                  strtoul(bi_address_tree.second.get_value<std::string>().c_str(), NULL, 16) ));
+            for (const std::pair<std::string, boost::property_tree::ptree> &bi : tree.get_child(bi_address_tree.first))
+                bi_map->insert( bim_type::value_type( atol(bi.first.c_str()) , bi.second.get_value<std::string>() ));
+        }
+
+        /* Print bimap
+        for( bim_type::const_iterator iter = myBimap->begin(), iend = myBimap->end(); iter != iend; ++iter )
+            std::cout << iter->left << " <--> " << iter->right << std::endl; */
     }
-
-    /* Print bimap
-    for( bim_type::const_iterator iter = myBimap->begin(), iend = myBimap->end(); iter != iend; ++iter )
-        std::cout << iter->left << " <--> " << iter->right << std::endl; */
-
+    catch(const boost::property_tree::ptree_error &e)
+    {
+        cout << e.what() << endl;
+        return -1;
+    }
     return 0;
 }
