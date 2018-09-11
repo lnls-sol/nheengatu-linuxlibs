@@ -1,0 +1,42 @@
+BIs:
+
+BIs are concatenated together to make a 64-bit variable. The result of doing this
+is that the lib would only need to perform a single read to read all binary inputs,
+and consequently would have to query for the right bit.
+
+A timer is used to perform reads every X microseconds. Using this timer, we do not
+overload the processor with a large amount of reads.
+
+A mutex is used to lock a region composed of a fetching time, fetched value (cache).
+This mutex is necessary so several threads do not perform unnecessary simultanous
+accesses to the FPGA. The mutex blocks all other threads.
+
+This implementation is not process safe. That means that each process will have its
+own session and its own mutex. The change that this will be happening is low, so no
+emphasis has been given about this point. The current implementations seems to be
+enough for our current needs. If a process safe implementation is deemed to be necessary,
+there will be a need to implement a shared memory. An example of the shared memory can
+be found in the eval folder. An interesting implementation was also found online when
+googling for boost::interprocess or boost, shared memory.
+
+
+BOs:
+
+For each BO, it was chosen a single address. The reason is that the area was estimated
+for a single BO and for 32 BOs, and the FPGA area consumption was MINOR.
+
+Obtained results:
+----------------Single BO-------------------
+Slice total         911 / 10250         8.9%
+Register Slices    2985 / 82000         3.6%
+LUT slices         2448 / 41000         6.0%
+RAM                 3   / 135           2.2%
+
+
+----------------32 BOs----------------------
+Slice total         964 / 10250         9.4%
+Register Slices    3217 / 82000         3.9%
+LUT slices         2611 / 41000         6.4%
+RAM                 3   / 135           2.2%
+
+As can be seen, the occupied slices by increasing the number of BOs is minor.
