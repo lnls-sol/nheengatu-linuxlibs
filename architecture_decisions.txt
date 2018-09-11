@@ -1,3 +1,11 @@
+Configuration file:
+
+The header file generated from labview NI eclipse will be used to generate the
+configuration file. This file will be used dynamically by the library. Then, the
+header file will be discarded. This form was chosen to not compile the library.
+We will have a single library for all CRIOs. However, each CRIO will have its own
+configuration file.
+
 BIs:
 
 BIs are concatenated together to make a 64-bit variable. The result of doing this
