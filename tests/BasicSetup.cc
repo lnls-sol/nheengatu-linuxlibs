@@ -4,12 +4,12 @@
 
 int main(void) {
     struct crio_context ctx;
-    auto Res = CrioSetup(&ctx);
+    auto Res = crioSetup(&ctx);
     assert(Res == 0);
 
     cout << "Session opened.\n";
 
-    CrioCleanup(&ctx);
+    crioCleanup(&ctx);
 
     cout << "Session closed.\n";
 

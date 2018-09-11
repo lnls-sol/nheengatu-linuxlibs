@@ -7,17 +7,17 @@
 int main(void) {
     struct crio_context ctx;
     unsigned Size;
-    auto Res = CrioSetup(&ctx);
+    auto Res = crioSetup(&ctx);
     const char *Name;
     bool Item;
     assert(Res == 0);
     cout << "Binary input values:" << "\n";
-    CrioGetBIArraySize(&ctx, &Size);
+    crioGetBIArraySize(&ctx, &Size);
 
     for (unsigned I = 0; I < Size; I++) {
-        Res = CrioGetBIArrayItemName(&ctx, I, &Name);
+        Res = crioGetBIArrayItemName(&ctx, I, &Name);
         assert(Res == 0);
-        Res = CrioGetBIArrayItemByIndex(&ctx, &Item, I);
+        Res = crioGetBIArrayItemByIndex(&ctx, &Item, I);
         assert(Res == 0);
 
         cout << Name << ": " << Item  << '\n';
@@ -25,7 +25,7 @@ int main(void) {
     cout << '\n';
 
 
-    CrioCleanup(&ctx);
+    crioCleanup(&ctx);
     cout << "FINISHED.\n";
 
     return 0;

@@ -37,7 +37,7 @@ find_package (Threads)
 # Compiler flags
 ########################################
 add_compiler_flags(-Wall -Wextra -Werror -Wmissing-declarations -Wno-maybe-uninitialized
-    -Wno-missing-field-initializers -Wno-unused-parameter -fdata-sections -ffunction-sections)
+    -Wno-missing-field-initializers -Wno-unused-parameter -fdata-sections -ffunction-sections -g)
 add_linker_flags(-Wl,--as-needed -Wl,--gc-sections)
 add_double_flags(-fsanitize=undefined)
 
@@ -76,8 +76,8 @@ install(FILES include/CrioLinux.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 ########################################
 # Evals
 ########################################
-add_eval(readTime eval/readSpeed.cc)
-add_eval(sharedMutex eval/mutex.cc eval/shared_mutex.cc)
+#add_eval(readTime eval/readSpeed.cc)
+#add_eval(sharedMutex eval/mutex.cc eval/shared_mutex.cc)
 
 ########################################
 # Tests

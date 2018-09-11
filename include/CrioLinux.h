@@ -29,14 +29,112 @@ struct crio_context {
 
 
 /* Available Functions */
-int  CrioSetup(struct crio_context*);
-void CrioCleanup(struct crio_context*);
-int CrioReadBIArray(struct crio_context*, uint64_t *output, uint64_t address);
-int CrioGetBIArrayItemByName(struct crio_context *ctx, bool *Item, const char *Name);
-int  CrioGetBIArrayItemByIndex(struct crio_context*, bool *item, uint32_t index);
-int CrioGetBIArraySize(struct crio_context *ctx, uint32_t *size);
-int CrioGetBIArrayItemName(struct crio_context *ctx, unsigned Item, const char **Name);
-int CrioGetBIArrayItemNumber(struct crio_context *ctx, const char *Text, unsigned *Number);
+
+/* ------------------------------------- Setting up and cleaning ------------------------------------- */
+
+
+
+/* Function Name  : crioSetup
+ * Description    : Sets up the target crio FPGA and the context.
+ * Parameters
+ * - crio_context : context to be initialized by the function
+ * Return value   :
+ * - OK  = 0
+ * - NOK = -1 (Resources could not be allocated)
+ * - NOK = -2 (NiFpga_Open failed)
+ */
+int  crioSetup(struct crio_context* ctx);
+
+
+
+/* Function Name  : crioCleanup
+ * Description    : Cleans up a session.
+ * Parameters
+ * - crio_context : context for the open CRIO session
+ * Return value   :
+ * - OK  = 0
+ */
+void crioCleanup(struct crio_context* ctx);
+
+
+
+/* ------------------------------------- BI functions ------------------------------------- */
+
+
+/* Function Name  : CrioGetBIArrayItemByName
+ * Description    : Gets the BIArray item using the name as a key
+ * Parameters
+ * - crio_context : context for the open CRIO session
+ * - item         : (Return value) Item to be obtained using name as a key
+ * - name         : key to obtain value (item)
+ * Return value   :
+ * - OK  = 0
+ * - NOK = -1 (no item found)
+ */
+int crioGetBIArrayItemByName(struct crio_context *ctx, bool *item, const char *name);
+
+
+
+/* Function Name  : crioGetBIArrayItemByIndex
+ * Description    : Gets the BIArray item using the index as a key.
+ *                  This function needs to be rethought when more
+ *                  than one BI array is necessary.
+ * Parameters
+ * - crio_context : context for the open CRIO session
+ * - item         : (Return value) Item to be obtained using name as a key
+ * - index        : key to obtain value (item)
+ * Return value   :
+ * - OK  = 0
+ * - NOK = -1 (out of range)
+ */
+int crioGetBIArrayItemByIndex(struct crio_context*, bool *item, uint32_t index);
+
+
+
+/* Function Name  : crioGetBIArraySize
+ * Description    : Gets the BIArray size. This function needs to
+ *                  be rethought when more than one BI array is
+ *                  necessary.
+ * Parameters
+ * - crio_context : context for the open CRIO session
+ * - size         : (Return value) size to be obtained
+ * Return value   :
+ * - OK  = 0
+ */
+int crioGetBIArraySize(struct crio_context *ctx, uint32_t *size);
+
+
+
+/* Function Name  : crioGetBIArrayItemName
+ * Description    : Gets the BIArray item name using the index
+ * Parameters
+ * - crio_context : context for the open CRIO session
+ * - index        : Index of item name
+ * - name         : (Return value) Name of item
+ * Return value   :
+ * - OK  = 0
+ * - NOK = -1 (out of range)
+ */
+int crioGetBIArrayItemName(struct crio_context *ctx, unsigned index, const char **name);
+
+
+/* Function Name  : crioGetBIArrayItemNumber
+ * Description    : Gets the BIArray item index using the name
+ * Parameters
+ * - crio_context : context for the open CRIO session
+ * - name         : Name of item
+ * - index        : (Return value) Index of item name
+ * Return value   :
+ * - OK  = 0
+ * - NOK = -1 (Item not found)
+ */
+int crioGetBIArrayItemNumber(struct crio_context *ctx, const char *name, unsigned *index);
+
+
+
+/* ------------------------------------- BO functions ------------------------------------- */
+
+
 #ifdef __cplusplus
 }
 #endif

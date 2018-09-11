@@ -5,7 +5,7 @@
 #include <boost/bimap.hpp>
 #include <string>
 
-typedef boost::bimap< unsigned, std::string > bm_type;
+typedef boost::bimap< unsigned, std::string > bim_type;
 typedef boost::bimap< std::string, unsigned > bm_address_type;
 
 class cfg_parser {
@@ -13,7 +13,7 @@ class cfg_parser {
         cfg_parser();
         ~cfg_parser();
         int get_settings(std::string &ip, std::string &path, std::string &fileName, std::string &signature);
-        int get_bimaps(bm_type *bi, bm_address_type *bi_address_map);
+        int get_bimaps(bim_type *bi, bm_address_type *bi_address_map);
     private:
         std::string cfg_file;
         boost::property_tree::ptree tree;
