@@ -2,7 +2,7 @@
 #include "CrioLinux.h"
 #include "cfg_parser.h"
 
-int crioSetup(struct crio_context *ctx) {
+int crioSetup(struct crio_context *ctx, string cfgfile) {
     string ip = "";
     string path = "";
     string url = "";
@@ -13,7 +13,7 @@ int crioSetup(struct crio_context *ctx) {
     if (!ctx->session_open)
     {
         /* Read cfg file */
-        cfg_parser parser;
+        cfg_parser parser(cfgfile);
 
         /* Get settings from configuration file */
         parser.get_settings(ip, path, fileName, signature);

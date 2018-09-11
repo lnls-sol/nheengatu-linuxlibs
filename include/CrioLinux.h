@@ -2,6 +2,7 @@
 #define CRIOLINUX_H
 
 #include <stdint.h>
+#include <iostream>
 
 #if __GNUC__ >= 4
 #pragma GCC visibility push(default)
@@ -11,6 +12,7 @@
 extern "C" {
 #endif
 
+#define CFG_FILE "cfg/cfg.ini"
 
 /* Type definitions */
 typedef	unsigned int CrioSession;
@@ -44,7 +46,7 @@ struct crio_context {
  * - NOK = -1 (Resources could not be allocated)
  * - NOK = -2 (NiFpga_Open failed)
  */
-int  crioSetup(struct crio_context* ctx);
+int crioSetup(struct crio_context *ctx, std::string cfgfile=CFG_FILE);
 
 
 

@@ -7,6 +7,11 @@ cfg_parser::cfg_parser()
     boost::property_tree::ini_parser::read_ini(CFG_FILE, tree);
 }
 
+cfg_parser::cfg_parser(std::string file)
+{
+    boost::property_tree::ini_parser::read_ini(file, tree);
+}
+
 cfg_parser::~cfg_parser()
 {
 }

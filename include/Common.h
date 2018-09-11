@@ -11,6 +11,5 @@
 
 using namespace std;
 
-#define CFG_FILE "cfg/cfg.ini"
 
 #endif /* COMMON_H */
