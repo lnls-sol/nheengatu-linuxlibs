@@ -9,7 +9,8 @@ int main(void) {
     unsigned Size;
     string BOs[] = {"Mod3/DIO31", "Mod3/DIO30"};
     bool x = true;
-    auto Res = crioSetup(&ctx, "cfg/bo_cfg.ini");
+    char cfg[] = "cfg/bo_cfg.ini";
+    auto Res = crioSetup(&ctx, cfg);
     assert(Res == 0);
 
     crioGetBOArraySize(&ctx, &Size);

@@ -4,7 +4,8 @@
 
 int main(void) {
     struct crio_context ctx;
-    auto Res = crioSetup(&ctx);
+    char cfg[] = "cfg/cfg.ini";
+    auto Res = crioSetup(&ctx, cfg);
     assert(Res == 0);
 
     cout << "Session opened.\n";

@@ -4,6 +4,7 @@
 #include <boost/property_tree/ini_parser.hpp>
 #include <boost/bimap.hpp>
 #include <string>
+#include "Common.h"
 
 typedef boost::bimap< unsigned, std::string > bim_type;
 typedef boost::bimap< std::string, unsigned > bm_address_type;
@@ -11,12 +12,12 @@ typedef boost::bimap< std::string, unsigned > bm_address_type;
 #define BIADDR_ALIAS "BIAddresses"
 #define BO_ALIAS     "BO"
 
-#define CFG_FILE "cfg/cfg.ini"
+
 
 class cfg_parser {
     public:
         cfg_parser();
-        cfg_parser(std::string file);
+        cfg_parser(char * file);
         ~cfg_parser();
         int get_settings(std::string &ip, std::string &path, std::string &fileName, std::string &signature);
         int get_bi_maps(bim_type *bi, bm_address_type *bi_address_map);

@@ -24,20 +24,24 @@ static __inline__ int crioSetBO(struct crio_context *ctx, uint32_t address, bool
     return 0;
 }
 
+/* ------------ API FUNCTIONS -------------- */
 int crioGetBOArraySize(struct crio_context *ctx, unsigned *size) {
+    if (!ctx->session_open)
+        return -2;
     *size = ((bm_address_type *)ctx->bo_addresses)->size();
     return 0;
 }
 
 
 int crioSetBOItem(struct crio_context *ctx, const char *name, bool value) {
-
+    if (!ctx->session_open)
+        return -2;
     try {
         return crioSetBO(ctx, ((bm_address_type *)ctx->bo_addresses)->left.at(name), value);
     }
     catch (out_of_range)
     {
-        cout << "Queried item not available: " << name << endl;
+        cout << "Queried returned NULL for: " << name << endl;
         return -1;
     }
 }

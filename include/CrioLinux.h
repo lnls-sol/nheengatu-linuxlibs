@@ -2,7 +2,6 @@
 #define CRIOLINUX_H
 
 #include <stdint.h>
-#include <iostream>
 
 #if __GNUC__ >= 4
 #pragma GCC visibility push(default)
@@ -12,7 +11,6 @@
 extern "C" {
 #endif
 
-#define CFG_FILE "cfg/cfg.ini"
 
 /* Type definitions */
 typedef	unsigned int CrioSession;
@@ -41,12 +39,13 @@ struct crio_context {
  * Description    : Sets up the target crio FPGA and the context.
  * Parameters
  * - crio_context : context to be initialized by the function
+ * - cfgfile      : path of the ini configuration file
  * Return value   :
  * - OK  = 0
  * - NOK = -1 (Resources could not be allocated)
  * - NOK = -2 (NiFpga_Open failed)
  */
-int crioSetup(struct crio_context *ctx, std::string cfgfile=CFG_FILE);
+int crioSetup(struct crio_context *ctx, char * cfgfile);
 
 
 
@@ -73,6 +72,7 @@ void crioCleanup(struct crio_context* ctx);
  * Return value   :
  * - OK  = 0
  * - NOK = -1 (no item found)
+ * - NOK = -2 (Session not open)
  */
 int crioGetBIArrayItemByName(struct crio_context *ctx, bool *item, const char *name);
 
@@ -89,6 +89,7 @@ int crioGetBIArrayItemByName(struct crio_context *ctx, bool *item, const char *n
  * Return value   :
  * - OK  = 0
  * - NOK = -1 (out of range)
+ * - NOK = -2 (Session not open)
  */
 int crioGetBIArrayItemByIndex(struct crio_context*, bool *item, uint32_t index);
 
@@ -103,6 +104,7 @@ int crioGetBIArrayItemByIndex(struct crio_context*, bool *item, uint32_t index);
  * - size         : (Return value) size to be obtained
  * Return value   :
  * - OK  = 0
+ * - NOK = -2 (Session not open)
  */
 int crioGetBIArraySize(struct crio_context *ctx, uint32_t *size);
 
@@ -117,6 +119,7 @@ int crioGetBIArraySize(struct crio_context *ctx, uint32_t *size);
  * Return value   :
  * - OK  = 0
  * - NOK = -1 (out of range)
+ * - NOK = -2 (Session not open)
  */
 int crioGetBIArrayItemName(struct crio_context *ctx, unsigned index, const char **name);
 
@@ -130,13 +133,38 @@ int crioGetBIArrayItemName(struct crio_context *ctx, unsigned index, const char 
  * Return value   :
  * - OK  = 0
  * - NOK = -1 (Item not found)
+ * - NOK = -2 (Session not open)
  */
 int crioGetBIArrayItemNumber(struct crio_context *ctx, const char *name, unsigned *index);
 
 
 
 /* ------------------------------------- BO functions ------------------------------------- */
+
+
+/* Function Name  : crioGetBOArraySize
+ * Description    : Gets the number of BOs registered by the cfg file
+ * Parameters
+ * - crio_context : context for the open CRIO session
+ * - size         : (Return value) size of BO array
+ * Return value   :
+ * - OK  = 0
+ * - NOK = -2 (Session not open)
+ */
 int crioGetBOArraySize(struct crio_context *ctx, unsigned *size);
+
+
+/* Function Name  : crioSetBOItem
+ * Description    : Sets the BO that is associated with the name
+ * Parameters
+ * - crio_context : context for the open CRIO session
+ * - name         : name of BO to be set
+ * - value        : value to set the BO with
+ * Return value   :
+ * - OK  = 0
+ * - NOK = -1 (query returned null)
+ * - NOK = -2 (Session not open)
+ */
 int crioSetBOItem(struct crio_context *ctx, const char *name, bool value);
 
 #ifdef __cplusplus

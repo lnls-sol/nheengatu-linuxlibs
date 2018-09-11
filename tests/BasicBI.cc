@@ -7,7 +7,8 @@
 int main(void) {
     struct crio_context ctx;
     unsigned Size;
-    auto Res = crioSetup(&ctx, "cfg/bi_cfg.ini");
+    char cfg[] = "cfg/bi_cfg.ini";
+    auto Res = crioSetup(&ctx, cfg);
     const char *Name;
     bool Item;
     assert(Res == 0);

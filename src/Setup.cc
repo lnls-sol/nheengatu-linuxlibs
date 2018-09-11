@@ -2,7 +2,7 @@
 #include "CrioLinux.h"
 #include "cfg_parser.h"
 
-int crioSetup(struct crio_context *ctx, string cfgfile) {
+int crioSetup(struct crio_context *ctx, char *cfgfile) {
     string ip = "";
     string path = "";
     string url = "";

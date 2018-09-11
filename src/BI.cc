@@ -79,6 +79,8 @@ static __inline__ bool getBI(struct crio_context *ctx, uint32_t index, uint64_t 
 
 /* ---------------- API FUNCTIONS ---------------- */
 int crioGetBIArrayItemByIndex(struct crio_context *ctx, bool *item, uint32_t index) {
+    if (!ctx->session_open)
+        return -2;
     try {
         ((bim_type *)ctx->bi_map)->left.at(index).c_str();
         *item = getBI(ctx, index, ((bm_address_type *)ctx->bi_addresses)->left.at("BI0") );
@@ -90,12 +92,17 @@ int crioGetBIArrayItemByIndex(struct crio_context *ctx, bool *item, uint32_t ind
 }
 
 int crioGetBIArraySize(struct crio_context *ctx, unsigned *size) {
+    if (!ctx->session_open)
+        return -2;
     bim_type * x = (bim_type *)ctx->bi_map;
     *size = (*x).size();
     return 0;
 }
 
 int crioGetBIArrayItemByName(struct crio_context *ctx, bool *item, const char *name) {
+    if (!ctx->session_open)
+        return -2;
+
     uint64_t index;
 
     try {
@@ -109,7 +116,8 @@ int crioGetBIArrayItemByName(struct crio_context *ctx, bool *item, const char *n
 }
 
 int crioGetBIArrayItemName(struct crio_context *ctx, unsigned index, const char **name) {
-
+    if (!ctx->session_open)
+        return -2;
     try {
         *name = ((bim_type *)ctx->bi_map)->left.at(index).c_str();
         return 0;
@@ -120,7 +128,8 @@ int crioGetBIArrayItemName(struct crio_context *ctx, unsigned index, const char 
 }
 
 int crioGetBIArrayItemNumber(struct crio_context *ctx, const char *name, unsigned *index) {
-
+    if (!ctx->session_open)
+        return -2;
     unsigned Val;
 
     if (ParseNumberStrict(name, &Val) == 0) {
