@@ -32,7 +32,8 @@ int cfg_parser::get_bimaps(bm_type *bi_map, bm_address_type * bi_address_map)
 {
     for (const std::pair<std::string, boost::property_tree::ptree> &bi_address_tree : tree.get_child("BIAddresses"))
     {
-        bi_address_map->insert( bm_address_type::value_type( (bi_address_tree.first.c_str()) , bi_address_tree.second.get_value<unsigned>() ));
+        bi_address_map->insert( bm_address_type::value_type( (bi_address_tree.first.c_str()) ,
+                                                              strtoul(bi_address_tree.second.get_value<std::string>().c_str(), NULL, 16) ));
         for (const std::pair<std::string, boost::property_tree::ptree> &bi : tree.get_child(bi_address_tree.first))
             bi_map->insert( bm_type::value_type( atol(bi.first.c_str()) , bi.second.get_value<std::string>() ));
     }

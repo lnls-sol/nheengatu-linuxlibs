@@ -2,10 +2,6 @@
 #include "CrioLinux.h"
 #include "cfg_parser.h"
 
-static const string BITFILE_PATH = BUILD_CRIO_LINUX_LIBDIR;
-
-
-
 int CrioSetup(struct crio_context *ctx) {
     string ip = "";
     string path = "";
@@ -58,5 +54,7 @@ void CrioCleanup(struct crio_context *ctx) {
     NiFpga_Close(ctx->session, NiFpga_CloseAttribute_NoResetIfLastSession);
     NiFpga_Finalize();
     ctx->session_open = false;
+    delete(ctx->bi_addresses);
+    delete(ctx->bi_map);
     pthread_mutex_destroy(&ctx->bi_mutex);
 }
