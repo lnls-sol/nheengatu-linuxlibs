@@ -8,16 +8,19 @@ configuration file.
 
 BIs:
 
-BIs are concatenated together to make a 64-bit variable. The result of doing this
-is that the lib would only need to perform a single read to read all binary inputs,
-and consequently would have to query for the right bit.
+BIs are joined in an array of any size. The lib can read the array at once using
+the NiFpga_ReadArrayBool function. Comparative results between a single 64-bit read
+and an array of bool was done, and the results where considerably similar in terms
+of time and area (read speed ~17 reads/ms). As an initial implementation, we opted
+for the 64-bit implementation. If this implementation is deemed to be insufficient
+in the future, a BI array can be implemented.
 
 A timer is used to perform reads every X microseconds. Using this timer, we do not
 overload the processor with a large amount of reads.
 
 A mutex is used to lock a region composed of a fetching time, fetched value (cache).
 This mutex is necessary so several threads do not perform unnecessary simultanous
-accesses to the FPGA. The mutex blocks all other threads.
+accesses to the FPGA. The mutex blocks all other threads (i.e. thread safe).
 
 This implementation is not process safe. That means that each process will have its
 own session and its own mutex. The change that this will be happening is low, so no
@@ -27,6 +30,19 @@ there will be a need to implement a shared memory. An example of the shared memo
 be found in the eval folder. An interesting implementation was also found online when
 googling for boost::interprocess or boost, shared memory.
 
+Obtained results:
+-----32 BIs in a 64-bit unsigned integer----
+Slice total        948  / 10250            %
+Register Slices    3373 / 82000            %
+LUT slices         2686 / 41000            %
+RAM                3    / 135              %
+
+
+-------64 BIs in an array of size 64--------
+Slice total        993  / 10250            %
+Register Slices    3569 / 82000            %
+LUT slices         2832 / 41000            %
+RAM                3    / 135              %
 
 BOs:
 

@@ -46,6 +46,7 @@ int crioSetup(struct crio_context *ctx, char *cfgfile) {
         /* Initialize context */
         ctx->session_open = true;
         ctx->session = (CrioSession)NiSession;
+        ctx->bi_cache_valid = false;
         Res = pthread_mutex_init(&ctx->bi_mutex,NULL);
         if (Res != 0)
         {

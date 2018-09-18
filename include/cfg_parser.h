@@ -6,11 +6,16 @@
 #include <string>
 #include "Common.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef boost::bimap< unsigned, std::string > bim_type;
 typedef boost::bimap< std::string, unsigned > bm_address_type;
 
 #define BIADDR_ALIAS "BIAddresses"
 #define BO_ALIAS     "BO"
+
 
 
 
@@ -28,6 +33,8 @@ class cfg_parser {
 };
 
 
-
+#ifdef __cplusplus
+}
+#endif
 
 #endif
