@@ -83,6 +83,7 @@ install(FILES include/CrioLinux.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 # Tests
 ########################################
 
+add_simple_test(TestBasicAI tests/BasicAI.cc)
 add_simple_test(TestBasicAO tests/BasicAO.cc)
 add_simple_test(TestBasicBO tests/BasicBO.cc)
 add_simple_test(TestBasicBI tests/BasicBI.cc)

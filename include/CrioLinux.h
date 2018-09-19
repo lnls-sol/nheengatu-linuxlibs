@@ -27,6 +27,7 @@ struct crio_context {
     void           * bi_addresses;
     void           * bo_addresses;
     void           * ao_addresses;
+    void           * ai_addresses;
 };
 
 
@@ -193,6 +194,33 @@ int crioSetAOItem(struct crio_context *ctx, const char *name, float value);
  * - NOK = -2 (Session not open)
  */
 int crioGetAOArraySize(struct crio_context *ctx, unsigned *size);
+
+
+
+/* Function Name  : crioGetAIArraySize
+ * Description    : Gets the number of AIs registered by the cfg file
+ * Parameters
+ * - crio_context : context for the open CRIO session
+ * - size         : (Return value) number of the registered AIs
+ * Return value   :
+ * - OK  = 0
+ * - NOK = -2 (Session not open)
+ */
+int crioGetAIArraySize(struct crio_context *ctx, unsigned *size);
+
+
+/* Function Name  : crioGetAIItem
+ * Description    : Sets the AI that is associated with the name
+ * Parameters
+ * - crio_context : context for the open CRIO session
+ * - name         : name of AI to be set
+ * - value        : value to set the AI with
+ * Return value   :
+ * - OK  = 0  (Success)
+ * - NOK = -1 (query returned null)
+ * - NOK = -2 (Session not open)
+ */
+int crioGetAIItem(struct crio_context *ctx, const char *name, float &value);
 
 #ifdef __cplusplus
 }

@@ -18,7 +18,7 @@ int main(void) {
         default: break;
     }
 
-    crioGetBOArraySize(&ctx, &Size);
+    crioGetAOArraySize(&ctx, &Size);
 
     while (1)
     {

@@ -6,6 +6,7 @@ header file will be discarded. This form was chosen to not compile the library.
 We will have a single library for all CRIOs. However, each CRIO will have its own
 configuration file.
 
+
 BIs:
 
 BIs are joined in an array of any size. The lib can read the array at once using
@@ -44,6 +45,8 @@ Register Slices    3569 / 82000            %
 LUT slices         2832 / 41000            %
 RAM                3    / 135              %
 
+
+
 BOs:
 
 For each BO, it was chosen a single address. The reason is that the area was estimated
@@ -65,7 +68,9 @@ RAM                 3   / 135           2.2%
 
 As can be seen, the occupied slices by increasing the number of BOs is minor.
 
-AO:
+
+AOs:
+
 The analog outputs seem to have a stronger footprint in the FPGA. Nonetheless, AO
 modules seem to come with a small number of outputs. In the AO implementation, the
 AOs are connected to the Linux RT using a single precision variable; however, in
@@ -78,3 +83,19 @@ Register Slices    5218 / 82000         6.4%
 LUT slices         4751 / 41000        11.6%
 RAM                 3   / 135           2.2%
 DSP                 1   / 240           0.4%
+
+
+AIs:
+
+The Analog inputs seem to also have a relatively large footprint in the FPGA. It was
+opted to implement each AI with its own address (as a control) instead of an array.
+The array implementation is more complex, and the only difference is that all of the
+controls will have a single address. It is not clear yet if this is an attractive
+feature or not.
+
+-----------------4 AIs----------------------
+Slice total       1237  / 10250        12.1%
+Register Slices   4341  / 82000         5.3%
+LUT slices        3546  / 41000         8.6%
+RAM                3    / 135           2.2%
+DSP                1    / 240           0.4%

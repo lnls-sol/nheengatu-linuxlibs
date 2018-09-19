@@ -57,7 +57,7 @@ int cfg_parser::get_bi_maps(bim_type *bi_map, bm_address_type * bi_address_map)
     return 0;
 }
 
-int cfg_parser::get_output_maps(bm_address_type * o_address_map, string alias)
+int cfg_parser::get_address_maps(bm_address_type * o_address_map, string alias)
 {
     try
     {
