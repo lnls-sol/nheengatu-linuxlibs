@@ -64,3 +64,17 @@ LUT slices         2611 / 41000         6.4%
 RAM                 3   / 135           2.2%
 
 As can be seen, the occupied slices by increasing the number of BOs is minor.
+
+AO:
+The analog outputs seem to have a stronger footprint in the FPGA. Nonetheless, AO
+modules seem to come with a small number of outputs. In the AO implementation, the
+AOs are connected to the Linux RT using a single precision variable; however, in
+the FPGA, it has to be converted to fixed point. Apparently, NI uses DSPs for this
+purpose. For now, this will be sufficient.
+
+----------------4 AOs----------------------
+Slice total        1543 / 10250        15.0%
+Register Slices    5218 / 82000         6.4%
+LUT slices         4751 / 41000        11.6%
+RAM                 3   / 135           2.2%
+DSP                 1   / 240           0.4%

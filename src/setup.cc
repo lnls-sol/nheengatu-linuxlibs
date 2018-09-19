@@ -36,11 +36,15 @@ int crioSetup(struct crio_context *ctx, char *cfgfile) {
         ctx->bi_map = (void *) new bim_type;
         ctx->bi_addresses = (void *) new bm_address_type;
         ctx->bo_addresses = (void *) new bm_address_type;
+        ctx->ao_addresses = (void *) new bm_address_type;
 
         Res = parser.get_bi_maps((bim_type*) ctx->bi_map, (bm_address_type *)ctx->bi_addresses);
         if (Res != 0)  return -1;
 
-        Res = parser.get_bo_maps((bm_address_type *)ctx->bo_addresses);
+        Res = parser.get_output_maps((bm_address_type *)ctx->bo_addresses, BO_ALIAS);
+        if (Res != 0)  return -1;
+
+        Res = parser.get_output_maps((bm_address_type *)ctx->ao_addresses, AO_ALIAS);
         if (Res != 0)  return -1;
 
         /* Initialize context */

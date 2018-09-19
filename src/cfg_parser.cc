@@ -57,14 +57,14 @@ int cfg_parser::get_bi_maps(bim_type *bi_map, bm_address_type * bi_address_map)
     return 0;
 }
 
-int cfg_parser::get_bo_maps(bm_address_type * bo_address_map)
+int cfg_parser::get_output_maps(bm_address_type * o_address_map, string alias)
 {
     try
     {
-        for (const std::pair<std::string, boost::property_tree::ptree> &bo_address_tree : tree.get_child(BO_ALIAS))
+        for (const std::pair<std::string, boost::property_tree::ptree> &o_address_tree : tree.get_child(alias))
         {
-            bo_address_map->insert( bm_address_type::value_type( (bo_address_tree.first.c_str()) ,
-                                                                  strtoul(bo_address_tree.second.get_value<std::string>().c_str(), NULL, 16) ));
+            o_address_map->insert( bm_address_type::value_type( (o_address_tree.first.c_str()) ,
+                                                                  strtoul(o_address_tree.second.get_value<std::string>().c_str(), NULL, 16) ));
         }
     }
     catch(const boost::property_tree::ptree_error &e)
@@ -72,8 +72,9 @@ int cfg_parser::get_bo_maps(bm_address_type * bo_address_map)
         cout << e.what() << endl;
         return -1;
     }
-    /* Print bimap
-    for( bm_address_type::const_iterator iter = bo_address_map->begin(), iend = bo_address_map->end(); iter != iend; ++iter )
+    /* Print bimap */
+    /*for( bm_address_type::const_iterator iter = o_address_map->begin(), iend = o_address_map->end(); iter != iend; ++iter )
         std::cout << iter->left << " <--> " << iter->right << std::endl;*/
     return 0;
 }
+

@@ -26,6 +26,7 @@ struct crio_context {
     void           * bi_map;
     void           * bi_addresses;
     void           * bo_addresses;
+    void           * ao_addresses;
 };
 
 
@@ -146,7 +147,7 @@ int crioGetBIArrayItemNumber(struct crio_context *ctx, const char *name, unsigne
  * Description    : Gets the number of BOs registered by the cfg file
  * Parameters
  * - crio_context : context for the open CRIO session
- * - size         : (Return value) size of BO array
+ * - size         : (Return value) number of registered BOs available in the ini file
  * Return value   :
  * - OK  = 0
  * - NOK = -2 (Session not open)
@@ -166,6 +167,32 @@ int crioGetBOArraySize(struct crio_context *ctx, unsigned *size);
  * - NOK = -2 (Session not open)
  */
 int crioSetBOItem(struct crio_context *ctx, const char *name, bool value);
+
+
+/* Function Name  : crioSetAOItem
+ * Description    : Sets the AO that is associated with the name
+ * Parameters
+ * - crio_context : context for the open CRIO session
+ * - name         : name of AO to be set
+ * - value        : value to set the AO with
+ * Return value   :
+ * - OK  = 0  (Success)
+ * - NOK = -1 (query returned null)
+ * - NOK = -2 (Session not open)
+ */
+int crioSetAOItem(struct crio_context *ctx, const char *name, float value);
+
+
+/* Function Name  : crioGetAOArraySize
+ * Description    : Gets the number of AOs registered by the cfg file
+ * Parameters
+ * - crio_context : context for the open CRIO session
+ * - size         : (Return value) number of the registered AOs
+ * Return value   :
+ * - OK  = 0
+ * - NOK = -2 (Session not open)
+ */
+int crioGetAOArraySize(struct crio_context *ctx, unsigned *size);
 
 #ifdef __cplusplus
 }
