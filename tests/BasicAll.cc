@@ -47,6 +47,10 @@ int main(void) {
         default: break;
     }
 
+    // Seems like the FPGA needs 1 second to start bringing data available on the ports.
+    // This value was obtained emperically.
+    sleep(1);
+
     /* BI */
     crioGetBIArraySize(&ctx, &Size);
     cout << "Binary inputs found:" << Size << endl;
@@ -73,16 +77,18 @@ int main(void) {
     /* BO */
     crioGetBOArraySize(&ctx, &Size);
     cout << "Binary outputs found:" << Size << endl;
+    Item = false;
     for (uint x = 0; x < Size; x++)
     {
-        Res = crioSetBOItem(&ctx, BOs[x].c_str(), x);
+        Res = crioSetBOItem(&ctx, BOs[x].c_str(), Item);
         switch (Res)
         {
             case -1 : cout << "Item " << BOs[x].c_str() << " does not exist\n"; return -1; break;
             case -2 : cout << "CRIO session not open\n"; return -1; break;
             default: break;
         }
-        cout << BOs[x].c_str() << "->" << x << endl;
+        cout << BOs[x].c_str() << "->" << Item << endl;
+        Item = !Item;
         assert(Res == 0);
     }
     cout << endl;
@@ -99,6 +105,7 @@ int main(void) {
             case -2 : cout << "CRIO session not open\n"; return -1; break;
             default: break;
         }
+
         cout << AIs[x].c_str() << "->" << ai_val << endl;
     }
     cout << endl;
