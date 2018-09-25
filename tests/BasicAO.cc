@@ -23,12 +23,19 @@ int main(void) {
     while (1)
     {
         Res = crioSetAOItem(&ctx, AOs[0].c_str(), x);
-        if (Res == -1)
-            cout << "Query returned NULL for AO address of name: " << AOs[0].c_str() << endl;
+        switch (Res)
+        {
+            case -1 : cout << "Query returned NULL for AO address of name: " << AOs[0].c_str() << endl; return -1; break;
+            case -2 : cout << "CRIO session not open\n"; return -1; break;
+            default: break;
+        }
         Res = crioSetAOItem(&ctx, AOs[1].c_str(), 10-x);
-        if (Res == -1)
-            cout << "Query returned NULL for AO address of name: " << AOs[1].c_str() << endl;
-        assert(Res == 0);
+        switch (Res)
+        {
+            case -1 : cout << "Query returned NULL for AO address of name: " << AOs[1].c_str() << endl; return -1; break;
+            case -2 : cout << "CRIO session not open\n"; return -1; break;
+            default: break;
+        }
         cout << AOs[0].c_str() << "->" << x << endl;
         cout << AOs[1].c_str() << "->" << 10-x << endl;
         getchar();

@@ -18,7 +18,19 @@ int main(void) {
     while (1)
     {
         Res = crioSetBOItem(&ctx, BOs[0].c_str(), x);
+        switch (Res)
+        {
+            case -1 : cout << "Item " << BOs[0].c_str() << " does not exist\n"; return -1; break;
+            case -2 : cout << "CRIO session not open\n"; return -1; break;
+            default: break;
+        }
         Res = crioSetBOItem(&ctx, BOs[1].c_str(), !x);
+        switch (Res)
+        {
+            case -1 : cout << "Item " << BOs[1].c_str() << " does not exist\n"; return -1; break;
+            case -2 : cout << "CRIO session not open\n"; return -1; break;
+            default: break;
+        }
         cout << BOs[0].c_str() << "->" << x << endl;
         cout << BOs[1].c_str() << "->" << !x << endl;
         sleep(1);

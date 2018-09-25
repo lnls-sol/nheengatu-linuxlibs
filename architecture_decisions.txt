@@ -99,3 +99,24 @@ Register Slices   4341  / 82000         5.3%
 LUT slices        3546  / 41000         8.6%
 RAM                3    / 135           2.2%
 DSP                1    / 240           0.4%
+
+
+Statistics:
+The following modules have been inserted on a CRIO chassi
+Mod 1 (NI9401) : DIO 0 - 7
+Mod 2 (NI9401) : DIO 0 - 7
+Mod 3 (NI9403) : DIO 0 - 31
+Mod 4 (NI9215) : AI 0 - 3
+Mod 5 (NI9263) : AO 0 - 3
+Mod 6 (NI9213) : TC - 15 (0 - 3 used)
+Mod 7 (NI9215) : AI 0 - 3
+Mod 8 (NI9215) : AI 0 - 3
+
+Compilation results are as follows
+
+---------------Upper setup------------------
+Slice total       3740  / 10250        36.5%
+Register Slices   11291 / 82000        13.8%
+LUT slices        11318 / 41000        27.6%
+RAM                3    / 135           2.2%
+DSP                4    / 240           1.7%

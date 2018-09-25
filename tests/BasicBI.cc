@@ -4,6 +4,7 @@
 
 
 
+
 int main(void) {
     struct crio_context ctx;
     unsigned Size;
@@ -17,9 +18,19 @@ int main(void) {
 
     for (unsigned I = 0; I < Size; I++) {
         Res = crioGetBIArrayItemName(&ctx, I, &Name);
-        assert(Res == 0);
+        switch (Res)
+        {
+            case -1 : cout << "Index " << I << " does not exist\n"; return -1; break;
+            case -2 : cout << "CRIO session not open\n"; return -1; break;
+            default: break;
+        }
         Res = crioGetBIArrayItemByIndex(&ctx, &Item, I);
-        assert(Res == 0);
+        switch (Res)
+        {
+            case -1 : cout << "Index " << I << " does not exist\n"; return -1; break;
+            case -2 : cout << "CRIO session not open\n"; return -1; break;
+            default: break;
+        }
 
         cout << Name << ": " << Item  << '\n';
     }

@@ -27,7 +27,7 @@ int cfg_parser::get_settings(std::string &ip, std::string &path, std::string &fi
     }
     catch(const boost::property_tree::ptree_error &e)
     {
-        cout << e.what() << endl;
+        //cout << e.what() << endl;
         return -1;
     }
     return 0;
@@ -51,25 +51,25 @@ int cfg_parser::get_bi_maps(bim_type *bi_map, bm_address_type * bi_address_map)
     }
     catch(const boost::property_tree::ptree_error &e)
     {
-        cout << e.what() << endl;
+        //cout << e.what() << endl;
         return -1;
     }
     return 0;
 }
 
-int cfg_parser::get_address_maps(bm_address_type * o_address_map, string alias)
+int cfg_parser::get_address_maps(bm_address_type * address_map, string alias)
 {
     try
     {
-        for (const std::pair<std::string, boost::property_tree::ptree> &o_address_tree : tree.get_child(alias))
+        for (const std::pair<std::string, boost::property_tree::ptree> &address_tree : tree.get_child(alias))
         {
-            o_address_map->insert( bm_address_type::value_type( (o_address_tree.first.c_str()) ,
-                                                                  strtoul(o_address_tree.second.get_value<std::string>().c_str(), NULL, 16) ));
+            address_map->insert( bm_address_type::value_type( (address_tree.first.c_str()) ,
+                                                                  strtoul(address_tree.second.get_value<std::string>().c_str(), NULL, 16) ));
         }
     }
     catch(const boost::property_tree::ptree_error &e)
     {
-        cout << e.what() << endl;
+        //cout << e.what() << endl;
         return -1;
     }
     /* Print bimap */

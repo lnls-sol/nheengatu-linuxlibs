@@ -25,8 +25,12 @@ int main(void) {
         for (int x = 0; x < 4; x++)
         {
             Res = crioGetAIItem(&ctx, AIs[x].c_str(), inputs[x]);
-            if (Res == -1)
-                cout << "Query returned NULL for AI address of name: " << AIs[x].c_str() << endl;
+            switch (Res)
+            {
+                case -1 : cout << "Query returned NULL for AI address of name: " << AIs[x].c_str() << endl; return -1; break;
+                case -2 : cout << "CRIO session not open\n"; return -1; break;
+                default: break;
+            }
             cout << AIs[x].c_str() << "->" << inputs[x] << endl;
         }
         sleep(1);

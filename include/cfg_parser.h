@@ -18,15 +18,25 @@ typedef boost::bimap< std::string, unsigned > bm_address_type;
 #define AO_ALIAS     "AO"
 #define AI_ALIAS     "AI"
 
-
+/* This class processes an ini file, and imports it to a
+ * boost property tree. It uses the formerly defined aliases
+ * to look for keys in the file.
+ *
+ */
 class cfg_parser {
     public:
         cfg_parser();
         cfg_parser(char * file);
         ~cfg_parser();
+
+        /* Gets settings key from the ini file */
         int get_settings(std::string &ip, std::string &path, std::string &fileName, std::string &signature);
+
+        /* fills the binary input BI key maps */
         int get_bi_maps(bim_type *bi, bm_address_type *bi_address_map);
-        int get_address_maps(bm_address_type * bo_address_map, string alias);
+
+        /* Fills all indicated address binary maps */
+        int get_address_maps(bm_address_type * address_map, string alias);
     private:
         std::string cfg_file;
         boost::property_tree::ptree tree;

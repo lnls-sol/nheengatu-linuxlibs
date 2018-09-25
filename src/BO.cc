@@ -41,7 +41,6 @@ int crioSetBOItem(struct crio_context *ctx, const char *name, bool value) {
     }
     catch (out_of_range)
     {
-        cout << "Queried returned NULL for: " << name << endl;
         return -1;
     }
 }
