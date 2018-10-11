@@ -5,7 +5,7 @@
 #include <stdexcept>
 #include <time.h>
 #include <boost/bimap.hpp>
-
+#include "rt_var_handler.h"
 #include "CrioLinux.h"
 
 #define CACHE_TIMEOUT_US 1000
@@ -99,14 +99,23 @@ int crioGetBIArraySize(struct crio_context *ctx, unsigned *size) {
 }
 
 int crioGetBIArrayItemByName(struct crio_context *ctx, bool *item, const char *name) {
+    uint8_t u08;
     if (!ctx->session_open)
         return -2;
 
     uint64_t index;
 
     try {
-        index = ((bim_type *)ctx->bi_map)->right.at(name);
-        *item = getBI(ctx, index, ((bm_address_type *)ctx->bi_addresses)->left.at("BI0"));
+        if (is_rt_var(name) == true)
+        {
+            u08 = *(uint8_t*)(ctx->shared_memory + ctx->rt_variable_offsets[((bm_address_type *)ctx->rt_addresses)->left.at(name)]);
+            *item = (bool) u08;
+        }
+        else
+        {
+            index = ((bim_type *)ctx->bi_map)->right.at(name);
+            *item = getBI(ctx, index, ((bm_address_type *)ctx->bi_addresses)->left.at("BI0"));
+        }
         return 0;
     }
     catch (out_of_range) {

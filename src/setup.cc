@@ -62,7 +62,6 @@ int crioSetup(struct crio_context *ctx, char *cfgfile) {
 
         Res = parser.get_address_maps(ctx->ai_count, (bm_address_type *)ctx->ai_addresses, (bm_address_type *)ctx->rt_addresses, AI_ALIAS);
         if (Res != 0)  return -1;
-        cout << "AI count" << ctx->ai_count << endl;
 
         /* Calculate offsets if shared memory is enabled */
         if (use_shared_memory == true) {
