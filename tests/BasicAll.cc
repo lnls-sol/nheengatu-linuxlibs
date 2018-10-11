@@ -64,7 +64,8 @@ int main(void) {
                     "Mod2/DIO4",
                     "Mod2/DIO5",
                     "Mod2/DIO6",
-                    "Mod2/DIO7"};
+                    "Mod2/DIO7",
+                    "RT_U08_BO0"};
 
     string AIs[] = {"Mod4/AI0", "Mod4/AI1", "Mod4/AI2", "Mod4/AI3",
                     "Mod6/TC0", "Mod6/TC1", "Mod6/TC2", "Mod6/TC3",
@@ -108,7 +109,7 @@ int main(void) {
     /* BO */
     crioGetBOArraySize(ctx, &Size);
     cout << "Binary outputs found:" << Size << endl;
-    Item = false;
+    Item = true;
     for (uint x = 0; x < Size; x++)
     {
         Res = crioSetBOItem(ctx, BOs[x].c_str(), Item);

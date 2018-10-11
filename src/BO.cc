@@ -5,7 +5,7 @@
 #include <stdexcept>
 #include <time.h>
 #include <boost/bimap.hpp>
-
+#include "rt_var_handler.h"
 #include "CrioLinux.h"
 
 /* boost namespace */
@@ -34,10 +34,18 @@ int crioGetBOArraySize(struct crio_context *ctx, unsigned *size) {
 
 
 int crioSetBOItem(struct crio_context *ctx, const char *name, bool value) {
+    uint8_t *u08;
     if (!ctx->session_open)
         return -2;
     try {
-        return crioSetBO(ctx, ((bm_address_type *)ctx->bo_addresses)->left.at(name), value);
+        if (is_rt_var(name) == true)
+        {
+            u08 = (uint8_t*)(ctx->shared_memory + ctx->rt_variable_offsets[((bm_address_type *)ctx->rt_addresses)->left.at(name)]);
+            *u08 = value;
+            return 0;
+        }
+        else
+            return crioSetBO(ctx, ((bm_address_type *)ctx->bo_addresses)->left.at(name), value);
     }
     catch (out_of_range)
     {
