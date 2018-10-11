@@ -2,6 +2,7 @@
 #include "CrioLinux.h"
 #include "cfg_parser.h"
 #include "utils.h"
+#include "rt_var_handler.h"
 
 int crioSetup(struct crio_context *ctx, char *cfgfile) {
     string ip = "";
