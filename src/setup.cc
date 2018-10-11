@@ -1,6 +1,7 @@
 #include "Common.h"
 #include "CrioLinux.h"
 #include "cfg_parser.h"
+#include "utils.h"
 
 int crioSetup(struct crio_context *ctx, char *cfgfile) {
     string ip = "";
@@ -11,6 +12,7 @@ int crioSetup(struct crio_context *ctx, char *cfgfile) {
     string signature = "";
     bool use_shared_memory = false;
     string shared_memory_path = "";
+    const char *name;
     if (!ctx->session_open)
     {
         /* Read cfg file */
@@ -43,7 +45,6 @@ int crioSetup(struct crio_context *ctx, char *cfgfile) {
         ctx->ai_addresses = (void *) new bm_address_type;
         ctx->rt_addresses = (void *) new bm_address_type;
 
-
         Res = parser.get_bi_maps((bim_type*) ctx->bi_map, (bm_address_type *)ctx->bi_addresses, (bm_address_type *)ctx->rt_addresses);
         if (Res != 0)  return -1;
 
@@ -59,10 +60,22 @@ int crioSetup(struct crio_context *ctx, char *cfgfile) {
         /* Calculate offsets if shared memory is enabled */
         if (use_shared_memory == true) {
             int rt_var_size = ((bm_address_type *)ctx->rt_addresses)->size();
-            cout << "RT variables size is : " << rt_var_size << endl;
             ctx->rt_variable_offsets = new uint8_t[rt_var_size];
 
+            /* Set first offset to 0 */
+            ctx->rt_variable_offsets[0] = 0;
+
             /* Iterate on all items of map from 0 to size-1 and calculate offset of each */
+            for (int index = 0; index < rt_var_size-1; index ++)
+            {
+                try {
+                    name = ((bm_address_type *)ctx->rt_addresses)->right.at(index).c_str();
+                }
+                catch (out_of_range) {
+                    return -1;
+                }
+                ctx->rt_variable_offsets[index+1] = ctx->rt_variable_offsets[index] + get_rt_var_size(name);
+            }
         }
 
         /* Initialize context */
@@ -86,7 +99,12 @@ void crioCleanup(struct crio_context *ctx) {
         NiFpga_Finalize();
         ctx->session_open = false;
         /* Fixme: crioCleanup immediately after crioSetup causes segmentation fault. */
+        delete((bm_address_type *)ctx->ai_addresses);
+        delete((bm_address_type *)ctx->rt_addresses);
+        delete((bm_address_type *)ctx->ao_addresses);
+        delete((bm_address_type *)ctx->bo_addresses);
         delete((bm_address_type *)ctx->bi_addresses);
+        delete ctx->rt_variable_offsets;
         delete((bim_type * )ctx->bi_map);
         pthread_mutex_destroy(&ctx->bi_mutex);
     }
