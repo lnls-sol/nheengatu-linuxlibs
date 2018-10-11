@@ -16,7 +16,7 @@ include(macros.cmake)
 #######################################
 # Global setup
 #######################################
-set_default_build_type(RelWithDebInfo)
+set_default_build_type(Debug)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED YES)
 set(CMAKE_CXX_EXTENSIONS NO)
@@ -37,7 +37,7 @@ find_package (Threads)
 # Compiler flags
 ########################################
 add_compiler_flags(-Wall -Wextra -Werror -Wmissing-declarations -Wno-maybe-uninitialized
-    -Wno-missing-field-initializers -Wno-unused-parameter -fdata-sections -ffunction-sections -g)
+    -Wno-missing-field-initializers -Wno-unused-parameter -fdata-sections -ffunction-sections -O0 -g)
 add_linker_flags(-Wl,--as-needed -Wl,--gc-sections)
 add_double_flags(-fsanitize=undefined)
 

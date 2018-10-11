@@ -28,6 +28,8 @@ struct crio_context {
     void           * bo_addresses;
     void           * ao_addresses;
     void           * ai_addresses;
+    void           * rt_addresses;
+    uint8_t        * rt_variable_offsets;
 };
 
 

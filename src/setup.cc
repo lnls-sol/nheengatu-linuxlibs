@@ -9,20 +9,23 @@ int crioSetup(struct crio_context *ctx, char *cfgfile) {
     string bitfile = "";
     string fileName = "";
     string signature = "";
-
+    bool use_shared_memory = false;
+    string shared_memory_path = "";
     if (!ctx->session_open)
     {
         /* Read cfg file */
         cfg_parser parser(cfgfile);
 
         /* Get settings from configuration file */
-        parser.get_settings(ip, path, fileName, signature);
+        auto Res = parser.get_settings(ip, path, fileName, signature, use_shared_memory, shared_memory_path);
+        if (Res != 0)  return -1;
 
+        cout << "use_shared_memory : " << use_shared_memory << " shared_memory_path : " << shared_memory_path << endl;
         url = "rio://" + ip + "/RIO0";
         bitfile = path + "/" + fileName;
 
         /* Setting up CRIO */
-        auto Res = NiFpga_Initialize();
+        Res = NiFpga_Initialize();
         if (NiFpga_IsError(Res)) return -1;
 
         NiFpga_Session NiSession;
@@ -38,18 +41,29 @@ int crioSetup(struct crio_context *ctx, char *cfgfile) {
         ctx->bo_addresses = (void *) new bm_address_type;
         ctx->ao_addresses = (void *) new bm_address_type;
         ctx->ai_addresses = (void *) new bm_address_type;
+        ctx->rt_addresses = (void *) new bm_address_type;
 
-        Res = parser.get_bi_maps((bim_type*) ctx->bi_map, (bm_address_type *)ctx->bi_addresses);
+
+        Res = parser.get_bi_maps((bim_type*) ctx->bi_map, (bm_address_type *)ctx->bi_addresses, (bm_address_type *)ctx->rt_addresses);
         if (Res != 0)  return -1;
 
-        Res = parser.get_address_maps((bm_address_type *)ctx->bo_addresses, BO_ALIAS);
+        Res = parser.get_address_maps((bm_address_type *)ctx->bo_addresses, (bm_address_type *)ctx->rt_addresses, BO_ALIAS);
         if (Res != 0)  return -1;
 
-        Res = parser.get_address_maps((bm_address_type *)ctx->ao_addresses, AO_ALIAS);
+        Res = parser.get_address_maps((bm_address_type *)ctx->ao_addresses, (bm_address_type *)ctx->rt_addresses, AO_ALIAS);
         if (Res != 0)  return -1;
 
-        Res = parser.get_address_maps((bm_address_type *)ctx->ai_addresses, AI_ALIAS);
+        Res = parser.get_address_maps((bm_address_type *)ctx->ai_addresses, (bm_address_type *)ctx->rt_addresses, AI_ALIAS);
         if (Res != 0)  return -1;
+
+        /* Calculate offsets if shared memory is enabled */
+        if (use_shared_memory == true) {
+            int rt_var_size = ((bm_address_type *)ctx->rt_addresses)->size();
+            cout << "RT variables size is : " << rt_var_size << endl;
+            ctx->rt_variable_offsets = new uint8_t[rt_var_size];
+
+            /* Iterate on all items of map from 0 to size-1 and calculate offset of each */
+        }
 
         /* Initialize context */
         ctx->session_open = true;
