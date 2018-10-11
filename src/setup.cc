@@ -14,7 +14,7 @@ int crioSetup(struct crio_context *ctx, char *cfgfile) {
     bool use_shared_memory = false;
     string shared_memory_path = "";
     const char *name;
-    if (!ctx->session_open)
+    if (ctx->session_open == false)
     {
         /* Read cfg file */
         cfg_parser parser(cfgfile);
@@ -67,6 +67,7 @@ int crioSetup(struct crio_context *ctx, char *cfgfile) {
             ctx->rt_variable_offsets[0] = 0;
 
             /* Iterate on all items of map from 0 to size-1 and calculate offset of each */
+            uint8_t offset;
             for (int index = 0; index < rt_var_size-1; index ++)
             {
                 try {
@@ -75,8 +76,13 @@ int crioSetup(struct crio_context *ctx, char *cfgfile) {
                 catch (out_of_range) {
                     return -1;
                 }
-                ctx->rt_variable_offsets[index+1] = ctx->rt_variable_offsets[index] + get_rt_var_size(name);
+                offset = ctx->rt_variable_offsets[index];
+                ctx->rt_variable_offsets[index+1] = offset + decode_enum_size(get_rt_var_size(name));
             }
+
+            /* open shared memory */
+            Res = open_shared_memory(shared_memory_path, &ctx->shared_memory);
+            if (Res != 0)  return -3;
         }
 
         /* Initialize context */
@@ -84,11 +90,7 @@ int crioSetup(struct crio_context *ctx, char *cfgfile) {
         ctx->session = (CrioSession)NiSession;
         ctx->bi_cache_valid = false;
         Res = pthread_mutex_init(&ctx->bi_mutex,NULL);
-        if (Res != 0)
-        {
-            perror("pthread_mutex_init");
-            return -1;
-        }
+        if (Res != 0) return -4;
     }
     return 0;
 }

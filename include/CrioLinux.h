@@ -7,6 +7,11 @@
 #pragma GCC visibility push(default)
 #endif
 
+#define TRED "\x1B[31m"
+#define TNORM "\x1B[0m"
+#define TGREEN "\x1B[32m"
+#define TCYAN "\x1B[36m"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -30,6 +35,7 @@ struct crio_context {
     void           * ai_addresses;
     void           * rt_addresses;
     uint8_t        * rt_variable_offsets;
+    uint8_t        * shared_memory;
 };
 
 
@@ -222,7 +228,7 @@ int crioGetAIArraySize(struct crio_context *ctx, unsigned *size);
  * - NOK = -1 (query returned null)
  * - NOK = -2 (Session not open)
  */
-int crioGetAIItem(struct crio_context *ctx, const char *name, float &value);
+int crioGetAIItem(struct crio_context *ctx, const char *name, double &value);
 
 #ifdef __cplusplus
 }

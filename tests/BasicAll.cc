@@ -6,7 +6,7 @@
 
 int main(void) {
     struct crio_context * ctx = new struct crio_context;
-    float ai_val;
+    double ai_val;
     unsigned Size;
     char cfg[] = "cfg/cfg.ini";
     const char *Name;
@@ -33,7 +33,8 @@ int main(void) {
     string AIs[] = {"Mod4/AI0", "Mod4/AI1", "Mod4/AI2", "Mod4/AI3",
                     "Mod6/TC0", "Mod6/TC1", "Mod6/TC2", "Mod6/TC3",
                     "Mod7/AI0", "Mod7/AI1", "Mod7/AI2", "Mod7/AI3",
-                    "Mod8/AI0", "Mod8/AI1", "Mod8/AI2", "Mod8/AI3"};
+                    "Mod8/AI0", "Mod8/AI1", "Mod8/AI2", "Mod8/AI3",
+                    "RT_DBL_AI0", "RT_I32_AI1"};
 
     string AOs[] = {"Mod5/AO0", "Mod5/AO1", "Mod5/AO2", "Mod5/AO3"};
 
@@ -96,7 +97,9 @@ int main(void) {
     /* AI */
     crioGetAIArraySize(ctx, &Size);
     cout << "Analog inputs found:" << Size << endl;
-    for (uint x = 0; x < Size; x++)
+    while (1)
+    {
+    for (uint x = 16; x < 18; x++)
     {
         Res = crioGetAIItem(ctx, AIs[x].c_str(), ai_val);
         switch (Res)
@@ -107,6 +110,8 @@ int main(void) {
         }
 
         cout << AIs[x].c_str() << "->" << ai_val << endl;
+    }
+    sleep(0.1);
     }
     cout << endl;
 

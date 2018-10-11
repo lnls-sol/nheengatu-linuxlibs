@@ -3,6 +3,16 @@
 
 #include "Common.h"
 #include <boost/bimap.hpp>
+#include <pthread.h>
+#include <stdio.h>
+#include <stdint.h>
+#include <sys/mman.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <errno.h>
+#include <sched.h>
+
 
 typedef boost::bimap< std::string, unsigned > bm_address_type;
 
@@ -11,6 +21,7 @@ extern "C" {
 #endif
 
 void print_bmap(bm_address_type * bmap);
+void set_cpu(uint cpu);
 
 #ifdef __cplusplus
 }

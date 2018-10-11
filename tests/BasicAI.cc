@@ -10,7 +10,7 @@ int main(void) {
     string AIs[] = {"Mod8/AI0", "Mod8/AI1", "Mod8/AI2", "Mod8/AI3"};
     char cfg[] = "cfg/ai_cfg.ini";
     auto Res = crioSetup(&ctx, cfg);
-    float inputs[4];
+    double inputs[4];
     switch (Res)
     {
         case -1 : cout << "Failed in reading ini file\n"; break;
