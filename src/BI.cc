@@ -94,8 +94,7 @@ int crioGetBIArrayItemByIndex(struct crio_context *ctx, bool *item, uint32_t ind
 int crioGetBIArraySize(struct crio_context *ctx, unsigned *size) {
     if (!ctx->session_open)
         return -2;
-    bim_type * x = (bim_type *)ctx->bi_map;
-    *size = (*x).size();
+    *size = ctx->bi_count;
     return 0;
 }
 

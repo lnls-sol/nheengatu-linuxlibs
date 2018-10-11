@@ -5,6 +5,7 @@
 #include <boost/bimap.hpp>
 #include "Common.h"
 
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -32,10 +33,10 @@ class cfg_parser {
         int get_settings(std::string &ip, std::string &path, std::string &fileName, std::string &signature, bool &use_shared_memory, std::string &shared_memory_path);
 
         /* fills the binary input BI key maps */
-        int get_bi_maps(bim_type *bi, bm_address_type *bi_address_map, bm_address_type *bi_rt_address_map);
+        int get_bi_maps(uint32_t &count, bim_type *bi, bm_address_type *bi_address_map, bm_address_type *bi_rt_address_map);
 
         /* Fills all indicated address binary maps */
-        int get_address_maps(bm_address_type * address_map, bm_address_type * rt_address_map, string alias);
+        int get_address_maps(uint32_t &count, bm_address_type * address_map, bm_address_type * rt_address_map, string alias);
     private:
         std::string cfg_file;
         boost::property_tree::ptree tree;

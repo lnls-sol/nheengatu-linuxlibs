@@ -29,7 +29,7 @@ static __inline__ int crioSetAO(struct crio_context *ctx, uint32_t address, floa
 int crioGetAOArraySize(struct crio_context *ctx, unsigned *size) {
     if (!ctx->session_open)
         return -2;
-    *size = ((bm_address_type *)ctx->ao_addresses)->size();
+    *size = ctx->ao_count;
     return 0;
 }
 

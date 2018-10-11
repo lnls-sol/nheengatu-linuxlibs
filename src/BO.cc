@@ -28,7 +28,7 @@ static __inline__ int crioSetBO(struct crio_context *ctx, uint32_t address, bool
 int crioGetBOArraySize(struct crio_context *ctx, unsigned *size) {
     if (!ctx->session_open)
         return -2;
-    *size = ((bm_address_type *)ctx->bo_addresses)->size();
+    *size = ctx->bo_count;
     return 0;
 }
 

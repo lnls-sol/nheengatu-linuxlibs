@@ -9,9 +9,44 @@ int main(void) {
     double ai_val;
     unsigned Size;
     char cfg[] = "cfg/cfg.ini";
-    const char *Name;
     bool Item;
     uint ao_val;
+
+    string BIs[] = {
+        "Mod3/DIO0",
+        "Mod3/DIO1",
+        "Mod3/DIO2",
+        "Mod3/DIO3",
+        "Mod3/DIO4",
+        "Mod3/DIO5",
+        "Mod3/DIO6",
+        "Mod3/DIO7",
+        "Mod3/DIO8",
+        "Mod3/DIO9",
+        "Mod3/DIO10",
+        "Mod3/DIO11",
+        "Mod3/DIO12",
+        "Mod3/DIO13",
+        "Mod3/DIO14",
+        "Mod3/DIO15",
+        "Mod3/DIO16",
+        "Mod3/DIO17",
+        "Mod3/DIO18",
+        "Mod3/DIO19",
+        "Mod3/DIO20",
+        "Mod3/DIO21",
+        "Mod3/DIO22",
+        "Mod3/DIO23",
+        "Mod3/DIO24",
+        "Mod3/DIO25",
+        "Mod3/DIO26",
+        "Mod3/DIO27",
+        "Mod3/DIO28",
+        "Mod3/DIO29",
+        "Mod3/DIO30",
+        "Mod3/DIO31",
+        "RT_BOL_STOP",
+        "RT_BOL_TEST"};
 
     string BOs[] = {"Mod1/DIO0",
                     "Mod1/DIO1",
@@ -45,6 +80,7 @@ int main(void) {
         case 0 : cout << "crioSetup executed successfully\n"; break;
         case -1 : cout << "Failed in reading ini file\n"; return -1; break;
         case -2 : cout << "Failed in initializing FPGA\n"; return -1; break;
+        case -3 : cout << "Failed in initializing Shared Memory\n"; return -1; break;
         default: break;
     }
 
@@ -57,21 +93,14 @@ int main(void) {
     cout << "Binary inputs found:" << Size << endl;
 
     for (unsigned I = 0; I < Size; I++) {
-        Res = crioGetBIArrayItemName(ctx, I, &Name);
+        Res = crioGetBIArrayItemByName(ctx, &Item, BIs[I].c_str());
         switch (Res)
         {
             case -1 : cout << "Index " << I << " does not exist\n"; return -1; break;
             case -2 : cout << "CRIO session not open\n"; return -1; break;
             default: break;
         }
-        Res = crioGetBIArrayItemByIndex(ctx, &Item, I);
-        switch (Res)
-        {
-            case -1 : cout << "Index " << I << " does not exist\n"; return -1; break;
-            case -2 : cout << "CRIO session not open\n"; return -1; break;
-            default: break;
-        }
-        cout << Name << ": " << Item  << endl;
+        cout << BIs[I].c_str() << ": " << Item  << endl;
     }
     cout << endl;
 
@@ -94,27 +123,6 @@ int main(void) {
     }
     cout << endl;
 
-    /* AI */
-    crioGetAIArraySize(ctx, &Size);
-    cout << "Analog inputs found:" << Size << endl;
-    while (1)
-    {
-    for (uint x = 16; x < 18; x++)
-    {
-        Res = crioGetAIItem(ctx, AIs[x].c_str(), ai_val);
-        switch (Res)
-        {
-            case -1 : cout << "Query returned NULL for AI address of name: " << AIs[x].c_str() << endl; return -1; break;
-            case -2 : cout << "CRIO session not open\n"; return -1; break;
-            default: break;
-        }
-
-        cout << AIs[x].c_str() << "->" << ai_val << endl;
-    }
-    sleep(0.1);
-    }
-    cout << endl;
-
     /* AO */
     crioGetAOArraySize(ctx, &Size);
     cout << "Analog outputs found:" << Size << endl;
@@ -131,9 +139,26 @@ int main(void) {
         cout << AOs[x].c_str() << "->" << ao_val << endl;
     }
     cout << endl;
+
+
+    /* AI */
+    crioGetAIArraySize(ctx, &Size);
+    cout << "Analog inputs found:" << Size << endl;
+    for (uint x = 0; x < Size; x++)
+    {
+        Res = crioGetAIItem(ctx, AIs[x].c_str(), ai_val);
+        switch (Res)
+        {
+            case -1 : cout << "Query returned NULL for AI address of name: " << AIs[x].c_str() << endl; return -1; break;
+            case -2 : cout << "CRIO session not open\n"; return -1; break;
+            default: break;
+        }
+
+        cout << AIs[x].c_str() << "->" << ai_val << endl;
+    }
+
     crioCleanup(ctx);
     cout << "FINISHED.\n";
-
     delete(ctx);
     return 0;
 }

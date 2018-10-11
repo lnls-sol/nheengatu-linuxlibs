@@ -36,6 +36,10 @@ struct crio_context {
     void           * rt_addresses;
     uint8_t        * rt_variable_offsets;
     uint8_t        * shared_memory;
+    uint32_t         ai_count;
+    uint32_t         ao_count;
+    uint32_t         bi_count;
+    uint32_t         bo_count;
 };
 
 
@@ -54,6 +58,7 @@ struct crio_context {
  * - OK  = 0
  * - NOK = -1 (Resources could not be allocated)
  * - NOK = -2 (NiFpga_Open failed)
+ * - NOK = -3 (Failure in accessing shared memory)
  */
 int crioSetup(struct crio_context *ctx, char * cfgfile);
 

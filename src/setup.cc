@@ -38,6 +38,11 @@ int crioSetup(struct crio_context *ctx, char *cfgfile) {
             return -2;
         }
 
+        ctx->ai_count = 0;
+        ctx->bi_count = 0;
+        ctx->ao_count = 0;
+        ctx->bo_count = 0;
+
         /* Fill in binary maps from the configuration file */
         ctx->bi_map = (void *) new bim_type;
         ctx->bi_addresses = (void *) new bm_address_type;
@@ -46,17 +51,18 @@ int crioSetup(struct crio_context *ctx, char *cfgfile) {
         ctx->ai_addresses = (void *) new bm_address_type;
         ctx->rt_addresses = (void *) new bm_address_type;
 
-        Res = parser.get_bi_maps((bim_type*) ctx->bi_map, (bm_address_type *)ctx->bi_addresses, (bm_address_type *)ctx->rt_addresses);
+        Res = parser.get_bi_maps(ctx->bi_count, (bim_type*) ctx->bi_map, (bm_address_type *)ctx->bi_addresses, (bm_address_type *)ctx->rt_addresses);
         if (Res != 0)  return -1;
 
-        Res = parser.get_address_maps((bm_address_type *)ctx->bo_addresses, (bm_address_type *)ctx->rt_addresses, BO_ALIAS);
+        Res = parser.get_address_maps(ctx->bo_count, (bm_address_type *)ctx->bo_addresses, (bm_address_type *)ctx->rt_addresses, BO_ALIAS);
         if (Res != 0)  return -1;
 
-        Res = parser.get_address_maps((bm_address_type *)ctx->ao_addresses, (bm_address_type *)ctx->rt_addresses, AO_ALIAS);
+        Res = parser.get_address_maps(ctx->ao_count, (bm_address_type *)ctx->ao_addresses, (bm_address_type *)ctx->rt_addresses, AO_ALIAS);
         if (Res != 0)  return -1;
 
-        Res = parser.get_address_maps((bm_address_type *)ctx->ai_addresses, (bm_address_type *)ctx->rt_addresses, AI_ALIAS);
+        Res = parser.get_address_maps(ctx->ai_count, (bm_address_type *)ctx->ai_addresses, (bm_address_type *)ctx->rt_addresses, AI_ALIAS);
         if (Res != 0)  return -1;
+        cout << "AI count" << ctx->ai_count << endl;
 
         /* Calculate offsets if shared memory is enabled */
         if (use_shared_memory == true) {

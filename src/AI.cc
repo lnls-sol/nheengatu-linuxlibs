@@ -78,7 +78,7 @@ static __inline__ int get_rt_val(struct crio_context *ctx, const char *name, dou
 int crioGetAIArraySize(struct crio_context *ctx, unsigned *size) {
     if (!ctx->session_open)
         return -2;
-    *size = ((bm_address_type *)ctx->ai_addresses)->size();
+    *size = ctx->ai_count;
     return 0;
 }
 
