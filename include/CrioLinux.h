@@ -194,7 +194,7 @@ int crioSetBOItem(struct crio_context *ctx, const char *name, bool value);
  * - NOK = -1 (query returned null)
  * - NOK = -2 (Session not open)
  */
-int crioSetAOItem(struct crio_context *ctx, const char *name, float value);
+int crioSetAOItem(struct crio_context *ctx, const char *name, double value);
 
 
 /* Function Name  : crioGetAOArraySize

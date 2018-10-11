@@ -12,20 +12,20 @@ bool is_rt_var(std::string name){
 }
 
 uint8_t decode_enum_size(enum type_code code){
-
+    return 8;
     switch (code)
     {
         case DBL: return 8;
         case SGL: return 4;
         case U64: return 8;
         case U32: return 4;
-        case U16: return 4;
-        case U08: return 4;
+        case U16: return 2;
+        case U08: return 1;
         case I64: return 8;
         case I32: return 4;
-        case I16: return 4;
-        case I08: return 4;
-        case BOL: return 4;
+        case I16: return 2;
+        case I08: return 1;
+        case BOL: return 1;
         default: return 0;
     }
 }

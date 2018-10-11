@@ -1,7 +1,8 @@
 #undef NDEBUG
 #include "Common.h"
 #include <CrioLinux.h>
-
+#include <ctime>    // For time()
+#include <cstdlib>
 
 
 int main(void) {
@@ -11,7 +12,7 @@ int main(void) {
     char cfg[] = "cfg/cfg.ini";
     bool Item;
     uint ao_val;
-
+    srand(time(0));
     string BIs[] = {
         "Mod3/DIO0",
         "Mod3/DIO1",
@@ -71,7 +72,7 @@ int main(void) {
                     "Mod8/AI0", "Mod8/AI1", "Mod8/AI2", "Mod8/AI3",
                     "RT_DBL_AI0", "RT_I32_AI1"};
 
-    string AOs[] = {"Mod5/AO0", "Mod5/AO1", "Mod5/AO2", "Mod5/AO3"};
+    string AOs[] = {"Mod5/AO0", "Mod5/AO1", "Mod5/AO2", "Mod5/AO3", "RT_U64_AO1"};
 
 
     auto Res = crioSetup(ctx, cfg);
