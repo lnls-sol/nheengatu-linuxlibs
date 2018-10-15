@@ -32,7 +32,8 @@ bool get_rt_var_sign(std::string name);
 type_code get_rt_var_size(std::string name);
 int open_shared_memory(std::string shm_name, uint8_t **memory_ptr);
 uint8_t decode_enum_size(enum type_code code);
-
+int get_rt_val(uint8_t *shared_memory, uint64_t offset, double &value, std::string name);
+int set_rt_val(uint8_t * shared_memory, uint64_t offset, double value, std::string name);
 #ifdef __cplusplus
 }
 #endif

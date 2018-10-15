@@ -11,8 +11,13 @@ bool is_rt_var(std::string name){
     return false;
 }
 
+
 uint8_t decode_enum_size(enum type_code code){
     return 8;
+    /* Due to the sanitizer library that is used when compiling with docker
+     * each type has some specific alignment in the memory. For simplicity
+     * we aligned all variables with addresses of multiples of 8.
+    */
     switch (code)
     {
         case DBL: return 8;
@@ -28,6 +33,110 @@ uint8_t decode_enum_size(enum type_code code){
         case BOL: return 1;
         default: return 0;
     }
+}
+
+
+int set_rt_val(uint8_t * shared_memory, uint64_t offset, double value, std::string name)
+{
+    double *dbl;
+    float *flt;
+    uint8_t *u08;
+    uint16_t *u16;
+    uint32_t *u32;
+    uint64_t *u64;
+    int8_t  *i08;
+    int16_t *i16;
+    int32_t *i32;
+    int64_t *i64;
+    switch (get_rt_var_size(name))
+    {
+        case DBL: dbl = (double*)(shared_memory + offset);
+                  *dbl = value;
+                  break;
+        case SGL: flt = (float*)(shared_memory + offset);
+                  *flt = value;
+                  break;
+        case U64: u64 = (uint64_t*)(shared_memory + offset);
+                  *u64 = value;
+                  break;
+        case U32: u32 = (uint32_t*)(shared_memory + offset);
+                  *u32 = value;
+                  break;
+        case U16: u16 = (uint16_t*)(shared_memory + offset);
+                  *u16 = value;
+                  break;
+        case U08: u08 = (uint8_t*)(shared_memory + offset);
+                  *u08 = value;
+                  break;
+        case I64: i64 = (int64_t*)(shared_memory + offset);
+                  *i64 = value;
+                  break;
+        case I32: i32 = (int32_t*)(shared_memory + offset);
+                  *i32 = value;
+                  break;
+        case I16: i16 = (int16_t*)(shared_memory + offset);
+                  *i16 = value;
+                  break;
+        case I08:
+        case BOL: i08 = (int8_t*)(shared_memory + offset);
+                  *i08 = value;
+                  break;
+        default: break;
+    }
+    return 0;
+}
+
+int get_rt_val(uint8_t *shared_memory, uint64_t offset, double &value, std::string name)
+{
+    double dbl;
+    float flt;
+    uint8_t u08;
+    uint16_t u16;
+    uint32_t u32;
+    uint64_t u64;
+    int8_t  i08;
+    int16_t i16;
+    int32_t i32;
+    int64_t i64;
+    bool boolean;
+    switch (get_rt_var_size(name))
+    {
+        case DBL: dbl = *(double*)(shared_memory + offset);
+                  value = (double) dbl;
+                  break;
+        case SGL: flt = *(float*)(shared_memory + offset);
+                  value = (double) flt;
+                  break;
+        case U64: u64 = *(uint64_t*)(shared_memory + offset);
+                  value = (double) u64;
+                  break;
+        case U32: u32 = *(uint32_t*)(shared_memory + offset);
+                  value = (double) u32;
+                  break;
+        case U16: u16 = *(uint16_t*)(shared_memory + offset);
+                  value = (double) u16;
+                  break;
+        case U08: u08 = *(uint8_t*)(shared_memory + offset);
+                  value = (double) u08;
+                  break;
+        case I64: i64 = *(int64_t*)(shared_memory + offset);
+                  value = (double) i64;
+                  break;
+        case I32: i32 = *(int32_t*)(shared_memory + offset);
+                  value = (double) i32;
+                  break;
+        case I16: i16 = *(int16_t*)(shared_memory + offset);
+                  value = (double) i16;
+                  break;
+        case I08: i08 = *(int8_t*)(shared_memory + offset);
+                  value = (double) i08;
+                  break;
+        case BOL: boolean = *(int8_t*)(shared_memory + offset);
+              value = (double) boolean;
+              break;
+        default: value = 0; break;
+    }
+    return 0;
 }
 
 enum type_code get_rt_var_size(std::string name){

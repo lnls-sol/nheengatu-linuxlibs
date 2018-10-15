@@ -99,7 +99,7 @@ int crioGetBIArraySize(struct crio_context *ctx, unsigned *size) {
 }
 
 int crioGetBIArrayItemByName(struct crio_context *ctx, bool *item, const char *name) {
-    uint8_t u08;
+    double value;
     if (!ctx->session_open)
         return -2;
 
@@ -108,8 +108,8 @@ int crioGetBIArrayItemByName(struct crio_context *ctx, bool *item, const char *n
     try {
         if (is_rt_var(name) == true)
         {
-            u08 = *(uint8_t*)(ctx->shared_memory + ctx->rt_variable_offsets[((bm_address_type *)ctx->rt_addresses)->left.at(name)]);
-            *item = (bool) u08;
+            get_rt_val(ctx->shared_memory, ctx->rt_variable_offsets[((bm_address_type *)ctx->rt_addresses)->left.at(name)], value, name);
+            *item = static_cast<bool>(value);
         }
         else
         {

@@ -34,14 +34,12 @@ int crioGetBOArraySize(struct crio_context *ctx, unsigned *size) {
 
 
 int crioSetBOItem(struct crio_context *ctx, const char *name, bool value) {
-    uint8_t *u08;
     if (!ctx->session_open)
         return -2;
     try {
         if (is_rt_var(name) == true)
         {
-            u08 = (uint8_t*)(ctx->shared_memory + ctx->rt_variable_offsets[((bm_address_type *)ctx->rt_addresses)->left.at(name)]);
-            *u08 = value;
+            set_rt_val(ctx->shared_memory, ctx->rt_variable_offsets[((bm_address_type *)ctx->rt_addresses)->left.at(name)], static_cast<double>(value), name);
             return 0;
         }
         else

@@ -4,6 +4,7 @@
 #include <ctime>    // For time()
 #include <cstdlib>
 
+#include <math.h>
 
 int main(void) {
     struct crio_context * ctx = new struct crio_context;
@@ -11,7 +12,7 @@ int main(void) {
     unsigned Size;
     char cfg[] = "cfg/cfg.ini";
     bool Item;
-    uint ao_val;
+    double ao_val;
     srand(time(0));
     string BIs[] = {
         "Mod3/DIO0",
@@ -46,8 +47,7 @@ int main(void) {
         "Mod3/DIO29",
         "Mod3/DIO30",
         "Mod3/DIO31",
-        "RT_BOL_STOP",
-        "RT_BOL_TEST"};
+        "RT_BOL_BITest"};
 
     string BOs[] = {"Mod1/DIO0",
                     "Mod1/DIO1",
@@ -65,15 +65,21 @@ int main(void) {
                     "Mod2/DIO5",
                     "Mod2/DIO6",
                     "Mod2/DIO7",
-                    "RT_U08_BO0"};
+                    "RT_BOL_BO0"};
 
     string AIs[] = {"Mod4/AI0", "Mod4/AI1", "Mod4/AI2", "Mod4/AI3",
                     "Mod6/TC0", "Mod6/TC1", "Mod6/TC2", "Mod6/TC3",
                     "Mod7/AI0", "Mod7/AI1", "Mod7/AI2", "Mod7/AI3",
                     "Mod8/AI0", "Mod8/AI1", "Mod8/AI2", "Mod8/AI3",
-                    "RT_DBL_AI0", "RT_I32_AI1"};
+                    "RT_DBL_AI0", "RT_SGL_AI1", "RT_I64_AI2", "RT_I32_AI3",
+                    "RT_I16_AI4", "RT_I08_AI5", "RT_U64_AI6", "RT_U32_AI7",
+                    "RT_U16_AI8", "RT_U08_AI9"};
 
-    string AOs[] = {"Mod5/AO0", "Mod5/AO1", "Mod5/AO2", "Mod5/AO3", "RT_U64_AO1"};
+
+    string AOs[] = {"Mod5/AO0", "Mod5/AO1", "Mod5/AO2", "Mod5/AO3",
+                    "RT_DBL_AO1", "RT_SGL_AO2", "RT_I64_AO3", "RT_I32_AO4",
+                   "RT_I16_AO5", "RT_I08_AO6", "RT_U64_AO7", "RT_U32_AO8",
+                   "RT_U16_AO9", "RT_U08_AO10"};
 
 
     auto Res = crioSetup(ctx, cfg);
@@ -109,7 +115,7 @@ int main(void) {
     /* BO */
     crioGetBOArraySize(ctx, &Size);
     cout << "Binary outputs found:" << Size << endl;
-    Item = true;
+    Item = rand() % 2;
     for (uint x = 0; x < Size; x++)
     {
         Res = crioSetBOItem(ctx, BOs[x].c_str(), Item);
@@ -138,7 +144,7 @@ int main(void) {
             case -2 : cout << "CRIO session not open\n"; return -1; break;
             default: break;
         }
-        cout << AOs[x].c_str() << "->" << ao_val << endl;
+        cout << AOs[x].c_str() << "->" << static_cast<int64_t>(ao_val) << endl;
     }
     cout << endl;
 
@@ -156,7 +162,7 @@ int main(void) {
             default: break;
         }
 
-        cout << AIs[x].c_str() << "->" << ai_val << endl;
+        cout << AIs[x].c_str() << "->" << static_cast<int64_t>(ai_val) << endl;
     }
 
     crioCleanup(ctx);
