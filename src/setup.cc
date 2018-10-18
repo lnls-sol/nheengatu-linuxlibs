@@ -23,7 +23,6 @@ int crioSetup(struct crio_context *ctx, char *cfgfile) {
         auto Res = parser.get_settings(ip, path, fileName, signature, use_shared_memory, shared_memory_path);
         if (Res != 0)  return -1;
 
-        cout << "use_shared_memory : " << use_shared_memory << " shared_memory_path : " << shared_memory_path << endl;
         url = "rio://" + ip + "/RIO0";
         bitfile = path + "/" + fileName;
 

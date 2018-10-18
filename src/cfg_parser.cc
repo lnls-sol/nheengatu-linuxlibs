@@ -38,6 +38,7 @@ int cfg_parser::get_settings(std::string &ip, std::string &path, std::string &fi
 
 int cfg_parser::get_bi_maps(uint32_t & count, bim_type *bi_map, bm_address_type * bi_address_map, bm_address_type * bi_rt_address_map )
 {
+    /* TODO: Check if either index of name exist. and return error if does. this will reduce debugging time.*/
     try
     {
         for (const std::pair<std::string, boost::property_tree::ptree> &bi_address_tree : tree.get_child(BIADDR_ALIAS))
@@ -69,6 +70,7 @@ int cfg_parser::get_bi_maps(uint32_t & count, bim_type *bi_map, bm_address_type 
 
 int cfg_parser::get_address_maps(uint32_t & count, bm_address_type * address_map, bm_address_type * rt_address_map, string alias)
 {
+    /* TODO: Check if either index of name exist. and return error if does. this will reduce debugging time.*/
     try
     {
         for (const std::pair<std::string, boost::property_tree::ptree> &address_tree : tree.get_child(alias))

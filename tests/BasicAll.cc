@@ -46,7 +46,6 @@ int main(void) {
         "Mod3/DIO28",
         "Mod3/DIO29",
         "Mod3/DIO30",
-        "Mod3/DIO31",
         "RT_BOL_BITest"};
 
     string BOs[] = {"Mod1/DIO0",
@@ -65,7 +64,8 @@ int main(void) {
                     "Mod2/DIO5",
                     "Mod2/DIO6",
                     "Mod2/DIO7",
-                    "RT_BOL_BO0"};
+                    "Mod3/DIO31",
+                    "RT_BOL_BO0" };
 
     string AIs[] = {"Mod4/AI0", "Mod4/AI1", "Mod4/AI2", "Mod4/AI3",
                     "Mod6/TC0", "Mod6/TC1", "Mod6/TC2", "Mod6/TC3",
@@ -121,7 +121,7 @@ int main(void) {
         Res = crioSetBOItem(ctx, BOs[x].c_str(), Item);
         switch (Res)
         {
-            case -1 : cout << "Item " << BOs[x].c_str() << " does not exist\n"; return -1; break;
+            case -1 : cout << "Item " << BOs[x].c_str() << " does not exist.\n"; return -1; break;
             case -2 : cout << "CRIO session not open\n"; return -1; break;
             default: break;
         }

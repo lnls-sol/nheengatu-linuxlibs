@@ -39,7 +39,7 @@ find_package (Threads)
 add_compiler_flags(-Wall -Wextra -Werror -Wmissing-declarations -Wno-maybe-uninitialized
     -Wno-missing-field-initializers -Wno-unused-parameter -fdata-sections -ffunction-sections -O0 -g)
 add_linker_flags(-Wl,--as-needed -Wl,--gc-sections)
-add_double_flags(-fsanitize=undefined)
+#add_double_flags(-fsanitize=undefined)
 
 if (NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_double_flags(-flto)
