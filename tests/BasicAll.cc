@@ -64,8 +64,8 @@ int main(void) {
                     "Mod2/DIO5",
                     "Mod2/DIO6",
                     "Mod2/DIO7",
-                    "Mod3/DIO31",
-                    "RT_BOL_BO0" };
+                    "RT_BOL_BO0",
+                    "Mod3/DIO31"};
 
     string AIs[] = {"Mod4/AI0", "Mod4/AI1", "Mod4/AI2", "Mod4/AI3",
                     "Mod6/TC0", "Mod6/TC1", "Mod6/TC2", "Mod6/TC3",
@@ -91,6 +91,14 @@ int main(void) {
         case -3 : cout << "Failed in initializing Shared Memory\n"; return -1; break;
         default: break;
     }
+    /*bool x = false;
+    while(1)
+    {
+        Res = crioSetBOItem(ctx, "Mod3/DIO31", x);
+        x = !x;
+        usleep(0.1 * 1000000);
+        printf("Altered x to %u\n", x);
+    }*/
 
     // Seems like the FPGA needs 1 second to start bringing data available on the ports.
     // This value was obtained emperically.
@@ -104,9 +112,10 @@ int main(void) {
         Res = crioGetBIArrayItemByName(ctx, &Item, BIs[I].c_str());
         switch (Res)
         {
+            case 0 : break;
             case -1 : cout << "Index " << I << " does not exist\n"; return -1; break;
             case -2 : cout << "CRIO session not open\n"; return -1; break;
-            default: break;
+            default: cout << "default case\n"; return -1; break;
         }
         cout << BIs[I].c_str() << ": " << Item  << endl;
     }
@@ -129,6 +138,8 @@ int main(void) {
         Item = !Item;
         assert(Res == 0);
     }
+
+
     cout << endl;
 
     /* AO */

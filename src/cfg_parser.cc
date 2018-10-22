@@ -36,7 +36,7 @@ int cfg_parser::get_settings(std::string &ip, std::string &path, std::string &fi
     return 0;
 }
 
-int cfg_parser::get_bi_maps(uint32_t & count, bim_type *bi_map, bm_address_type * bi_address_map, bm_address_type * bi_rt_address_map )
+int cfg_parser::get_bi_maps(bool rt_support, uint32_t & count, bim_type *bi_map, bm_address_type * bi_address_map, bm_address_type * bi_rt_address_map )
 {
     /* TODO: Check if either index of name exist. and return error if does. this will reduce debugging time.*/
     try
@@ -53,7 +53,7 @@ int cfg_parser::get_bi_maps(uint32_t & count, bim_type *bi_map, bm_address_type 
                     count++;
                 }
             }
-            else {
+            else if (rt_support == true){
                 bi_rt_address_map->insert( bm_address_type::value_type( (bi_address_tree.first.c_str()) ,
                                                                       strtoul(bi_address_tree.second.get_value<std::string>().c_str(), NULL, 10) ));
                 count++;
@@ -68,7 +68,7 @@ int cfg_parser::get_bi_maps(uint32_t & count, bim_type *bi_map, bm_address_type 
     return 0;
 }
 
-int cfg_parser::get_address_maps(uint32_t & count, bm_address_type * address_map, bm_address_type * rt_address_map, string alias)
+int cfg_parser::get_address_maps(bool rt_support, uint32_t & count, bm_address_type * address_map, bm_address_type * rt_address_map, string alias)
 {
     /* TODO: Check if either index of name exist. and return error if does. this will reduce debugging time.*/
     try
@@ -77,8 +77,10 @@ int cfg_parser::get_address_maps(uint32_t & count, bm_address_type * address_map
         {
             if (is_rt_var(address_tree.first) == false)
                 address_map->insert( bm_address_type::value_type( (address_tree.first.c_str()) , strtoul(address_tree.second.get_value<std::string>().c_str(), NULL, 16) ));
-            else
+            else if (rt_support == true)
                 rt_address_map->insert( bm_address_type::value_type( (address_tree.first.c_str()) , strtoul(address_tree.second.get_value<std::string>().c_str(), NULL, 10) ));
+            else
+                continue;
             count++;
         }
     }

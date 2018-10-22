@@ -7,8 +7,10 @@
 #include <boost/bimap.hpp>
 #include "rt_var_handler.h"
 #include "CrioLinux.h"
+#include <sys/types.h>
+#include <sys/syscall.h>
 
-#define CACHE_TIMEOUT_US 1000
+#define CACHE_TIMEOUT_US 100
 
 /* boost namespace */
 using boost::bimap;
@@ -51,23 +53,28 @@ static __inline__ int ParseNumberStrict(const char *Text, unsigned *Value) {
 
 static __inline__ int crioReadBIArray(struct crio_context *ctx, uint64_t *output, uint64_t address) {
 
+    //pid_t x = syscall(__NR_gettid);
+    //printf("Thread %d attempting to aquire mutex\n",x);
+
     pthread_mutex_lock(&ctx->bi_mutex);
     clock_t delta = clock() - ctx->bi_sample_time;
-    if (delta*(1000000.0/CLOCKS_PER_SEC) < CACHE_TIMEOUT_US && ctx->bi_cache_valid == true)
+    if ((delta*(1000000.0/CLOCKS_PER_SEC) < CACHE_TIMEOUT_US) && ctx->bi_cache_valid == true)
     {
         *output = ctx->bi_cache;
-        //printf("Using cached  ");
+        //printf("Using cached  \n");
     } 
-    else 
+    else
     {
+        //printf( "Fetching data: Time is %f\n", clock()*(1000.0/CLOCKS_PER_SEC));
         auto Res = NiFpga_ReadU64(NiFpga_Session(ctx->session), address, output);
         if (NiFpga_IsError(Res)) return -1;
         ctx->bi_cache = *output;
         ctx->bi_cache_valid = true;
         ctx->bi_sample_time = clock();
-        //printf("Fetching data ");
+        //printf( "Fetched data: Time is %f\n", clock()*(1000.0/CLOCKS_PER_SEC));
     }
     pthread_mutex_unlock(&ctx->bi_mutex);
+    //printf("Thread %d unlocked mutex\n", x);
     return 0;
 }
 
