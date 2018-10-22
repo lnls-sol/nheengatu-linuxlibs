@@ -24,7 +24,7 @@ typedef	unsigned int CrioSession;
 struct crio_context {
     CrioSession      session;
     bool             session_open;
-    clock_t          bi_sample_time;
+    struct timespec  bi_sample_time;
     uint64_t         bi_cache;
     bool             bi_cache_valid;
     pthread_mutex_t  bi_mutex;

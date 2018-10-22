@@ -1,4 +1,5 @@
 #include "Common.h"
+#include "utils.h"
 
 #include <ctype.h>
 #include <errno.h>
@@ -10,7 +11,7 @@
 #include <sys/types.h>
 #include <sys/syscall.h>
 
-#define CACHE_TIMEOUT_US 100
+#define CACHE_TIMEOUT_US 1000
 
 /* boost namespace */
 using boost::bimap;
@@ -51,30 +52,40 @@ static __inline__ int ParseNumberStrict(const char *Text, unsigned *Value) {
     return 0;
 }
 
+
+
+
 static __inline__ int crioReadBIArray(struct crio_context *ctx, uint64_t *output, uint64_t address) {
 
     //pid_t x = syscall(__NR_gettid);
-    //printf("Thread %d attempting to aquire mutex\n",x);
-
     pthread_mutex_lock(&ctx->bi_mutex);
-    clock_t delta = clock() - ctx->bi_sample_time;
-    if ((delta*(1000000.0/CLOCKS_PER_SEC) < CACHE_TIMEOUT_US) && ctx->bi_cache_valid == true)
+
+    struct timespec  current, delta;
+    clock_gettime(CLOCK_REALTIME, &current);
+    timespec_diff(&ctx->bi_sample_time, &current, &delta);
+    double delta_us = delta.tv_sec * 1000000.0 + delta.tv_nsec / 1000.0;
+    //double start, stop;
+    if ((delta_us < CACHE_TIMEOUT_US) && ctx->bi_cache_valid == true)
     {
+        //start = clock()*(1000.0/CLOCKS_PER_SEC);
         *output = ctx->bi_cache;
-        //printf("Using cached  \n");
+        //stop = clock()*(1000.0/CLOCKS_PER_SEC);
+        //printf( "[%f] cached: took %f ms. Value=%lu, ID=%d, Delta=%f\n", stop, stop - start, *output, x, delta_us);
+        //printf( "Cached\n");
     } 
     else
     {
-        //printf( "Fetching data: Time is %f\n", clock()*(1000.0/CLOCKS_PER_SEC));
+        //start = clock()*(1000.0/CLOCKS_PER_SEC);
         auto Res = NiFpga_ReadU64(NiFpga_Session(ctx->session), address, output);
         if (NiFpga_IsError(Res)) return -1;
         ctx->bi_cache = *output;
+        memcpy(&ctx->bi_sample_time, &current, sizeof (struct timespec));
         ctx->bi_cache_valid = true;
-        ctx->bi_sample_time = clock();
-        //printf( "Fetched data: Time is %f\n", clock()*(1000.0/CLOCKS_PER_SEC));
+        //printf( "Fetched\n");
+        //stop = clock()*(1000.0/CLOCKS_PER_SEC);
+        //printf( "[%f] Fetched: took %f ms. Value=%lu, ID=%d, Delta=%f\n", stop, stop - start, *output, x, delta_us);
     }
     pthread_mutex_unlock(&ctx->bi_mutex);
-    //printf("Thread %d unlocked mutex\n", x);
     return 0;
 }
 

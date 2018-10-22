@@ -91,14 +91,14 @@ int main(void) {
         case -3 : cout << "Failed in initializing Shared Memory\n"; return -1; break;
         default: break;
     }
-    /*bool x = false;
+    bool x = false;
     while(1)
     {
         Res = crioSetBOItem(ctx, "Mod3/DIO31", x);
         x = !x;
         usleep(0.1 * 1000000);
         printf("Altered x to %u\n", x);
-    }*/
+    }
 
     // Seems like the FPGA needs 1 second to start bringing data available on the ports.
     // This value was obtained emperically.
