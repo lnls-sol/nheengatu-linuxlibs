@@ -14,27 +14,29 @@ int crioSetup(struct crio_context *ctx, char *cfgfile) {
     bool use_shared_memory = false;
     string shared_memory_path = "";
     const char *name;
+    cfg_parser * parser;
     if (ctx->session_open == false)
     {
         /* Read cfg file */
-        cfg_parser parser(cfgfile);
+        TRY(parser = new cfg_parser(cfgfile));
+
 
         /* Get settings from configuration file */
-        auto Res = parser.get_settings(ip, path, fileName, signature, use_shared_memory, shared_memory_path);
-        if (Res != 0)  return -1;
+        TRY(parser->get_settings(ip, path, fileName, signature, use_shared_memory, shared_memory_path));
 
         url = "rio://" + ip + "/RIO0";
         bitfile = path + "/" + fileName;
 
         /* Setting up CRIO */
-        Res = NiFpga_Initialize();
-        if (NiFpga_IsError(Res)) return -1;
+        auto Res = NiFpga_Initialize();
+        if (NiFpga_IsError(Res))
+            throw (CrioLibException(E_FPGA_INIT, "[%s] Failed to initialize FPGA.", LIB_CRIO_LINUX));
 
         NiFpga_Session NiSession;
         Res = NiFpga_Open(bitfile.c_str(), signature.c_str(), url.c_str(), 0, &NiSession);
         if (NiFpga_IsError(Res)) {
             NiFpga_Finalize();
-            return -2;
+            throw (CrioLibException(E_FPGA_INIT, "[%s] Failed to write bitstream. Check path, signature and IP.", LIB_CRIO_LINUX));
         }
 
         ctx->ai_count = 0;
@@ -50,17 +52,10 @@ int crioSetup(struct crio_context *ctx, char *cfgfile) {
         ctx->ai_addresses = (void *) new bm_address_type;
         ctx->rt_addresses = (void *) new bm_address_type;
 
-        Res = parser.get_bi_maps(use_shared_memory, ctx->bi_count, (bim_type*) ctx->bi_map, (bm_address_type *)ctx->bi_addresses, (bm_address_type *)ctx->rt_addresses);
-        if (Res != 0)  return -1;
-
-        Res = parser.get_address_maps(use_shared_memory, ctx->bo_count, (bm_address_type *)ctx->bo_addresses, (bm_address_type *)ctx->rt_addresses, BO_ALIAS);
-        if (Res != 0)  return -1;
-
-        Res = parser.get_address_maps(use_shared_memory, ctx->ao_count, (bm_address_type *)ctx->ao_addresses, (bm_address_type *)ctx->rt_addresses, AO_ALIAS);
-        if (Res != 0)  return -1;
-
-        Res = parser.get_address_maps(use_shared_memory, ctx->ai_count, (bm_address_type *)ctx->ai_addresses, (bm_address_type *)ctx->rt_addresses, AI_ALIAS);
-        if (Res != 0)  return -1;
+        TRY(parser->get_bi_maps(use_shared_memory, ctx->bi_count, (bim_type*) ctx->bi_map, (bm_address_type *)ctx->bi_addresses, (bm_address_type *)ctx->rt_addresses));
+        TRY(parser->get_address_maps(use_shared_memory, ctx->bo_count, (bm_address_type *)ctx->bo_addresses, (bm_address_type *)ctx->rt_addresses, BO_ALIAS));
+        TRY(parser->get_address_maps(use_shared_memory, ctx->ao_count, (bm_address_type *)ctx->ao_addresses, (bm_address_type *)ctx->rt_addresses, AO_ALIAS));
+        TRY(parser->get_address_maps(use_shared_memory, ctx->ai_count, (bm_address_type *)ctx->ai_addresses, (bm_address_type *)ctx->rt_addresses, AI_ALIAS));
 
         /* Calculate offsets if shared memory is enabled */
         if (use_shared_memory == true) {
@@ -78,26 +73,30 @@ int crioSetup(struct crio_context *ctx, char *cfgfile) {
                     name = ((bm_address_type *)ctx->rt_addresses)->right.at(index).c_str();
                 }
                 catch (out_of_range) {
-                    return -1;
+                    throw (CrioLibException(E_OUT_OF_RANGE, "[%s] Cannot find RT item of index <%d>.", LIB_CRIO_LINUX, index));
                 }
                 offset = ctx->rt_variable_offsets[index];
                 ctx->rt_variable_offsets[index+1] = offset + decode_enum_size(get_rt_var_size(name));
             }
 
             /* open shared memory */
-            Res = open_shared_memory(shared_memory_path, &ctx->shared_memory);
-            if (Res != 0)  return -3;
+            TRY(open_shared_memory(shared_memory_path, &ctx->shared_memory));
+
         }
 
         /* Initialize context */
         ctx->session_open = true;
         ctx->session = (CrioSession)NiSession;
         ctx->bi_cache_valid = false;
+        ctx->bi_cache_timeout = 1000;
         Res = pthread_mutex_init(&ctx->bi_mutex,NULL);
-        if (Res != 0) return -4;
+        if (Res != 0) throw (CrioLibException(E_RESOURCE_ALLOC, "[%s] Cannot create mutex.", LIB_CRIO_LINUX));
     }
+    delete parser;
     return 0;
 }
+
+
 
 void crioCleanup(struct crio_context *ctx) {
     if (ctx->session_open)
@@ -105,7 +104,6 @@ void crioCleanup(struct crio_context *ctx) {
         NiFpga_Close(ctx->session, NiFpga_CloseAttribute_NoResetIfLastSession);
         NiFpga_Finalize();
         ctx->session_open = false;
-        /* Fixme: crioCleanup immediately after crioSetup causes segmentation fault. */
         delete((bm_address_type *)ctx->ai_addresses);
         delete((bm_address_type *)ctx->rt_addresses);
         delete((bm_address_type *)ctx->ao_addresses);

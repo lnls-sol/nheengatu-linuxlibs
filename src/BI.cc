@@ -57,33 +57,23 @@ static __inline__ int ParseNumberStrict(const char *Text, unsigned *Value) {
 
 static __inline__ int crioReadBIArray(struct crio_context *ctx, uint64_t *output, uint64_t address) {
 
-    //pid_t x = syscall(__NR_gettid);
     pthread_mutex_lock(&ctx->bi_mutex);
 
     struct timespec  current, delta;
     clock_gettime(CLOCK_REALTIME, &current);
     timespec_diff(&ctx->bi_sample_time, &current, &delta);
     double delta_us = delta.tv_sec * 1000000.0 + delta.tv_nsec / 1000.0;
-    //double start, stop;
-    if ((delta_us < CACHE_TIMEOUT_US) && ctx->bi_cache_valid == true)
+    if ((delta_us < ctx->bi_cache_timeout) && ctx->bi_cache_valid == true)
     {
-        //start = clock()*(1000.0/CLOCKS_PER_SEC);
         *output = ctx->bi_cache;
-        //stop = clock()*(1000.0/CLOCKS_PER_SEC);
-        //printf( "[%f] cached: took %f ms. Value=%lu, ID=%d, Delta=%f\n", stop, stop - start, *output, x, delta_us);
-        //printf( "Cached\n");
     } 
     else
     {
-        //start = clock()*(1000.0/CLOCKS_PER_SEC);
         auto Res = NiFpga_ReadU64(NiFpga_Session(ctx->session), address, output);
-        if (NiFpga_IsError(Res)) return -1;
+        if (NiFpga_IsError(Res)) throw (CrioLibException(E_VAR_ACCESS, "Cannot access address."));
         ctx->bi_cache = *output;
         memcpy(&ctx->bi_sample_time, &current, sizeof (struct timespec));
         ctx->bi_cache_valid = true;
-        //printf( "Fetched\n");
-        //stop = clock()*(1000.0/CLOCKS_PER_SEC);
-        //printf( "[%f] Fetched: took %f ms. Value=%lu, ID=%d, Delta=%f\n", stop, stop - start, *output, x, delta_us);
     }
     pthread_mutex_unlock(&ctx->bi_mutex);
     return 0;
@@ -91,27 +81,39 @@ static __inline__ int crioReadBIArray(struct crio_context *ctx, uint64_t *output
 
 static __inline__ bool getBI(struct crio_context *ctx, uint32_t index, uint64_t address){
     uint64_t output;
-    crioReadBIArray(ctx, &output, address);
+    try{
+        crioReadBIArray(ctx, &output, address);
+    } catch(CrioLibException &e) {
+        throw (e);
+    }
+
     return (bool) (output & (0x1UL << index));
 }
 
 /* ---------------- API FUNCTIONS ---------------- */
+
+void setBICacheTimeout(struct crio_context *ctx, double timeout)
+{
+    ctx->bi_cache_timeout = timeout;
+}
+
 int crioGetBIArrayItemByIndex(struct crio_context *ctx, bool *item, uint32_t index) {
     if (!ctx->session_open)
-        return -2;
+        throw (CrioLibException(E_SESSION_CLOSED , "[%s] Operation performed on closed session.", LIB_CRIO_LINUX ));
     try {
         ((bim_type *)ctx->bi_map)->left.at(index).c_str();
         *item = getBI(ctx, index, ((bm_address_type *)ctx->bi_addresses)->left.at("BI0") );
         return 0;
-    }
-    catch (out_of_range) {
-        return -1;
+    } catch (out_of_range) {
+        throw (CrioLibException(E_OUT_OF_RANGE , "[%s] Property <BI0>: Query returned null for index %d.", LIB_CRIO_LINUX , index ));
+    } catch(CrioLibException &e) {
+        throw (CrioLibException(e.errorcode, "[%s] Property <%s>: %s.", LIB_CRIO_LINUX , "BI0", e.what()));
     }
 }
 
 int crioGetBIArraySize(struct crio_context *ctx, unsigned *size) {
     if (!ctx->session_open)
-        return -2;
+        throw (CrioLibException(E_SESSION_CLOSED , "[%s] Operation performed on closed session.", LIB_CRIO_LINUX ));
     *size = ctx->bi_count;
     return 0;
 }
@@ -119,7 +121,7 @@ int crioGetBIArraySize(struct crio_context *ctx, unsigned *size) {
 int crioGetBIArrayItemByName(struct crio_context *ctx, bool *item, const char *name) {
     double value;
     if (!ctx->session_open)
-        return -2;
+        throw (CrioLibException(E_SESSION_CLOSED , "[%s] Operation performed on closed session.", LIB_CRIO_LINUX ));
 
     uint64_t index;
 
@@ -135,43 +137,20 @@ int crioGetBIArrayItemByName(struct crio_context *ctx, bool *item, const char *n
             *item = getBI(ctx, index, ((bm_address_type *)ctx->bi_addresses)->left.at("BI0"));
         }
         return 0;
-    }
-    catch (out_of_range) {
-        return -1;
+    } catch (out_of_range) {
+        throw (CrioLibException(E_OUT_OF_RANGE , "[%s] Property <%s>: Query returned null.", LIB_CRIO_LINUX , name ));
+    } catch(CrioLibException &e) {
+        throw (CrioLibException(e.errorcode, "[%s] Property <%s>: %s.", LIB_CRIO_LINUX , name, e.what()));
     }
 }
 
 int crioGetBIArrayItemName(struct crio_context *ctx, unsigned index, const char **name) {
     if (!ctx->session_open)
-        return -2;
+        throw (CrioLibException(E_SESSION_CLOSED , "[%s] Operation performed on closed session.", LIB_CRIO_LINUX ));
     try {
         *name = ((bim_type *)ctx->bi_map)->left.at(index).c_str();
         return 0;
-    }
-    catch (out_of_range) {
-        return -1;
-    }
-}
-
-int crioGetBIArrayItemNumber(struct crio_context *ctx, const char *name, unsigned *index) {
-    if (!ctx->session_open)
-        return -2;
-    unsigned Val;
-
-    if (ParseNumberStrict(name, &Val) == 0) {
-        if (Val >= 32) return -1;
-
-        *index = Val;
-
-        return 0;
-    }
-
-    try {
-        *index = ((bim_type *)ctx->bi_map)->right.at(name);
-
-        return 0;
-    }
-    catch (out_of_range) {
-        return -1;
+    } catch (out_of_range) {
+        throw (CrioLibException(E_OUT_OF_RANGE , "[%s] Property <%s>: Query returned null.", LIB_CRIO_LINUX , *name ));
     }
 }

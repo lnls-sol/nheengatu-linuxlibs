@@ -4,6 +4,7 @@
 #include "Common.h"
 #include <sys/mman.h>
 #include <fcntl.h>
+#include "CrioLinux.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -20,14 +20,14 @@ static __inline__ int crioSetBO(struct crio_context *ctx, uint32_t address, bool
 
 static __inline__ int crioSetBO(struct crio_context *ctx, uint32_t address, bool value) {
     auto Res = NiFpga_WriteBool(NiFpga_Session(ctx->session), address, value);
-    if (NiFpga_IsError(Res)) return -1;
+    if (NiFpga_IsError(Res)) throw (CrioLibException(E_VAR_ACCESS, "Cannot access address."));
     return 0;
 }
 
 /* ------------ API FUNCTIONS -------------- */
 int crioGetBOArraySize(struct crio_context *ctx, unsigned *size) {
     if (!ctx->session_open)
-        return -2;
+        throw (CrioLibException(E_SESSION_CLOSED , "[%s] Operation performed on closed session.", LIB_CRIO_LINUX ));
     *size = ctx->bo_count;
     return 0;
 }
@@ -35,7 +35,7 @@ int crioGetBOArraySize(struct crio_context *ctx, unsigned *size) {
 
 int crioSetBOItem(struct crio_context *ctx, const char *name, bool value) {
     if (!ctx->session_open)
-        return -2;
+        throw (CrioLibException(E_SESSION_CLOSED , "[%s] Operation performed on closed session.", LIB_CRIO_LINUX ));
     try {
         if (is_rt_var(name) == true)
         {
@@ -44,9 +44,9 @@ int crioSetBOItem(struct crio_context *ctx, const char *name, bool value) {
         }
         else
             return crioSetBO(ctx, ((bm_address_type *)ctx->bo_addresses)->left.at(name), value);
-    }
-    catch (out_of_range)
-    {
-        return -1;
+    } catch (out_of_range) {
+        throw (CrioLibException(E_OUT_OF_RANGE , "[%s] Property <%s>: Query returned null.", LIB_CRIO_LINUX , name ));
+    } catch(CrioLibException &e) {
+        throw (CrioLibException(e.errorcode, "[%s] Property <%s>: %s.", LIB_CRIO_LINUX , name, e.what()));
     }
 }

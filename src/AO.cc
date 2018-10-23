@@ -22,7 +22,7 @@ static __inline__ int crioSetAO(struct crio_context *ctx, uint32_t address, floa
 
 static __inline__ int crioSetAO(struct crio_context *ctx, uint32_t address, float value) {
     auto Res = NiFpga_WriteSgl(NiFpga_Session(ctx->session), address, value);
-    if (NiFpga_IsError(Res)) return -1;
+    if (NiFpga_IsError(Res)) throw (CrioLibException(E_VAR_ACCESS, "Cannot access address."));
     return 0;
 }
 
@@ -30,7 +30,7 @@ static __inline__ int crioSetAO(struct crio_context *ctx, uint32_t address, floa
 /* ------------ API FUNCTIONS -------------- */
 int crioGetAOArraySize(struct crio_context *ctx, unsigned *size) {
     if (!ctx->session_open)
-        return -2;
+        throw (CrioLibException(E_SESSION_CLOSED , "[%s] Operation performed on closed session.", LIB_CRIO_LINUX ));
     *size = ctx->ao_count;
     return 0;
 }
@@ -38,19 +38,19 @@ int crioGetAOArraySize(struct crio_context *ctx, unsigned *size) {
 
 int crioSetAOItem(struct crio_context *ctx, const char *name, double value) {
     if (!ctx->session_open)
-        return -2;
+        throw (CrioLibException(E_SESSION_CLOSED , "[%s] Operation performed on closed session.", LIB_CRIO_LINUX ));
     try {
         if (is_rt_var(name) == true)
         {
             set_rt_val(ctx->shared_memory, ctx->rt_variable_offsets[((bm_address_type *)ctx->rt_addresses)->left.at(name)], value, name);
-            return 0;
         }
         else
            return crioSetAO(ctx, ((bm_address_type *)ctx->ao_addresses)->left.at(name), (float)value);
+    } catch (out_of_range) {
+        throw (CrioLibException(E_OUT_OF_RANGE , "[%s] Property <%s>: Query returned null.", LIB_CRIO_LINUX , name ));
+    } catch(CrioLibException &e) {
+        throw (CrioLibException(e.errorcode, "[%s] Property <%s>: %s.", LIB_CRIO_LINUX , name, e.what()));
     }
-    catch (out_of_range)
-    {
-        return -1;
-    }
+    return 0;
 }
 

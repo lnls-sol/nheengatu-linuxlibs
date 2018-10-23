@@ -2,7 +2,9 @@
 #define CRIOLINUX_H
 
 #include <stdint.h>
-
+#include <exception>
+#include<string.h>
+#include <stdarg.h>
 #if __GNUC__ >= 4
 #pragma GCC visibility push(default)
 #endif
@@ -12,9 +14,55 @@
 #define TGREEN "\x1B[32m"
 #define TCYAN "\x1B[36m"
 
+#define LIB_CRIO_LINUX "LibCrioLinux"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+
+#define TRY(x)         try {x;}   \
+catch(const CrioLibException &e)  \
+{                                 \
+throw e;                          \
+}                                 \
+
+#define TRY_SILENT(x)  try {x;}   \
+catch(const CrioLibException &e)  \
+{                                 \
+std::cout << e.what() << endl;    \
+}                                 \
+
+/* Error codes that will be passed with the Exception */
+enum errorcodes{
+    E_NO_MEMORY = -1,
+    E_FPGA_INIT = -2,
+    E_SHARED_MEM = -3,
+    E_SESSION_CLOSED = -4,
+    E_OUT_OF_RANGE = -5,
+    E_NOT_FOUND = -6,
+    E_INI = -7,
+    E_SAME_ADDRESS = -8,
+    E_RESOURCE_ALLOC = -9,
+    E_VAR_ACCESS = -10
+};
+
+
+/* exception structure that will be captured by the software */
+struct CrioLibException : public std::exception {
+    char error_text[1000];
+    enum errorcodes errorcode;
+    CrioLibException(enum errorcodes code, char const* fmt, ...) __attribute__((format(printf,3,4))) {
+            va_list ap;
+            va_start(ap, fmt);
+            vsnprintf(error_text, sizeof error_text, fmt, ap);
+            va_end(ap);
+        errorcode = code;
+    }
+   const char * what () const throw () {
+      return error_text;
+   }
+};
 
 
 /* Type definitions */
@@ -27,6 +75,7 @@ struct crio_context {
     struct timespec  bi_sample_time;
     uint64_t         bi_cache;
     bool             bi_cache_valid;
+    double           bi_cache_timeout;
     pthread_mutex_t  bi_mutex;
     void           * bi_map;
     void           * bi_addresses;
@@ -56,9 +105,9 @@ struct crio_context {
  * - cfgfile      : path of the ini configuration file
  * Return value   :
  * - OK  = 0
- * - NOK = -1 (Resources could not be allocated)
- * - NOK = -2 (NiFpga_Open failed)
- * - NOK = -3 (Failure in accessing shared memory)
+ * - NOK = E_NO_MEMORY (Resources could not be allocated)
+ * - NOK = E_FPGA_INIT (NiFpga_Open failed)
+ * - NOK = E_SHARED_MEM (Failure in accessing shared memory)
  */
 int crioSetup(struct crio_context *ctx, char * cfgfile);
 
@@ -86,10 +135,11 @@ void crioCleanup(struct crio_context* ctx);
  * - name         : key to obtain value (item)
  * Return value   :
  * - OK  = 0
- * - NOK = -1 (no item found)
- * - NOK = -2 (Session not open)
+ * - NOK = E_NOT_FOUND (no item found)
+ * - NOK = E_SESSION_CLOSED (Session not open)
  */
 int crioGetBIArrayItemByName(struct crio_context *ctx, bool *item, const char *name);
+
 
 
 
@@ -103,8 +153,8 @@ int crioGetBIArrayItemByName(struct crio_context *ctx, bool *item, const char *n
  * - index        : key to obtain value (item)
  * Return value   :
  * - OK  = 0
- * - NOK = -1 (out of range)
- * - NOK = -2 (Session not open)
+ * - NOK = E_OUT_OF_RANGE (out of range)
+ * - NOK = E_SESSION_CLOSED (Session not open)
  */
 int crioGetBIArrayItemByIndex(struct crio_context*, bool *item, uint32_t index);
 
@@ -119,7 +169,7 @@ int crioGetBIArrayItemByIndex(struct crio_context*, bool *item, uint32_t index);
  * - size         : (Return value) size to be obtained
  * Return value   :
  * - OK  = 0
- * - NOK = -2 (Session not open)
+ * - NOK = E_SESSION_CLOSED (Session not open)
  */
 int crioGetBIArraySize(struct crio_context *ctx, uint32_t *size);
 
@@ -133,26 +183,18 @@ int crioGetBIArraySize(struct crio_context *ctx, uint32_t *size);
  * - name         : (Return value) Name of item
  * Return value   :
  * - OK  = 0
- * - NOK = -1 (out of range)
- * - NOK = -2 (Session not open)
+ * - NOK = E_OUT_OF_RANGE (out of range)
+ * - NOK = E_SESSION_CLOSED (Session not open)
  */
 int crioGetBIArrayItemName(struct crio_context *ctx, unsigned index, const char **name);
 
 
-/* Function Name  : crioGetBIArrayItemNumber
- * Description    : Gets the BIArray item index using the name
+/* Function Name  : setBICacheTimeout
+ * Description    : Set BI cache timeout
  * Parameters
- * - crio_context : context for the open CRIO session
- * - name         : Name of item
- * - index        : (Return value) Index of item name
- * Return value   :
- * - OK  = 0
- * - NOK = -1 (Item not found)
- * - NOK = -2 (Session not open)
+ * - timeout : timeout in Microseconds for BI cache
  */
-int crioGetBIArrayItemNumber(struct crio_context *ctx, const char *name, unsigned *index);
-
-
+void setBICacheTimeout(struct crio_context *ctx, double timeout);
 
 /* ------------------------------------- BO functions ------------------------------------- */
 
@@ -164,7 +206,7 @@ int crioGetBIArrayItemNumber(struct crio_context *ctx, const char *name, unsigne
  * - size         : (Return value) number of registered BOs available in the ini file
  * Return value   :
  * - OK  = 0
- * - NOK = -2 (Session not open)
+ * - NOK = E_SESSION_CLOSED (Session not open)
  */
 int crioGetBOArraySize(struct crio_context *ctx, unsigned *size);
 
@@ -177,10 +219,11 @@ int crioGetBOArraySize(struct crio_context *ctx, unsigned *size);
  * - value        : value to set the BO with
  * Return value   :
  * - OK  = 0
- * - NOK = -1 (query returned null)
- * - NOK = -2 (Session not open)
+ * - NOK = E_NOT_FOUND (query returned null)
+ * - NOK = E_SESSION_CLOSED (Session not open)
  */
 int crioSetBOItem(struct crio_context *ctx, const char *name, bool value);
+
 
 
 /* Function Name  : crioSetAOItem
@@ -191,10 +234,11 @@ int crioSetBOItem(struct crio_context *ctx, const char *name, bool value);
  * - value        : value to set the AO with
  * Return value   :
  * - OK  = 0  (Success)
- * - NOK = -1 (query returned null)
- * - NOK = -2 (Session not open)
+ * - NOK = E_NOT_FOUND (query returned null)
+ * - NOK = E_SESSION_CLOSED (Session not open)
  */
 int crioSetAOItem(struct crio_context *ctx, const char *name, double value);
+
 
 
 /* Function Name  : crioGetAOArraySize
@@ -204,7 +248,7 @@ int crioSetAOItem(struct crio_context *ctx, const char *name, double value);
  * - size         : (Return value) number of the registered AOs
  * Return value   :
  * - OK  = 0
- * - NOK = -2 (Session not open)
+ * - NOK = E_SESSION_CLOSED (Session not open)
  */
 int crioGetAOArraySize(struct crio_context *ctx, unsigned *size);
 
@@ -217,7 +261,7 @@ int crioGetAOArraySize(struct crio_context *ctx, unsigned *size);
  * - size         : (Return value) number of the registered AIs
  * Return value   :
  * - OK  = 0
- * - NOK = -2 (Session not open)
+ * - NOK = E_SESSION_CLOSED (Session not open)
  */
 int crioGetAIArraySize(struct crio_context *ctx, unsigned *size);
 
@@ -230,8 +274,8 @@ int crioGetAIArraySize(struct crio_context *ctx, unsigned *size);
  * - value        : value to set the AI with
  * Return value   :
  * - OK  = 0  (Success)
- * - NOK = -1 (query returned null)
- * - NOK = -2 (Session not open)
+ * - NOK = E_NOT_FOUND (query returned null)
+ * - NOK = E_SESSION_CLOSED (Session not open)
  */
 int crioGetAIItem(struct crio_context *ctx, const char *name, double &value);
 

@@ -21,7 +21,7 @@ int main(void) {
         "Mod3/DIO3",
         "Mod3/DIO4",
         "Mod3/DIO5",
-        "Mod3/DIO6",
+        "Mod3/DIO61",
         "Mod3/DIO7",
         "Mod3/DIO8",
         "Mod3/DIO9",
@@ -46,7 +46,8 @@ int main(void) {
         "Mod3/DIO28",
         "Mod3/DIO29",
         "Mod3/DIO30",
-        "RT_BOL_BITest"};
+        "RT_BOL_BITest",
+        "RT_BOL_BITest2"};
 
     string BOs[] = {"Mod1/DIO0",
                     "Mod1/DIO1",
@@ -57,7 +58,7 @@ int main(void) {
                     "Mod1/DIO6",
                     "Mod1/DIO7",
                     "Mod2/DIO0",
-                    "Mod2/DIO1",
+                    "Mod2/DIO12",
                     "Mod2/DIO2",
                     "Mod2/DIO3",
                     "Mod2/DIO4",
@@ -70,113 +71,78 @@ int main(void) {
     string AIs[] = {"Mod4/AI0", "Mod4/AI1", "Mod4/AI2", "Mod4/AI3",
                     "Mod6/TC0", "Mod6/TC1", "Mod6/TC2", "Mod6/TC3",
                     "Mod7/AI0", "Mod7/AI1", "Mod7/AI2", "Mod7/AI3",
-                    "Mod8/AI0", "Mod8/AI1", "Mod8/AI2", "Mod8/AI3",
+                    "Mod8/AI0", "Mod8/AI1", "Mod8/AI23", "Mod8/AI3",
                     "RT_DBL_AI0", "RT_SGL_AI1", "RT_I64_AI2", "RT_I32_AI3",
                     "RT_I16_AI4", "RT_I08_AI5", "RT_U64_AI6", "RT_U32_AI7",
                     "RT_U16_AI8", "RT_U08_AI9"};
 
 
-    string AOs[] = {"Mod5/AO0", "Mod5/AO1", "Mod5/AO2", "Mod5/AO3",
+    string AOs[] = {"Mod5/AO0", "Mod5/AO41", "Mod5/AO2", "Mod5/AO3",
                     "RT_DBL_AO1", "RT_SGL_AO2", "RT_I64_AO3", "RT_I32_AO4",
                    "RT_I16_AO5", "RT_I08_AO6", "RT_U64_AO7", "RT_U32_AO8",
                    "RT_U16_AO9", "RT_U08_AO10"};
 
 
-    auto Res = crioSetup(ctx, cfg);
-    switch (Res)
-    {
-        case 0 : cout << "crioSetup executed successfully\n"; break;
-        case -1 : cout << "Failed in reading ini file\n"; return -1; break;
-        case -2 : cout << "Failed in initializing FPGA\n"; return -1; break;
-        case -3 : cout << "Failed in initializing Shared Memory\n"; return -1; break;
-        default: break;
-    }
-    bool x = false;
+    TRY_SILENT(crioSetup(ctx, cfg));
+    /*bool x = false;
     while(1)
     {
         Res = crioSetBOItem(ctx, "Mod3/DIO31", x);
         x = !x;
         usleep(0.1 * 1000000);
         printf("Altered x to %u\n", x);
-    }
+    }*/
 
     // Seems like the FPGA needs 1 second to start bringing data available on the ports.
     // This value was obtained emperically.
     sleep(1);
 
     /* BI */
-    crioGetBIArraySize(ctx, &Size);
+    TRY_SILENT(crioGetBIArraySize(ctx, &Size));
     cout << "Binary inputs found:" << Size << endl;
 
     for (unsigned I = 0; I < Size; I++) {
-        Res = crioGetBIArrayItemByName(ctx, &Item, BIs[I].c_str());
-        switch (Res)
-        {
-            case 0 : break;
-            case -1 : cout << "Index " << I << " does not exist\n"; return -1; break;
-            case -2 : cout << "CRIO session not open\n"; return -1; break;
-            default: cout << "default case\n"; return -1; break;
-        }
+        TRY_SILENT(crioGetBIArrayItemByName(ctx, &Item, BIs[I].c_str()));
         cout << BIs[I].c_str() << ": " << Item  << endl;
     }
     cout << endl;
 
     /* BO */
-    crioGetBOArraySize(ctx, &Size);
+    TRY_SILENT(crioGetBOArraySize(ctx, &Size));
     cout << "Binary outputs found:" << Size << endl;
     Item = rand() % 2;
     for (uint x = 0; x < Size; x++)
     {
-        Res = crioSetBOItem(ctx, BOs[x].c_str(), Item);
-        switch (Res)
-        {
-            case -1 : cout << "Item " << BOs[x].c_str() << " does not exist.\n"; return -1; break;
-            case -2 : cout << "CRIO session not open\n"; return -1; break;
-            default: break;
-        }
+        TRY_SILENT(crioSetBOItem(ctx, BOs[x].c_str(), Item));
         cout << BOs[x].c_str() << "->" << Item << endl;
         Item = !Item;
-        assert(Res == 0);
     }
 
 
     cout << endl;
 
     /* AO */
-    crioGetAOArraySize(ctx, &Size);
+    TRY_SILENT(crioGetAOArraySize(ctx, &Size));
     cout << "Analog outputs found:" << Size << endl;
     for (uint x = 0; x < Size; x++)
     {
         ao_val = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX/10));
-        Res = crioSetAOItem(ctx, AOs[x].c_str(), ao_val);
-        switch (Res)
-        {
-            case -1 : cout << "Query returned NULL for AO address of name: " << AOs[x].c_str() << endl; return -1; break;
-            case -2 : cout << "CRIO session not open\n"; return -1; break;
-            default: break;
-        }
+        TRY_SILENT(crioSetAOItem(ctx, AOs[x].c_str(), ao_val));
         cout << AOs[x].c_str() << "->" << static_cast<int64_t>(ao_val) << endl;
     }
     cout << endl;
 
 
     /* AI */
-    crioGetAIArraySize(ctx, &Size);
+    TRY_SILENT(crioGetAIArraySize(ctx, &Size));
     cout << "Analog inputs found:" << Size << endl;
     for (uint x = 0; x < Size; x++)
     {
-        Res = crioGetAIItem(ctx, AIs[x].c_str(), ai_val);
-        switch (Res)
-        {
-            case -1 : cout << "Query returned NULL for AI address of name: " << AIs[x].c_str() << endl; return -1; break;
-            case -2 : cout << "CRIO session not open\n"; return -1; break;
-            default: break;
-        }
-
+        TRY_SILENT(crioGetAIItem(ctx, AIs[x].c_str(), ai_val));
         cout << AIs[x].c_str() << "->" << static_cast<int64_t>(ai_val) << endl;
     }
 
-    crioCleanup(ctx);
+    TRY_SILENT(crioCleanup(ctx));
     cout << "FINISHED.\n";
     delete(ctx);
     return 0;
