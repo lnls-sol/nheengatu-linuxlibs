@@ -21,7 +21,7 @@ int main(void) {
         "Mod3/DIO3",
         "Mod3/DIO4",
         "Mod3/DIO5",
-        "Mod3/DIO61",
+        "Mod3/DIO6",
         "Mod3/DIO7",
         "Mod3/DIO8",
         "Mod3/DIO9",
@@ -46,8 +46,7 @@ int main(void) {
         "Mod3/DIO28",
         "Mod3/DIO29",
         "Mod3/DIO30",
-        "RT_BOL_BITest",
-        "RT_BOL_BITest2"};
+        "RT_BOL_BITest"};
 
     string BOs[] = {"Mod1/DIO0",
                     "Mod1/DIO1",
@@ -58,7 +57,7 @@ int main(void) {
                     "Mod1/DIO6",
                     "Mod1/DIO7",
                     "Mod2/DIO0",
-                    "Mod2/DIO12",
+                    "Mod2/DIO1",
                     "Mod2/DIO2",
                     "Mod2/DIO3",
                     "Mod2/DIO4",
@@ -71,19 +70,19 @@ int main(void) {
     string AIs[] = {"Mod4/AI0", "Mod4/AI1", "Mod4/AI2", "Mod4/AI3",
                     "Mod6/TC0", "Mod6/TC1", "Mod6/TC2", "Mod6/TC3",
                     "Mod7/AI0", "Mod7/AI1", "Mod7/AI2", "Mod7/AI3",
-                    "Mod8/AI0", "Mod8/AI1", "Mod8/AI23", "Mod8/AI3",
+                    "Mod8/AI0", "Mod8/AI1", "Mod8/AI2", "Mod8/AI3",
                     "RT_DBL_AI0", "RT_SGL_AI1", "RT_I64_AI2", "RT_I32_AI3",
                     "RT_I16_AI4", "RT_I08_AI5", "RT_U64_AI6", "RT_U32_AI7",
                     "RT_U16_AI8", "RT_U08_AI9"};
 
 
-    string AOs[] = {"Mod5/AO0", "Mod5/AO41", "Mod5/AO2", "Mod5/AO3",
+    string AOs[] = {"Mod5/AO0", "Mod5/AO1", "Mod5/AO2", "Mod5/AO3",
                     "RT_DBL_AO1", "RT_SGL_AO2", "RT_I64_AO3", "RT_I32_AO4",
                    "RT_I16_AO5", "RT_I08_AO6", "RT_U64_AO7", "RT_U32_AO8",
                    "RT_U16_AO9", "RT_U08_AO10"};
 
 
-    TRY_SILENT(crioSetup(ctx, cfg));
+    TRY_THROW(crioSetup(ctx, cfg));
     /*bool x = false;
     while(1)
     {
