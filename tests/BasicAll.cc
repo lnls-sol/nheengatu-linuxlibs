@@ -14,58 +14,59 @@ int main(void) {
     bool Item;
     double ao_val;
     srand(time(0));
-    string BIs[] = {
-        "Mod3/DIO0",
-        "Mod3/DIO1",
-        "Mod3/DIO2",
-        "Mod3/DIO3",
-        "Mod3/DIO4",
-        "Mod3/DIO5",
-        "Mod3/DIO6",
-        "Mod3/DIO7",
-        "Mod3/DIO8",
-        "Mod3/DIO9",
-        "Mod3/DIO10",
-        "Mod3/DIO11",
-        "Mod3/DIO12",
-        "Mod3/DIO13",
-        "Mod3/DIO14",
-        "Mod3/DIO15",
-        "Mod3/DIO16",
-        "Mod3/DIO17",
-        "Mod3/DIO18",
-        "Mod3/DIO19",
-        "Mod3/DIO20",
-        "Mod3/DIO21",
-        "Mod3/DIO22",
-        "Mod3/DIO23",
-        "Mod3/DIO24",
-        "Mod3/DIO25",
-        "Mod3/DIO26",
-        "Mod3/DIO27",
-        "Mod3/DIO28",
-        "Mod3/DIO29",
-        "Mod3/DIO30",
-        "RT_BOL_BITest"};
+    string BIs[] = {"Mod3/DIO0",
+                    "Mod3/DIO1",
+                    "Mod3/DIO2",
+                    "Mod3/DIO3",
+                    "Mod3/DIO4",
+                    "Mod3/DIO5",
+                    "Mod3/DIO6",
+                    "Mod3/DIO7",
+                    "Mod3/DIO8",
+                    "Mod3/DIO9",
+                    "Mod3/DIO10",
+                    "Mod3/DIO11",
+                    "Mod3/DIO12",
+                    "Mod3/DIO13",
+                    "Mod3/DIO14",
+                    "Mod3/DIO15",
+                    "Mod1/DIO4",
+                    "Mod1/DIO5",
+                    "Mod1/DIO6",
+                    "Mod1/DIO7",
+                    "Mod2/DIO4",
+                    "Mod2/DIO5",
+                    "Mod2/DIO6",
+                    "Mod2/DIO7",
+                    "RT_BOL_BITest"};
+
+
 
     string BOs[] = {"Mod1/DIO0",
                     "Mod1/DIO1",
                     "Mod1/DIO2",
                     "Mod1/DIO3",
-                    "Mod1/DIO4",
-                    "Mod1/DIO5",
-                    "Mod1/DIO6",
-                    "Mod1/DIO7",
                     "Mod2/DIO0",
                     "Mod2/DIO1",
                     "Mod2/DIO2",
                     "Mod2/DIO3",
-                    "Mod2/DIO4",
-                    "Mod2/DIO5",
-                    "Mod2/DIO6",
-                    "Mod2/DIO7",
-                    "RT_BOL_BO0",
-                    "Mod3/DIO31"};
+                    "Mod3/DIO16",
+                    "Mod3/DIO17",
+                    "Mod3/DIO18",
+                    "Mod3/DIO19",
+                    "Mod3/DIO20",
+                    "Mod3/DIO21",
+                    "Mod3/DIO22",
+                    "Mod3/DIO23",
+                    "Mod3/DIO24",
+                    "Mod3/DIO25",
+                    "Mod3/DIO26",
+                    "Mod3/DIO27",
+                    "Mod3/DIO28",
+                    "Mod3/DIO29",
+                    "Mod3/DIO30",
+                    "Mod3/DIO31",
+                    "RT_BOL_BO0"};
 
     string AIs[] = {"Mod4/AI0", "Mod4/AI1", "Mod4/AI2", "Mod4/AI3",
                     "Mod6/TC0", "Mod6/TC1", "Mod6/TC2", "Mod6/TC3",
@@ -127,7 +128,17 @@ int main(void) {
     {
         ao_val = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX/10));
         TRY_SILENT_CONT(crioSetAOItem(ctx, AOs[x].c_str(), ao_val));
-        cout << AOs[x].c_str() << "->" << ao_val << endl;
+        if (true == is_rt_var(AOs[x].c_str())) {
+            switch (get_rt_var_size(AOs[x].c_str()))
+            {
+                case DBL: case SGL : cout << AOs[x].c_str() << "->" << ao_val << endl; break;
+                case U64: case U32: case U16: case U08: cout << AOs[x].c_str() << "->" << static_cast<uint64_t>(ao_val) << endl; break;
+                case I64: case I32: case I16: case I08: cout << AOs[x].c_str() << "->" << static_cast<int64_t>(ao_val) << endl; break;
+            default: cout << "Found unknown RT variable size in AO \n";
+            }
+        }
+        else
+            cout << AOs[x].c_str() << "->" << ao_val << endl;
     }
     cout << endl;
 
@@ -139,10 +150,13 @@ int main(void) {
     {
         TRY_SILENT_CONT(crioGetAIItem(ctx, AIs[x].c_str(), ai_val));
         if (true == is_rt_var(AIs[x].c_str())) {
-            if (U64 == get_rt_var_size(AIs[x].c_str()))
-                cout << AIs[x].c_str() << "->" << static_cast<int64_t>(ai_val) << endl;
-            else
-                cout << AIs[x].c_str() << "->" << ai_val << endl;
+            switch (get_rt_var_size(AIs[x].c_str()))
+            {
+                case DBL: case SGL : cout << AIs[x].c_str() << "->" << ai_val << endl; break;
+                case U64: case U32: case U16: case U08: cout << AIs[x].c_str() << "->" << static_cast<uint64_t>(ai_val) << endl; break;
+                case I64: case I32: case I16: case I08: cout << AIs[x].c_str() << "->" << static_cast<int64_t>(ai_val) << endl; break;
+            default: cout << "Found unknown RT variable size in AI\n";
+            }
         }
         else
             cout << AIs[x].c_str() << "->" << ai_val << endl;
