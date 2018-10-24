@@ -21,7 +21,7 @@ extern "C" {
 #endif
 
 
-#define TRY(x)         try {x;}   \
+#define TRY_THROW(x)   try {x;}   \
 catch(const CrioLibException &e)  \
 {                                 \
 throw e;                          \
@@ -33,6 +33,12 @@ catch(const CrioLibException &e)  \
 std::cout << e.what() << endl;    \
 }                                 \
 
+#define TRY_SILENT_CONT(x)  try {x;}   \
+catch(const CrioLibException &e)       \
+{                                      \
+std::cout << e.what() << endl;         \
+continue;                              \
+}                                      \
 /* Error codes that will be passed with the Exception */
 enum errorcodes{
     E_NO_MEMORY = -1,

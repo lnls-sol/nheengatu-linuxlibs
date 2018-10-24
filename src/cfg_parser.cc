@@ -86,16 +86,26 @@ int cfg_parser::get_bi_maps(bool rt_support, uint32_t & count, bim_type *bi_map,
 
                 for (const std::pair<std::string, boost::property_tree::ptree> &bi : tree.get_child(bi_address_tree.first))
                 {
-                    //bm_address_type::right_const_iterator id_iter = bi_address_map->right.find(strtoul(bi_address_tree.second.get_value<std::string>().c_str(), NULL, 16));
-                    bi_map->insert( bim_type::value_type( atol(bi.first.c_str()) , bi.second.get_value<std::string>() ));
-                    count++;
+                    bim_type::right_const_iterator id_iter = bi_map->right.find(bi.second.get_value<std::string>());
+
+                    if( id_iter != bi_map->right.end() )
+                    {
+                        throw CrioLibException(E_SAME_ADDRESS, "[%s] Found distinct index assignments for item <%s:%s>.",
+                                               LIB_CRIO_LINUX, bi_address_tree.first.c_str(),
+                                               bi.second.get_value<std::string>().c_str() );
+                    }
+                    else
+                    {
+                       bi_map->insert( bim_type::value_type( atol(bi.first.c_str()) , bi.second.get_value<std::string>() ));
+                        count++;
+                    }
                 }
             }
             else if (rt_support == true){
                 bm_address_type::right_const_iterator id_iter = bi_rt_address_map->right.find(strtoul(bi_address_tree.second.get_value<std::string>().c_str(), NULL, 10));
                 if( id_iter != bi_rt_address_map->right.end() )
                 {
-                    throw CrioLibException(E_SAME_ADDRESS, "[%s] Found replicated index for items <%s> and <%s>.", LIB_CRIO_LINUX, bi_address_tree.first.c_str(),
+                    throw CrioLibException(E_SAME_ADDRESS, "[%s] Found replicated index for items <%s> and <%s>. Ignoring second Index.", LIB_CRIO_LINUX, bi_address_tree.first.c_str(),
                                                                                             id_iter->second.c_str() );
                 }
                 else

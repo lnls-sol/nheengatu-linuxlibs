@@ -18,11 +18,11 @@ int crioSetup(struct crio_context *ctx, char *cfgfile) {
     if (ctx->session_open == false)
     {
         /* Read cfg file */
-        TRY(parser = new cfg_parser(cfgfile));
+        TRY_THROW(parser = new cfg_parser(cfgfile));
 
 
         /* Get settings from configuration file */
-        TRY(parser->get_settings(ip, path, fileName, signature, use_shared_memory, shared_memory_path));
+        TRY_THROW(parser->get_settings(ip, path, fileName, signature, use_shared_memory, shared_memory_path));
 
         url = "rio://" + ip + "/RIO0";
         bitfile = path + "/" + fileName;
@@ -52,10 +52,10 @@ int crioSetup(struct crio_context *ctx, char *cfgfile) {
         ctx->ai_addresses = (void *) new bm_address_type;
         ctx->rt_addresses = (void *) new bm_address_type;
 
-        TRY(parser->get_bi_maps(use_shared_memory, ctx->bi_count, (bim_type*) ctx->bi_map, (bm_address_type *)ctx->bi_addresses, (bm_address_type *)ctx->rt_addresses));
-        TRY(parser->get_address_maps(use_shared_memory, ctx->bo_count, (bm_address_type *)ctx->bo_addresses, (bm_address_type *)ctx->rt_addresses, BO_ALIAS));
-        TRY(parser->get_address_maps(use_shared_memory, ctx->ao_count, (bm_address_type *)ctx->ao_addresses, (bm_address_type *)ctx->rt_addresses, AO_ALIAS));
-        TRY(parser->get_address_maps(use_shared_memory, ctx->ai_count, (bm_address_type *)ctx->ai_addresses, (bm_address_type *)ctx->rt_addresses, AI_ALIAS));
+        TRY_THROW(parser->get_bi_maps(use_shared_memory, ctx->bi_count, (bim_type*) ctx->bi_map, (bm_address_type *)ctx->bi_addresses, (bm_address_type *)ctx->rt_addresses));
+        TRY_THROW(parser->get_address_maps(use_shared_memory, ctx->bo_count, (bm_address_type *)ctx->bo_addresses, (bm_address_type *)ctx->rt_addresses, BO_ALIAS));
+        TRY_THROW(parser->get_address_maps(use_shared_memory, ctx->ao_count, (bm_address_type *)ctx->ao_addresses, (bm_address_type *)ctx->rt_addresses, AO_ALIAS));
+        TRY_THROW(parser->get_address_maps(use_shared_memory, ctx->ai_count, (bm_address_type *)ctx->ai_addresses, (bm_address_type *)ctx->rt_addresses, AI_ALIAS));
 
         /* Calculate offsets if shared memory is enabled */
         if (use_shared_memory == true) {
@@ -80,7 +80,7 @@ int crioSetup(struct crio_context *ctx, char *cfgfile) {
             }
 
             /* open shared memory */
-            TRY(open_shared_memory(shared_memory_path, &ctx->shared_memory));
+            TRY_THROW(open_shared_memory(shared_memory_path, &ctx->shared_memory));
 
         }
 

@@ -102,7 +102,7 @@ int main(void) {
     cout << "Binary inputs found:" << Size << endl;
 
     for (unsigned I = 0; I < Size; I++) {
-        TRY_SILENT(crioGetBIArrayItemByName(ctx, &Item, BIs[I].c_str()));
+        TRY_SILENT_CONT(crioGetBIArrayItemByName(ctx, &Item, BIs[I].c_str()));
         cout << BIs[I].c_str() << ": " << Item  << endl;
     }
     cout << endl;
@@ -113,7 +113,7 @@ int main(void) {
     Item = rand() % 2;
     for (uint x = 0; x < Size; x++)
     {
-        TRY_SILENT(crioSetBOItem(ctx, BOs[x].c_str(), Item));
+        TRY_SILENT_CONT(crioSetBOItem(ctx, BOs[x].c_str(), Item));
         cout << BOs[x].c_str() << "->" << Item << endl;
         Item = !Item;
     }
@@ -127,7 +127,7 @@ int main(void) {
     for (uint x = 0; x < Size; x++)
     {
         ao_val = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX/10));
-        TRY_SILENT(crioSetAOItem(ctx, AOs[x].c_str(), ao_val));
+        TRY_SILENT_CONT(crioSetAOItem(ctx, AOs[x].c_str(), ao_val));
         cout << AOs[x].c_str() << "->" << static_cast<int64_t>(ao_val) << endl;
     }
     cout << endl;
@@ -138,7 +138,7 @@ int main(void) {
     cout << "Analog inputs found:" << Size << endl;
     for (uint x = 0; x < Size; x++)
     {
-        TRY_SILENT(crioGetAIItem(ctx, AIs[x].c_str(), ai_val));
+        TRY_SILENT_CONT(crioGetAIItem(ctx, AIs[x].c_str(), ai_val));
         cout << AIs[x].c_str() << "->" << static_cast<int64_t>(ai_val) << endl;
     }
 
