@@ -53,6 +53,20 @@ enum errorcodes{
     E_VAR_ACCESS = -10
 };
 
+enum type_code{
+    DBL,
+    SGL,
+    U64,
+    U32,
+    U16,
+    U08,
+    I64,
+    I32,
+    I16,
+    I08,
+    BOL,
+    UNKNOWN
+};
 
 /* exception structure that will be captured by the software */
 struct CrioLibException : public std::exception {
@@ -284,6 +298,28 @@ int crioGetAIArraySize(struct crio_context *ctx, unsigned *size);
  * - NOK = E_SESSION_CLOSED (Session not open)
  */
 int crioGetAIItem(struct crio_context *ctx, const char *name, double &value);
+
+
+/* Function Name  : get_rt_var_size
+ * Description    : Gets the RT variable size
+ * Parameters
+ * - name         : name of RT variable to detect its size
+ * Return value   :
+ * enum type_code : one of the sizes defined in enum type_code
+ */
+enum type_code get_rt_var_size(std::string name);
+
+
+/* Function Name  : is_rt_var
+ * Description    : Checks if the name passed is an RT variable
+ * Parameters
+ * - name         : name of RT variable to detect its size
+ * Return value   :
+ * true  = is an RT variable
+ * false = is not an RT variable
+ */
+bool is_rt_var(std::string name);
+
 
 #ifdef __cplusplus
 }

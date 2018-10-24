@@ -128,7 +128,7 @@ int main(void) {
     {
         ao_val = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX/10));
         TRY_SILENT_CONT(crioSetAOItem(ctx, AOs[x].c_str(), ao_val));
-        cout << AOs[x].c_str() << "->" << static_cast<int64_t>(ao_val) << endl;
+        cout << AOs[x].c_str() << "->" << ao_val << endl;
     }
     cout << endl;
 
@@ -139,7 +139,14 @@ int main(void) {
     for (uint x = 0; x < Size; x++)
     {
         TRY_SILENT_CONT(crioGetAIItem(ctx, AIs[x].c_str(), ai_val));
-        cout << AIs[x].c_str() << "->" << static_cast<int64_t>(ai_val) << endl;
+        if (true == is_rt_var(AIs[x].c_str())) {
+            if (U64 == get_rt_var_size(AIs[x].c_str()))
+                cout << AIs[x].c_str() << "->" << static_cast<int64_t>(ai_val) << endl;
+            else
+                cout << AIs[x].c_str() << "->" << ai_val << endl;
+        }
+        else
+            cout << AIs[x].c_str() << "->" << ai_val << endl;
     }
 
     TRY_SILENT(crioCleanup(ctx));

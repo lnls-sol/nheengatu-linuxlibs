@@ -66,7 +66,6 @@ int cfg_parser::get_settings(std::string &ip, std::string &path, std::string &fi
 
 int cfg_parser::get_bi_maps(bool rt_support, uint32_t & count, bim_type *bi_map, bm_address_type * bi_address_map, bm_address_type * bi_rt_address_map )
 {
-    /* TODO: Check if either index of name exist. and return error if does. this will reduce debugging time.*/
     try
     {
         for (const std::pair<std::string, boost::property_tree::ptree> &bi_address_tree : tree.get_child(BIADDR_ALIAS))
@@ -76,8 +75,8 @@ int cfg_parser::get_bi_maps(bool rt_support, uint32_t & count, bim_type *bi_map,
                 bm_address_type::right_const_iterator id_iter = bi_address_map->right.find(strtoul(bi_address_tree.second.get_value<std::string>().c_str(), NULL, 16));
                 if( id_iter != bi_address_map->right.end() )
                 {
-                    throw CrioLibException(E_SAME_ADDRESS, "[%s] Found replicated address for items <%s> and <%s>.",  LIB_CRIO_LINUX, bi_address_tree.first.c_str(),
-                                                                                            id_iter->second.c_str() );
+                    throw CrioLibException(E_SAME_ADDRESS, "[%s] Found replicated address for items <%s> and <%s>.",
+                                           LIB_CRIO_LINUX, bi_address_tree.first.c_str(), id_iter->second.c_str() );
                 }
                 else {
                     bi_address_map->insert( bm_address_type::value_type( (bi_address_tree.first.c_str()) ,
@@ -105,16 +104,14 @@ int cfg_parser::get_bi_maps(bool rt_support, uint32_t & count, bim_type *bi_map,
                 bm_address_type::right_const_iterator id_iter = bi_rt_address_map->right.find(strtoul(bi_address_tree.second.get_value<std::string>().c_str(), NULL, 10));
                 if( id_iter != bi_rt_address_map->right.end() )
                 {
-                    throw CrioLibException(E_SAME_ADDRESS, "[%s] Found replicated index for items <%s> and <%s>. Ignoring second Index.", LIB_CRIO_LINUX, bi_address_tree.first.c_str(),
-                                                                                            id_iter->second.c_str() );
+                    throw CrioLibException(E_SAME_ADDRESS, "[%s] Found replicated index for items <%s> and <%s>. Ignoring second Index.",
+                                           LIB_CRIO_LINUX, bi_address_tree.first.c_str(), id_iter->second.c_str() );
                 }
                 else
                 {
                     bi_rt_address_map->insert( bm_address_type::value_type( (bi_address_tree.first.c_str()) ,
-                                                                          strtoul(bi_address_tree.second.get_value<std::string>().c_str(), NULL, 10) ));
-
+                                               strtoul(bi_address_tree.second.get_value<std::string>().c_str(), NULL, 10) ));
                 }
-
                 count++;
             }
         }
@@ -128,7 +125,6 @@ int cfg_parser::get_bi_maps(bool rt_support, uint32_t & count, bim_type *bi_map,
 
 int cfg_parser::get_address_maps(bool rt_support, uint32_t & count, bm_address_type * address_map, bm_address_type * rt_address_map, string alias)
 {
-    /* TODO: Check if either index of name exist. and return error if does. this will reduce debugging time.*/
     try
     {
         for (const std::pair<std::string, boost::property_tree::ptree> &address_tree : tree.get_child(alias))
@@ -138,8 +134,8 @@ int cfg_parser::get_address_maps(bool rt_support, uint32_t & count, bm_address_t
                 bm_address_type::right_const_iterator id_iter = address_map->right.find(strtoul(address_tree.second.get_value<std::string>().c_str(), NULL, 16));
                 if( id_iter != address_map->right.end() )
                 {
-                    throw CrioLibException(E_SAME_ADDRESS, "[%s] Found replicated index for items <%s> and <%s>.", LIB_CRIO_LINUX, address_tree.first.c_str(),
-                                                                                            id_iter->second.c_str() );
+                    throw CrioLibException(E_SAME_ADDRESS, "[%s] Found replicated index for items <%s> and <%s>.",
+                                           LIB_CRIO_LINUX, address_tree.first.c_str(), id_iter->second.c_str() );
                 }
                 else
                 {
@@ -151,8 +147,8 @@ int cfg_parser::get_address_maps(bool rt_support, uint32_t & count, bm_address_t
                 bm_address_type::right_const_iterator id_iter = rt_address_map->right.find(strtoul(address_tree.second.get_value<std::string>().c_str(), NULL, 10));
                 if( id_iter != rt_address_map->right.end() )
                 {
-                    throw CrioLibException(E_SAME_ADDRESS, "[%s] Found replicated index for items <%s> and <%s>.", LIB_CRIO_LINUX, address_tree.first.c_str(),
-                                                                                            id_iter->second.c_str() );
+                    throw CrioLibException(E_SAME_ADDRESS, "[%s] Found replicated index for items <%s> and <%s>.",
+                                           LIB_CRIO_LINUX, address_tree.first.c_str(), id_iter->second.c_str() );
                 }
                 else
                 {

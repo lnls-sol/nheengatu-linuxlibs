@@ -11,7 +11,7 @@ extern "C" {
 #endif
 
 
-
+/* Moving to CrioLinux.h
 enum type_code{
     DBL,
     SGL,
@@ -25,7 +25,7 @@ enum type_code{
     I08,
     BOL,
     UNKNOWN
-};
+};  */
 
 
 bool is_rt_var(std::string name);
