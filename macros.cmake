@@ -106,3 +106,23 @@ function(show_target NAME)
     message("-- Link libraries: ${LINK_TEXT}")
     message("-- Binary data directory: ${CRIO_LINUX_LIBDIR}")
 endfunction()
+
+function(getVersion)
+    #recipe: https://stackoverflow.com/questions/1435953/how-can-i-pass-git-sha1-to-compiler-as-definition-using-cmake
+    execute_process(COMMAND
+      "${GIT_EXECUTABLE}" describe --match=NeVeRmAtCh --always --abbrev=40
+      WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+      OUTPUT_VARIABLE GIT_SHA1
+      ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
+    execute_process(COMMAND
+      "${GIT_EXECUTABLE}" log -1 --format=%ad --date=local
+      WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+      OUTPUT_VARIABLE GIT_DATE
+      ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
+    execute_process(COMMAND
+      "${GIT_EXECUTABLE}" log -1 --format=%s
+      WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+      OUTPUT_VARIABLE GIT_COMMIT_SUBJECT
+      ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
+    configure_file("src/version.cc.in" "version.cc" @ONLY)
+endfunction()

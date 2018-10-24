@@ -15,6 +15,8 @@ int crioSetup(struct crio_context *ctx, char *cfgfile) {
     string shared_memory_path = "";
     const char *name;
     cfg_parser * parser;
+
+
     if (ctx->session_open == false)
     {
         /* Read cfg file */

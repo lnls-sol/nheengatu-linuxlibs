@@ -28,11 +28,12 @@ add_definitions(-DBUILD_CRIO_LINUX_LIBDIR=\"${CRIO_LINUX_LIBDIR}/\")
 ########################################
 # External modules
 ########################################
-find_package(Boost 1.35.0 REQUIRED)
+find_package(Boost)
 check_module_no_pkg(NIFPGAHELPER NiFpga.h NiFpgaHelper)
 #find_path(NIFPGA_CRIOLINUX_INCLUDE_DIR NiFpga_CrioLinux.h HINTS ENV CPATH ENV C_INCLUDE_PATH ${CRIO_LINUX_LIBDIR})
 find_package (Threads)
 
+find_package(Git)
 ########################################
 # Compiler flags
 ########################################
@@ -49,6 +50,13 @@ if (NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
     endif()
 endif()
 
+
+########################################
+# Setup library version variables
+########################################
+getVersion()
+
+
 ########################################
 # Include files
 ########################################
@@ -60,7 +68,8 @@ include_directories(${Boost_INCLUDE_DIRS})
 ########################################
 # Main target: CrioLinux
 ########################################
-file(GLOB LIB_SOURCE "src/*.cc")
+file(GLOB LIB_SOURCE "src/*.cc" "build/version.cc")
+
 add_library(CrioLinux SHARED ${LIB_SOURCE})
 target_link_libraries(CrioLinux ${NIFPGAHELPER_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} -lrt)
 set_target_properties(CrioLinux PROPERTIES VERSION 0.1.0 SOVERSION 0)
@@ -100,3 +109,5 @@ show_target(CrioLinux)
 message("")
 message("===============================================================================")
 message("")
+
+

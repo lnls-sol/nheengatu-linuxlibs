@@ -39,6 +39,8 @@ catch(const CrioLibException &e)       \
 std::cout << e.what() << endl;         \
 continue;                              \
 }                                      \
+
+
 /* Error codes that will be passed with the Exception */
 enum errorcodes{
     E_NO_MEMORY = -1,
@@ -319,6 +321,12 @@ enum type_code get_rt_var_size(std::string name);
  * false = is not an RT variable
  */
 bool is_rt_var(std::string name);
+
+
+/* This function prints build information
+ * of the CrioLinux library.
+ */
+void printVersion(void);
 
 
 #ifdef __cplusplus

@@ -1,0 +1,15 @@
+#include "version.hh"
+
+const std::string Version::GIT_SHA1 = "@GIT_SHA1@";
+const std::string Version::GIT_DATE = "@GIT_DATE@";
+const std::string Version::GIT_COMMIT_SUBJECT = "@GIT_COMMIT_SUBJECT@";
+
+
+void printVersion()
+{
+    std::cout << "\n--------------- LibCrioLinux version information -----------------\n";
+    std::cout << "      Git Hash       : " << Version::GIT_SHA1 << std::endl;
+    std::cout << "      Data           : " << Version::GIT_DATE << std::endl;
+    std::cout << "      Commit subject : " << Version::GIT_COMMIT_SUBJECT << std::endl;
+    std::cout << "------------------------------------------------------------------\n\n";        
+}
