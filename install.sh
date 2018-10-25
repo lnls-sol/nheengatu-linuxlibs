@@ -1,7 +1,10 @@
 #!/bin/sh
 
-sudo cp build/libCrioLinux.so.0.1.0 /usr/local/lib/.
-sudo ln -s /usr/local/lib/libCrioLinux.so.0.1.0 /usr/local/lib/libCrioLinux.so.0
-sudo ln -s /usr/local/lib/libCrioLinux.so.0 /usr/local/lib/libCrioLinux.so
+cp -f build/libCrioLinux.so.0.1.0 /usr/local/lib/.
+ln -sf /usr/local/lib/libCrioLinux.so.0.1.0 /usr/local/lib/libCrioLinux.so.0
+ln -sf /usr/local/lib/libCrioLinux.so.0 /usr/local/lib/libCrioLinux.so
 
-sudo cp include/CrioLinux.h /usr/local/include/.
+cp -f include/CrioLinux.h /usr/local/include/.
+ls -alh /usr/local/include/CrioLinux.h /usr/local/lib/libCrioLinux.so*
+ldconfig
+echo "CrioLinux Library installation complete"
