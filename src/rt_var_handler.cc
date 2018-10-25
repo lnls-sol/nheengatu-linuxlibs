@@ -165,15 +165,15 @@ bool get_rt_var_sign(std::string name){
 
 int open_shared_memory(std::string shm_name, uint8_t **memory_ptr)
 {
-    if (access((SHM_PATH+shm_name).c_str(), F_OK) != 0) return -1;
+    if (access((SHM_PATH+shm_name).c_str(), F_OK) != 0) throw (CrioLibException(E_SHARED_MEM, "Cannot find shared memory file <%s>.", shm_name.c_str()));
 
     // Open file descriptor to shared memory.
     int fd = shm_open(shm_name.c_str(), O_RDWR, (mode_t) 0777);
-    if (fd < 0) throw (CrioLibException(E_SHARED_MEM, "Cannot open shared memory file <%s>.\n", shm_name.c_str()));
+    if (fd < 0) throw (CrioLibException(E_SHARED_MEM, "Cannot open shared memory file <%s>.", shm_name.c_str()));
 
     // Map memory from shared memory to application memory.
     void *mmapPointer = mmap(NULL, 4096, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-    if (mmapPointer == MAP_FAILED) throw (CrioLibException(E_SHARED_MEM, "Cannot map shared memory file.\n"));
+    if (mmapPointer == MAP_FAILED) throw (CrioLibException(E_SHARED_MEM, "Cannot map shared memory file."));
 
     // Since file descriptor is no longer needed after mmap, close it.
     close(fd);
