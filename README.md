@@ -18,4 +18,4 @@ link time and run time search directories).
 
 ## Install:
 
-	$ sudo ./build.sh install
+	$ sudo ./install.sh
