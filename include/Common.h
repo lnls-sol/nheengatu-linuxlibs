@@ -10,7 +10,7 @@
 #include<string.h>
 using namespace std;
 
-#define CFG_FILE "cfg/cfg.ini"
+#define CFG_FILE "/usr/local/epics/config/cfg.ini"
 
 
 

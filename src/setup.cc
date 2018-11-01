@@ -20,7 +20,11 @@ int crioSetup(struct crio_context *ctx, char *cfgfile) {
     if (ctx->session_open == false)
     {
         /* Read cfg file */
-        TRY_THROW(parser = new cfg_parser(cfgfile));
+        if (cfgfile != NULL) {
+            TRY_THROW(parser = new cfg_parser(cfgfile));
+        } else {
+            TRY_THROW(parser = new cfg_parser(CFG_FILE));
+        }
 
 
         /* Get settings from configuration file */

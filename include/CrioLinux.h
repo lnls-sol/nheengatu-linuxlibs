@@ -21,24 +21,27 @@ extern "C" {
 #endif
 
 
-#define TRY_THROW(x)   try {x;}   \
+#define TRY_THROW(x)  {try {x;}   \
 catch(const CrioLibException &e)  \
 {                                 \
 throw e;                          \
 }                                 \
+} while(0)                        \
 
-#define TRY_SILENT(x)  try {x;}   \
+#define TRY_SILENT(x) {try {x;}   \
 catch(const CrioLibException &e)  \
 {                                 \
 std::cout << e.what() << endl;    \
 }                                 \
+} while(0)                        \
 
-#define TRY_SILENT_CONT(x)  try {x;}   \
+#define TRY_SILENT_CONT(x) {try {x;}   \
 catch(const CrioLibException &e)       \
 {                                      \
 std::cout << e.what() << endl;         \
 continue;                              \
 }                                      \
+} while(0)                             \
 
 
 /* Error codes that will be passed with the Exception */
@@ -124,7 +127,9 @@ struct crio_context {
  * Description    : Sets up the target crio FPGA and the context.
  * Parameters
  * - crio_context : context to be initialized by the function
- * - cfgfile      : path of the ini configuration file
+ * - cfgfile      : path of the ini configuration file. If
+ *                  NULL is passed, the default location and filename
+ *                  are used: /usr/local/epics/config/cfg.ini
  * Return value   :
  * - OK  = 0
  * - NOK = E_NO_MEMORY (Resources could not be allocated)
