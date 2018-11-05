@@ -38,7 +38,7 @@ find_package(Git)
 # Compiler flags
 ########################################
 add_compiler_flags(-Wall -Wextra -Werror -Wmissing-declarations -Wno-maybe-uninitialized
-    -Wno-missing-field-initializers -Wno-unused-parameter -fdata-sections -ffunction-sections)
+    -Wno-missing-field-initializers -Wno-unused-parameter -fdata-sections -ffunction-sections -O0)
 add_linker_flags(-Wl,--as-needed -Wl,--gc-sections)
 #add_double_flags(-fsanitize=undefined)
 
