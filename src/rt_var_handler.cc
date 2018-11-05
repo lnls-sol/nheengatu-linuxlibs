@@ -13,8 +13,9 @@ bool is_rt_var(std::string name){
 
 
 uint8_t decode_enum_size(enum type_code code){
-    return 8;
-    /* Due to the sanitizer library that is used when compiling with docker
+
+    /* If sanitizer is enabled, this function must return 8 for any size.
+     * Due to the sanitizer library that is used when compiling with docker
      * each type has some specific alignment in the memory. For simplicity
      * we aligned all variables with addresses of multiples of 8.
     */
