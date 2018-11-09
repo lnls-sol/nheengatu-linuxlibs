@@ -16,7 +16,7 @@ include(macros.cmake)
 #######################################
 # Global setup
 #######################################
-set_default_build_type(Release)
+set_default_build_type(Debug)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED YES)
 set(CMAKE_CXX_EXTENSIONS NO)
@@ -38,7 +38,7 @@ find_package(Git)
 # Compiler flags
 ########################################
 add_compiler_flags(-Wall -Wextra -Werror -Wmissing-declarations -Wno-maybe-uninitialized
-    -Wno-missing-field-initializers -Wno-unused-parameter -fdata-sections -ffunction-sections -O0)
+    -Wno-missing-field-initializers -Wno-unused-parameter -fdata-sections -ffunction-sections -g -O0)
 add_linker_flags(-Wl,--as-needed -Wl,--gc-sections)
 #add_double_flags(-fsanitize=undefined)
 
@@ -93,6 +93,7 @@ install(FILES include/CrioLinux.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 ########################################
 
 add_simple_test(TestBasicAll tests/BasicAll.cc)
+add_simple_test(TestScaler tests/Scaler.cc)
 #add_simple_test(TestBasicAI tests/BasicAI.cc)
 #add_simple_test(TestBasicAO tests/BasicAO.cc)
 #add_simple_test(TestBasicBO tests/BasicBO.cc)

@@ -124,7 +124,6 @@ int crioGetBIArrayItemByName(struct crio_context *ctx, bool *item, const char *n
         throw (CrioLibException(E_SESSION_CLOSED , "[%s] Operation performed on closed session.", LIB_CRIO_LINUX ));
 
     uint64_t index;
-
     try {
         if (is_rt_var(name) == true)
         {
@@ -133,6 +132,7 @@ int crioGetBIArrayItemByName(struct crio_context *ctx, bool *item, const char *n
         }
         else
         {
+
             index = ((bim_type *)ctx->bi_map)->right.at(name);
             *item = getBI(ctx, index, ((bm_address_type *)ctx->bi_addresses)->left.at("BI0"));
         }

@@ -66,6 +66,8 @@ int cfg_parser::get_settings(std::string &ip, std::string &path, std::string &fi
 
 int cfg_parser::get_bi_maps(bool rt_support, uint32_t & count, bim_type *bi_map, bm_address_type * bi_address_map, bm_address_type * bi_rt_address_map )
 {
+    if (tree.count(BIADDR_ALIAS) == 0)
+        return 0;
     try
     {
         for (const std::pair<std::string, boost::property_tree::ptree> &bi_address_tree : tree.get_child(BIADDR_ALIAS))
@@ -129,6 +131,8 @@ int cfg_parser::get_bi_maps(bool rt_support, uint32_t & count, bim_type *bi_map,
 
 int cfg_parser::get_address_maps(bool rt_support, uint32_t & count, bm_address_type * address_map, bm_address_type * rt_address_map, string alias)
 {
+    if (tree.count(alias) == 0)
+        return 0;
     try
     {
         for (const std::pair<std::string, boost::property_tree::ptree> &address_tree : tree.get_child(alias))
@@ -174,3 +178,36 @@ int cfg_parser::get_address_maps(bool rt_support, uint32_t & count, bm_address_t
     return 0;
 }
 
+int cfg_parser::get_scaler_data(bm_address_type * scaler_name_index_map, struct scaler_ctx ** scaler_addr, uint32_t  *scaler_count)
+{
+    *scaler_count = tree.count(SCALER_ALIAS);
+    if (*scaler_count == 0)
+        return -1;
+
+    struct scaler_ctx *scaler_addr_local;
+
+    *scaler_addr = new struct scaler_ctx [*scaler_count];
+
+    try
+    {
+        for (const std::pair<std::string, boost::property_tree::ptree> &address_tree : tree.get_child(SCALER_ALIAS))
+        {
+            scaler_name_index_map->insert( bm_address_type::value_type( (address_tree.first.c_str()) , strtoul(address_tree.second.get_value<std::string>().c_str(), NULL, 16) ));
+            scaler_addr_local = scaler_addr[ strtoul(address_tree.second.get_value<std::string>().c_str(), NULL, 16) ];
+            scaler_addr_local->reset_addr = strtoul(tree.get <std::string>(address_tree.first + ".Reset").c_str(), NULL, 16);
+            scaler_addr_local->enable_addr = strtoul(tree.get <std::string>(address_tree.first + ".Enable").c_str(), NULL, 16);
+            scaler_addr_local->gate_array_addr = strtoul(tree.get <std::string>(address_tree.first + ".Gate").c_str(), NULL, 16);
+            scaler_addr_local->oneshot_addr = strtoul(tree.get <std::string>(address_tree.first + ".OneShot").c_str(), NULL, 16);
+            scaler_addr_local->counter_array_addr = strtoul(tree.get <std::string>(address_tree.first + ".Counters").c_str(), NULL, 16);
+            scaler_addr_local->pr_array_addr = strtoul(tree.get <std::string>(address_tree.first + ".Preset Values").c_str(), NULL, 16);
+            scaler_addr_local->num_of_counters = tree.get <unsigned>(address_tree.first + ".Number of Counters");
+            scaler_addr_local->done_addr = strtoul(tree.get <std::string>(address_tree.first + ".Done").c_str(), NULL, 16);
+        }
+    }
+    catch(const boost::property_tree::ptree_error &e)
+    {
+        throw CrioLibException(E_INI, "[%s] %s", LIB_CRIO_LINUX, e.what());
+    }
+    return 0;
+
+}

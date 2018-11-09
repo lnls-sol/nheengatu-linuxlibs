@@ -16,32 +16,34 @@
 
 #define LIB_CRIO_LINUX "LibCrioLinux"
 
+#define MAX_SCALER_CHANNELS 64
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 
-#define TRY_THROW(x)  {try {x;}   \
+#define TRY_THROW(x)  do{try {x;} \
 catch(const CrioLibException &e)  \
 {                                 \
 throw e;                          \
 }                                 \
-} while(0)                        \
+} while(0)
 
-#define TRY_SILENT(x) {try {x;}   \
+#define TRY_SILENT(x) do {try {x;}\
 catch(const CrioLibException &e)  \
 {                                 \
 std::cout << e.what() << endl;    \
 }                                 \
-} while(0)                        \
+} while(0)
 
-#define TRY_SILENT_CONT(x) {try {x;}   \
+#define TRY_SILENT_CONT(x) do {try {x;}\
 catch(const CrioLibException &e)       \
 {                                      \
 std::cout << e.what() << endl;         \
 continue;                              \
 }                                      \
-} while(0)                             \
+} while(0)
 
 
 /* Error codes that will be passed with the Exception */
@@ -93,27 +95,31 @@ struct CrioLibException : public std::exception {
 /* Type definitions */
 typedef	unsigned int CrioSession;
 
+
 /* Structures */
 struct crio_context {
-    CrioSession      session;
-    bool             session_open;
-    struct timespec  bi_sample_time;
-    uint64_t         bi_cache;
-    bool             bi_cache_valid;
-    double           bi_cache_timeout;
-    pthread_mutex_t  bi_mutex;
-    void           * bi_map;
-    void           * bi_addresses;
-    void           * bo_addresses;
-    void           * ao_addresses;
-    void           * ai_addresses;
-    void           * rt_addresses;
-    uint8_t        * rt_variable_offsets;
-    uint8_t        * shared_memory;
-    uint32_t         ai_count;
-    uint32_t         ao_count;
-    uint32_t         bi_count;
-    uint32_t         bo_count;
+    CrioSession          session;
+    bool                 session_open;
+    struct timespec      bi_sample_time;
+    uint64_t             bi_cache;
+    bool                 bi_cache_valid;
+    double               bi_cache_timeout;
+    pthread_mutex_t      bi_mutex;
+    void               * bi_map;
+    void               * bi_addresses;
+    void               * bo_addresses;
+    void               * ao_addresses;
+    void               * ai_addresses;
+    void               * rt_addresses;
+    uint8_t            * rt_variable_offsets;
+    uint8_t            * shared_memory;
+    uint32_t             ai_count;
+    uint32_t             ao_count;
+    uint32_t             bi_count;
+    uint32_t             bo_count;
+    uint32_t              num_of_scalers;
+    void              *  scalers;
+    void               * scaler_name_index_map;
 };
 
 
@@ -333,6 +339,13 @@ bool is_rt_var(std::string name);
  */
 void printVersion(void);
 
+
+int crioSetScalerReset(struct crio_context *ctx, const char *name);
+int crioGetScalerCounters(struct crio_context *ctx, const char * name, uint32_t *counters);
+int crioSetScalerPresets(struct crio_context *ctx, const char * name, uint32_t preset_index, uint32_t prs);
+int crioGetScalerDone(struct crio_context *ctx, const char * name, bool *done);
+int crioSetScalerGates(struct crio_context *ctx, const char * name, uint32_t gate_index, bool gate);
+int crioSetScalerArm(struct crio_context *ctx, const char * name, bool arm, bool oneshot);
 
 #ifdef __cplusplus
 }

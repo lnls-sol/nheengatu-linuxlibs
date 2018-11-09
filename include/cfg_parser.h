@@ -13,10 +13,11 @@ extern "C" {
 typedef boost::bimap< unsigned, std::string > bim_type;
 typedef boost::bimap< std::string, unsigned > bm_address_type;
 
-#define BIADDR_ALIAS "BIAddresses"
-#define BO_ALIAS     "BO"
-#define AO_ALIAS     "AO"
-#define AI_ALIAS     "AI"
+#define BIADDR_ALIAS     "BIAddresses"
+#define BO_ALIAS         "BO"
+#define AO_ALIAS         "AO"
+#define AI_ALIAS         "AI"
+#define SCALER_ALIAS     "SCALERS"
 
 /* This class processes an ini file, and imports it to a
  * boost property tree. It uses the formerly defined aliases
@@ -37,6 +38,8 @@ class cfg_parser {
 
         /* Fills all indicated address binary maps */
         int get_address_maps(bool rt_support, uint32_t &count, bm_address_type * address_map, bm_address_type * rt_address_map, string alias);
+
+        int get_scaler_data(bm_address_type *scaler, scaler_ctx **scaler_addr, uint32_t *scaler_count);
     private:
         std::string cfg_file;
         boost::property_tree::ptree tree;

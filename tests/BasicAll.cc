@@ -10,7 +10,7 @@ int main(void) {
     struct crio_context * ctx = new struct crio_context;
     double ai_val;
     unsigned Size;
-    char cfg[] = "cfg/cfg.ini";
+    //char cfg[] = "cfg/cfg.ini";
     bool Item;
     double ao_val;
     srand(time(0));
@@ -83,7 +83,7 @@ int main(void) {
                    "RT_U16_AO9", "RT_U08_AO10"};
 
 
-    TRY_THROW(crioSetup(ctx, cfg));
+    TRY_THROW(crioSetup(ctx, NULL));
     /*bool x = false;
     while(1)
     {

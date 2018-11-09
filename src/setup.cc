@@ -15,7 +15,7 @@ int crioSetup(struct crio_context *ctx, char *cfgfile) {
     string shared_memory_path = "";
     const char *name;
     cfg_parser * parser;
-
+    int Ret = -1;
 
     if (ctx->session_open == false)
     {
@@ -57,11 +57,22 @@ int crioSetup(struct crio_context *ctx, char *cfgfile) {
         ctx->ao_addresses = (void *) new bm_address_type;
         ctx->ai_addresses = (void *) new bm_address_type;
         ctx->rt_addresses = (void *) new bm_address_type;
-
+        ctx->scaler_name_index_map   = (void *) new bm_address_type;
+        struct scaler_ctx *scaler = (struct scaler_ctx *)ctx->scalers;
         TRY_THROW(parser->get_bi_maps(use_shared_memory, ctx->bi_count, (bim_type*) ctx->bi_map, (bm_address_type *)ctx->bi_addresses, (bm_address_type *)ctx->rt_addresses));
         TRY_THROW(parser->get_address_maps(use_shared_memory, ctx->bo_count, (bm_address_type *)ctx->bo_addresses, (bm_address_type *)ctx->rt_addresses, BO_ALIAS));
         TRY_THROW(parser->get_address_maps(use_shared_memory, ctx->ao_count, (bm_address_type *)ctx->ao_addresses, (bm_address_type *)ctx->rt_addresses, AO_ALIAS));
         TRY_THROW(parser->get_address_maps(use_shared_memory, ctx->ai_count, (bm_address_type *)ctx->ai_addresses, (bm_address_type *)ctx->rt_addresses, AI_ALIAS));
+        TRY_THROW(Ret = parser->get_scaler_data((bm_address_type*) ctx->scaler_name_index_map, &scaler, &ctx->num_of_scalers));
+
+        if (Ret == 0) /* Init scaler preset cache array */
+        {
+            for (uint8_t i = 0; i < ctx->num_of_scalers; i++)
+            {
+                scaler[i].scaler_preset_cache = new uint32_t[MAX_SCALER_CHANNELS];
+                scaler[i].scaler_gate_cache  = new bool[MAX_SCALER_CHANNELS];
+            }
+        }
 
         /* Calculate offsets if shared memory is enabled */
         if (use_shared_memory == true) {
@@ -115,6 +126,9 @@ void crioCleanup(struct crio_context *ctx) {
         delete((bm_address_type *)ctx->ao_addresses);
         delete((bm_address_type *)ctx->bo_addresses);
         delete((bm_address_type *)ctx->bi_addresses);
+
+        /* TODO: SCALER CLEANUP */
+
         delete ctx->rt_variable_offsets;
         delete((bim_type * )ctx->bi_map);
         pthread_mutex_destroy(&ctx->bi_mutex);
