@@ -138,9 +138,8 @@ struct crio_context {
  *                  are used: /usr/local/epics/config/cfg.ini
  * Return value   :
  * - OK  = 0
- * - NOK = E_NO_MEMORY (Resources could not be allocated)
- * - NOK = E_FPGA_INIT (NiFpga_Open failed)
- * - NOK = E_SHARED_MEM (Failure in accessing shared memory)
+ * otherwise an exception will be thrown with the
+ * one of the errorcodes defined in errorcodes.
  */
 int crioSetup(struct crio_context *ctx, char * cfgfile);
 
@@ -168,8 +167,8 @@ void crioCleanup(struct crio_context* ctx);
  * - name         : key to obtain value (item)
  * Return value   :
  * - OK  = 0
- * - NOK = E_NOT_FOUND (no item found)
- * - NOK = E_SESSION_CLOSED (Session not open)
+ * otherwise an exception will be thrown with the
+ * one of the errorcodes defined in errorcodes.
  */
 int crioGetBIArrayItemByName(struct crio_context *ctx, bool *item, const char *name);
 
@@ -186,8 +185,8 @@ int crioGetBIArrayItemByName(struct crio_context *ctx, bool *item, const char *n
  * - index        : key to obtain value (item)
  * Return value   :
  * - OK  = 0
- * - NOK = E_OUT_OF_RANGE (out of range)
- * - NOK = E_SESSION_CLOSED (Session not open)
+ * otherwise an exception will be thrown with the
+ * one of the errorcodes defined in errorcodes.
  */
 int crioGetBIArrayItemByIndex(struct crio_context*, bool *item, uint32_t index);
 
@@ -201,8 +200,8 @@ int crioGetBIArrayItemByIndex(struct crio_context*, bool *item, uint32_t index);
  * - crio_context : context for the open CRIO session
  * - size         : (Return value) size to be obtained
  * Return value   :
- * - OK  = 0
- * - NOK = E_SESSION_CLOSED (Session not open)
+ * otherwise an exception will be thrown with the
+ * one of the errorcodes defined in errorcodes.
  */
 int crioGetBIArraySize(struct crio_context *ctx, uint32_t *size);
 
@@ -216,8 +215,8 @@ int crioGetBIArraySize(struct crio_context *ctx, uint32_t *size);
  * - name         : (Return value) Name of item
  * Return value   :
  * - OK  = 0
- * - NOK = E_OUT_OF_RANGE (out of range)
- * - NOK = E_SESSION_CLOSED (Session not open)
+ * otherwise an exception will be thrown with the
+ * one of the errorcodes defined in errorcodes.
  */
 int crioGetBIArrayItemName(struct crio_context *ctx, unsigned index, const char **name);
 
@@ -239,7 +238,8 @@ void setBICacheTimeout(struct crio_context *ctx, double timeout);
  * - size         : (Return value) number of registered BOs available in the ini file
  * Return value   :
  * - OK  = 0
- * - NOK = E_SESSION_CLOSED (Session not open)
+ * otherwise an exception will be thrown with the
+ * one of the errorcodes defined in errorcodes.
  */
 int crioGetBOArraySize(struct crio_context *ctx, unsigned *size);
 
@@ -252,8 +252,8 @@ int crioGetBOArraySize(struct crio_context *ctx, unsigned *size);
  * - value        : value to set the BO with
  * Return value   :
  * - OK  = 0
- * - NOK = E_NOT_FOUND (query returned null)
- * - NOK = E_SESSION_CLOSED (Session not open)
+ * otherwise an exception will be thrown with the
+ * one of the errorcodes defined in errorcodes.
  */
 int crioSetBOItem(struct crio_context *ctx, const char *name, bool value);
 
@@ -267,8 +267,8 @@ int crioSetBOItem(struct crio_context *ctx, const char *name, bool value);
  * - value        : value to set the AO with
  * Return value   :
  * - OK  = 0  (Success)
- * - NOK = E_NOT_FOUND (query returned null)
- * - NOK = E_SESSION_CLOSED (Session not open)
+ * otherwise an exception will be thrown with the
+ * one of the errorcodes defined in errorcodes.
  */
 int crioSetAOItem(struct crio_context *ctx, const char *name, double value);
 
@@ -281,7 +281,8 @@ int crioSetAOItem(struct crio_context *ctx, const char *name, double value);
  * - size         : (Return value) number of the registered AOs
  * Return value   :
  * - OK  = 0
- * - NOK = E_SESSION_CLOSED (Session not open)
+ * otherwise an exception will be thrown with the
+ * one of the errorcodes defined in errorcodes.
  */
 int crioGetAOArraySize(struct crio_context *ctx, unsigned *size);
 
@@ -294,7 +295,8 @@ int crioGetAOArraySize(struct crio_context *ctx, unsigned *size);
  * - size         : (Return value) number of the registered AIs
  * Return value   :
  * - OK  = 0
- * - NOK = E_SESSION_CLOSED (Session not open)
+ * otherwise an exception will be thrown with the
+ * one of the errorcodes defined in errorcodes.
  */
 int crioGetAIArraySize(struct crio_context *ctx, unsigned *size);
 
@@ -307,8 +309,8 @@ int crioGetAIArraySize(struct crio_context *ctx, unsigned *size);
  * - value        : value to set the AI with
  * Return value   :
  * - OK  = 0  (Success)
- * - NOK = E_NOT_FOUND (query returned null)
- * - NOK = E_SESSION_CLOSED (Session not open)
+ * otherwise an exception will be thrown with the
+ * one of the errorcodes defined in errorcodes.
  */
 int crioGetAIItem(struct crio_context *ctx, const char *name, double &value);
 
@@ -318,7 +320,8 @@ int crioGetAIItem(struct crio_context *ctx, const char *name, double &value);
  * Parameters
  * - name         : name of RT variable to detect its size
  * Return value   :
- * enum type_code : one of the sizes defined in enum type_code
+ * otherwise an exception will be thrown with the
+ * one of the errorcodes defined in errorcodes.
  */
 enum type_code get_rt_var_size(std::string name);
 
@@ -340,11 +343,89 @@ bool is_rt_var(std::string name);
 void printVersion(void);
 
 
+/* ------------------------------------- Scaler functions ------------------------------------- */
+
+/* Function Name  : crioSetScalerReset
+ * Description    : Resets CRIO scaler module, and sets all gate and preset values to zero
+ * Parameters
+ * - crio_context : context for the open CRIO session*
+ * - name         : name of scaler defined in the configuration file
+ * Return value   :
+ * - OK  = 0  (Success)
+ * otherwise an exception will be thrown with the
+ * one of the errorcodes defined in errorcodes.
+ */
 int crioSetScalerReset(struct crio_context *ctx, const char *name);
+
+/* Function Name  : crioGetScalerCounters
+ * Description    : gets all 64 scaler counter values
+ * Parameters
+ * - crio_context : context for the open CRIO session*
+ * - name         : name of scaler defined in the configuration file
+ * - counters     : counter values will be returned in this array
+ * Return value   :
+ * - OK  = 0  (Success)
+ * otherwise an exception will be thrown with the
+ * one of the errorcodes defined in errorcodes.
+ */
 int crioGetScalerCounters(struct crio_context *ctx, const char * name, uint32_t *counters);
+
+/* Function Name  : crioSetScalerPresets
+ * Description    : set a single preset value in preset cache and
+ *                  sets associate gate value to 1.
+ * Parameters
+ * - crio_context : context for the open CRIO session*
+ * - name         : name of scaler defined in the configuration file
+ * - preset_index : Index of the preset to be set
+ * - prs          : value of the preset
+ * Return value   :
+ * - OK  = 0  (Success)
+ * otherwise an exception will be thrown with the
+ * one of the errorcodes defined in errorcodes.
+ */
 int crioSetScalerPresets(struct crio_context *ctx, const char * name, uint32_t preset_index, uint32_t prs);
+
+/* Function Name  : crioGetScalerDone
+ * Description    : checks if hardware is done
+ * Parameters
+ * - crio_context : context for the open CRIO session*
+ * - name         : name of scaler defined in the configuration file
+ * - done         : if done, function will set this value to true
+ * Return value   :
+ * - OK  = 0  (Success)
+ * otherwise an exception will be thrown with the
+ * one of the errorcodes defined in errorcodes.
+ */
 int crioGetScalerDone(struct crio_context *ctx, const char * name, bool *done);
+
+/* Function Name  : crioSetScalerGates
+ * Description    : Sets a single gate to <gate>
+ * Parameters
+ * - crio_context : context for the open CRIO session*
+ * - name         : name of scaler defined in the configuration file
+ * - gate_index   : index if the gate to set
+ * - gate         : value to set the gate with
+ * Return value   :
+ * - OK  = 0  (Success)
+ * otherwise an exception will be thrown with the
+ * one of the errorcodes defined in errorcodes.
+ */
 int crioSetScalerGates(struct crio_context *ctx, const char * name, uint32_t gate_index, bool gate);
+
+/* Function Name  : crioSetScalerArm
+ * Description    : arms the scaler. This functions writes the gate
+ *                  and preset caches to hardware.
+ * Parameters
+ * - crio_context : context for the open CRIO session*
+ * - name         : name of scaler defined in the configuration file
+ * - arm          : arm or disarm the scaler hardware
+ * - oneshot      : set to true, oneshot will be enabled. Otherwise
+ *                  autocount will be used.
+ * Return value   :
+ * - OK  = 0  (Success)
+ * otherwise an exception will be thrown with the
+ * one of the errorcodes defined in errorcodes.
+ */
 int crioSetScalerArm(struct crio_context *ctx, const char * name, bool arm, bool oneshot);
 
 #ifdef __cplusplus

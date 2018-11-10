@@ -123,6 +123,7 @@ int crioSetScalerPresets(struct crio_context *ctx, const char * name, uint32_t p
         uint32_t scaler_index = ((bm_address_type *)ctx->scaler_name_index_map)->left.at(name);
         struct scaler_ctx* scaler = ((struct scaler_ctx*)(ctx->scalers));
         scaler[scaler_index].scaler_preset_cache[preset_index] = prs;
+        crioSetScalerGates(ctx,name, preset_index, true);
     } catch (out_of_range) {
         throw (CrioLibException(E_OUT_OF_RANGE , "[%s] Property Scalers: Query returned null for name %s.", LIB_CRIO_LINUX , name ));
     }

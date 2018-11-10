@@ -203,10 +203,10 @@ int cfg_parser::get_scaler_data(bm_address_type * scaler_name_index_map, struct 
             try {
             scaler_ctx_local->num_of_counters = tree.get <unsigned>(address_tree.first + ".Number of Counters");
             } catch(const boost::property_tree::ptree_error &e) {
-                throw CrioLibException(E_INI, "[%s] Property %s:Number of Counters error:%s. Is this an integer?", LIB_CRIO_LINUX, address_tree.first.c_str(), e.what());
+                throw CrioLibException(E_INI, "[%s] Property [%s]:[Number of Counters] error:%s. Is this an integer?", LIB_CRIO_LINUX, address_tree.first.c_str(), e.what());
             }
             if (scaler_ctx_local->num_of_counters > MAX_SCALER_CHANNELS)
-                throw CrioLibException(E_INI, "[%s] Property %s:%s Number of scaler channels larger than defined maximum (%u)", LIB_CRIO_LINUX, SCALER_ALIAS, address_tree.first.c_str(), MAX_SCALER_CHANNELS );
+                throw CrioLibException(E_INI, "[%s] Property [%s]:[%s] Number of scaler channels larger than defined maximum (%u)", LIB_CRIO_LINUX, SCALER_ALIAS, address_tree.first.c_str(), MAX_SCALER_CHANNELS );
             scaler_ctx_local->done_addr = strtoul(tree.get <std::string>(address_tree.first + ".Done").c_str(), NULL, 16);
         }
     }
