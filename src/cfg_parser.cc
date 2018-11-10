@@ -77,7 +77,7 @@ int cfg_parser::get_bi_maps(bool rt_support, uint32_t & count, bim_type *bi_map,
                 bm_address_type::right_const_iterator id_iter = bi_address_map->right.find(strtoul(bi_address_tree.second.get_value<std::string>().c_str(), NULL, 16));
                 if( id_iter != bi_address_map->right.end() )
                 {
-                    throw CrioLibException(E_SAME_ADDRESS, "[%s] Found replicated address for items <%s> and <%s>.",
+                    throw CrioLibException(E_SAME_ADDRESS, "[%s] Found replicated address for items [%s] and [%s].",
                                            LIB_CRIO_LINUX, bi_address_tree.first.c_str(), id_iter->second.c_str() );
                 }
                 else {
@@ -142,7 +142,7 @@ int cfg_parser::get_address_maps(bool rt_support, uint32_t & count, bm_address_t
                 bm_address_type::right_const_iterator id_iter = address_map->right.find(strtoul(address_tree.second.get_value<std::string>().c_str(), NULL, 16));
                 if( id_iter != address_map->right.end() )
                 {
-                    throw CrioLibException(E_SAME_ADDRESS, "[%s] Found replicated index for items <%s> and <%s>.",
+                    throw CrioLibException(E_SAME_ADDRESS, "[%s] Found replicated index for items [%s] and [%s].",
                                            LIB_CRIO_LINUX, address_tree.first.c_str(), id_iter->second.c_str() );
                 }
                 else
@@ -158,7 +158,7 @@ int cfg_parser::get_address_maps(bool rt_support, uint32_t & count, bm_address_t
                 bm_address_type::right_const_iterator id_iter = rt_address_map->right.find(strtoul(address_tree.second.get_value<std::string>().c_str(), NULL, 10));
                 if( id_iter != rt_address_map->right.end() )
                 {
-                    throw CrioLibException(E_SAME_ADDRESS, "[%s] Found replicated index for items <%s> and <%s>.",
+                    throw CrioLibException(E_SAME_ADDRESS, "[%s] Found replicated index for items [%s] and [%s].",
                                            LIB_CRIO_LINUX, address_tree.first.c_str(), id_iter->second.c_str() );
                 }
                 else
@@ -200,7 +200,13 @@ int cfg_parser::get_scaler_data(bm_address_type * scaler_name_index_map, struct 
             scaler_ctx_local->oneshot_addr = strtoul(tree.get <std::string>(address_tree.first + ".OneShot").c_str(), NULL, 16);
             scaler_ctx_local->counter_array_addr = strtoul(tree.get <std::string>(address_tree.first + ".Counters").c_str(), NULL, 16);
             scaler_ctx_local->pr_array_addr = strtoul(tree.get <std::string>(address_tree.first + ".Preset Values").c_str(), NULL, 16);
+            try {
             scaler_ctx_local->num_of_counters = tree.get <unsigned>(address_tree.first + ".Number of Counters");
+            } catch(const boost::property_tree::ptree_error &e) {
+                throw CrioLibException(E_INI, "[%s] Property %s:Number of Counters error:%s. Is this an integer?", LIB_CRIO_LINUX, address_tree.first.c_str(), e.what());
+            }
+            if (scaler_ctx_local->num_of_counters > MAX_SCALER_CHANNELS)
+                throw CrioLibException(E_INI, "[%s] Property %s:%s Number of scaler channels larger than defined maximum (%u)", LIB_CRIO_LINUX, SCALER_ALIAS, address_tree.first.c_str(), MAX_SCALER_CHANNELS );
             scaler_ctx_local->done_addr = strtoul(tree.get <std::string>(address_tree.first + ".Done").c_str(), NULL, 16);
         }
     }

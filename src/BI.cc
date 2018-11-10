@@ -107,7 +107,7 @@ int crioGetBIArrayItemByIndex(struct crio_context *ctx, bool *item, uint32_t ind
     } catch (out_of_range) {
         throw (CrioLibException(E_OUT_OF_RANGE , "[%s] Property <BI0>: Query returned null for index %d.", LIB_CRIO_LINUX , index ));
     } catch(CrioLibException &e) {
-        throw (CrioLibException(e.errorcode, "[%s] Property <%s>: %s.", LIB_CRIO_LINUX , "BI0", e.what()));
+        throw (CrioLibException(e.errorcode, "[%s] Property [%s]: %s.", LIB_CRIO_LINUX , "BI0", e.what()));
     }
 }
 
@@ -138,9 +138,9 @@ int crioGetBIArrayItemByName(struct crio_context *ctx, bool *item, const char *n
         }
         return 0;
     } catch (out_of_range) {
-        throw (CrioLibException(E_OUT_OF_RANGE , "[%s] Property <%s>: Query returned null.", LIB_CRIO_LINUX , name ));
+        throw (CrioLibException(E_OUT_OF_RANGE , "[%s] Property [%s]: Query returned null.", LIB_CRIO_LINUX , name ));
     } catch(CrioLibException &e) {
-        throw (CrioLibException(e.errorcode, "[%s] Property <%s>: %s.", LIB_CRIO_LINUX , name, e.what()));
+        throw (CrioLibException(e.errorcode, "[%s] Property [%s]: %s.", LIB_CRIO_LINUX , name, e.what()));
     }
 }
 
@@ -151,6 +151,6 @@ int crioGetBIArrayItemName(struct crio_context *ctx, unsigned index, const char 
         *name = ((bim_type *)ctx->bi_map)->left.at(index).c_str();
         return 0;
     } catch (out_of_range) {
-        throw (CrioLibException(E_OUT_OF_RANGE , "[%s] Property <%s>: Query returned null.", LIB_CRIO_LINUX , *name ));
+        throw (CrioLibException(E_OUT_OF_RANGE , "[%s] Property [%s]: Query returned null.", LIB_CRIO_LINUX , *name ));
     }
 }

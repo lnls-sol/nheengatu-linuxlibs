@@ -86,10 +86,17 @@ int crioSetScalerReset(struct crio_context *ctx, const char * name){
     try {
         uint32_t scaler_index = ((bm_address_type *)ctx->scaler_name_index_map)->left.at(name);
         reset(ctx, scaler_index);
+        for (int gate_index = 0; gate_index < MAX_SCALER_CHANNELS; gate_index++)
+        {
+            crioSetScalerGates(ctx, name, gate_index, false);
+            crioSetScalerPresets(ctx, name, gate_index, 0);
+        }
+        setGates(ctx, scaler_index, ((struct scaler_ctx*)ctx->scalers)[scaler_index].scaler_gate_cache);
+        setPRs(ctx, scaler_index, ((struct scaler_ctx*)ctx->scalers)[scaler_index].scaler_preset_cache);
     } catch (out_of_range) {
         throw (CrioLibException(E_OUT_OF_RANGE , "[%s] Property Scalers: Query returned null for name %s.", LIB_CRIO_LINUX , name ));
     } catch(CrioLibException &e) {
-           throw (CrioLibException(e.errorcode, "[%s] Property <%s>:<%s> %s.", LIB_CRIO_LINUX , "Scalers", name, e.what()));
+           throw (CrioLibException(e.errorcode, "[%s] Property [%s]:[%s] %s.", LIB_CRIO_LINUX , "Scalers", name, e.what()));
     }
     return 0;
 }
@@ -103,7 +110,7 @@ int crioGetScalerCounters(struct crio_context *ctx, const char * name, uint32_t 
     } catch (out_of_range) {
         throw (CrioLibException(E_OUT_OF_RANGE , "[%s] Property Scalers: Query returned null for name %s.", LIB_CRIO_LINUX , name ));
     } catch(CrioLibException &e) {
-           throw (CrioLibException(e.errorcode, "[%s] Property <%s>:<%s> %s.", LIB_CRIO_LINUX , "Scalers", name, e.what()));
+           throw (CrioLibException(e.errorcode, "[%s] Property [%s]:[%s] %s.", LIB_CRIO_LINUX , "Scalers", name, e.what()));
     }
     return 0;
 }
@@ -144,7 +151,7 @@ int crioGetScalerDone(struct crio_context *ctx, const char * name, bool *done){
     } catch (out_of_range) {
         throw (CrioLibException(E_OUT_OF_RANGE , "[%s] Property Scalers: Query returned null for name %s.", LIB_CRIO_LINUX , name ));
     } catch(CrioLibException &e) {
-           throw (CrioLibException(e.errorcode, "[%s] Property <%s>:<%s> %s.", LIB_CRIO_LINUX , "Scalers", name, e.what()));
+           throw (CrioLibException(e.errorcode, "[%s] Property [%s]:[%s] %s.", LIB_CRIO_LINUX , "Scalers", name, e.what()));
     }
     return 0;
 }
@@ -166,7 +173,7 @@ int crioSetScalerArm(struct crio_context *ctx, const char * name, bool arm, bool
     } catch (out_of_range) {
         throw (CrioLibException(E_OUT_OF_RANGE , "[%s] Property Scalers: Query returned null for name %s.", LIB_CRIO_LINUX , name ));
     } catch(CrioLibException &e) {
-           throw (CrioLibException(e.errorcode, "[%s] Property <%s>:<%s> %s.", LIB_CRIO_LINUX , "Scalers", name, e.what()));
+           throw (CrioLibException(e.errorcode, "[%s] Property [%s]:[%s] %s.", LIB_CRIO_LINUX , "Scalers", name, e.what()));
     }
     return 0;
 }

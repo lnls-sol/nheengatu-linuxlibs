@@ -45,8 +45,8 @@ int crioSetBOItem(struct crio_context *ctx, const char *name, bool value) {
         else
             return crioSetBO(ctx, ((bm_address_type *)ctx->bo_addresses)->left.at(name), value);
     } catch (out_of_range) {
-        throw (CrioLibException(E_OUT_OF_RANGE , "[%s] Property <%s>: Query returned null.", LIB_CRIO_LINUX , name ));
+        throw (CrioLibException(E_OUT_OF_RANGE , "[%s] Property [%s]: Query returned null.", LIB_CRIO_LINUX , name ));
     } catch(CrioLibException &e) {
-        throw (CrioLibException(e.errorcode, "[%s] Property <%s>: %s.", LIB_CRIO_LINUX , name, e.what()));
+        throw (CrioLibException(e.errorcode, "[%s] Property [%s]: %s.", LIB_CRIO_LINUX , name, e.what()));
     }
 }

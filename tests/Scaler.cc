@@ -13,16 +13,17 @@ int main(void) {
     uint32_t counters[64];
     bool done = false;
     TRY_SILENT(crioSetup(ctx, cfg));
-    sleep(1);
     TRY_SILENT(crioSetScalerReset(ctx, name));
     TRY_SILENT(crioSetScalerGates(ctx, name, 0, true));
+    TRY_SILENT(crioSetScalerGates(ctx, name, 1, true));
     TRY_SILENT(crioSetScalerPresets(ctx, name, 0, 100000));
+    TRY_SILENT(crioSetScalerPresets(ctx, name, 1, 2500));
     TRY_SILENT(crioSetScalerArm(ctx, name, true, true));
     while(done == false)
     {
         crioGetScalerDone(ctx, name, &done);
         crioGetScalerCounters(ctx, name, counters);
-        for (int i = 0 ; i < 1; i++)
+        for (int i = 0 ; i < 2; i++)
             cout << "Counter " << i << " : " << counters[i] << endl;
     }
     cout << "Done!\n";
