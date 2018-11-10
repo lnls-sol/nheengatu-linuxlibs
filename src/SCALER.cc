@@ -20,59 +20,59 @@ typedef bimap< std::string, unsigned > bm_address_type;
 
 /* ------------ Helpers -------------- */
 int static __inline__ getDone(struct crio_context *ctx, uint32_t index, bool *value){
-    struct scaler_ctx** scaler = ((struct scaler_ctx**)(ctx->scalers));
-    auto Res = NiFpga_ReadBool(NiFpga_Session(ctx->session), scaler[index]->done_addr, (NiFpga_Bool *) value);
+    struct scaler_ctx* scaler = ((struct scaler_ctx*)(ctx->scalers));
+    auto Res = NiFpga_ReadBool(NiFpga_Session(ctx->session), scaler[index].done_addr, (NiFpga_Bool *) value);
     if (NiFpga_IsError(Res)) throw (CrioLibException(E_VAR_ACCESS, "Cannot access address."));
     return 0;
 }
 
 int static __inline__ enable(struct crio_context *ctx, uint32_t index){
-    struct scaler_ctx** scaler = ((struct scaler_ctx**)(ctx->scalers));
-    auto Res = NiFpga_WriteBool(NiFpga_Session(ctx->session), scaler[index]->enable_addr, true);
+    struct scaler_ctx* scaler = ((struct scaler_ctx*)(ctx->scalers));
+    auto Res = NiFpga_WriteBool(NiFpga_Session(ctx->session), scaler[index].enable_addr, true);
     if (NiFpga_IsError(Res)) throw (CrioLibException(E_VAR_ACCESS, "Cannot access address."));
     return 0;
 }
 
 int static __inline__ disable(struct crio_context *ctx, uint32_t index){
-    struct scaler_ctx** scaler = ((struct scaler_ctx**)(ctx->scalers));
-    auto Res = NiFpga_WriteBool(NiFpga_Session(ctx->session), scaler[index]->enable_addr, false);
+    struct scaler_ctx* scaler = ((struct scaler_ctx*)(ctx->scalers));
+    auto Res = NiFpga_WriteBool(NiFpga_Session(ctx->session), scaler[index].enable_addr, false);
     if (NiFpga_IsError(Res)) throw (CrioLibException(E_VAR_ACCESS, "Cannot access address."));
     return 0;
 }
 
 int static __inline__ reset(struct crio_context *ctx, uint32_t index){
-    struct scaler_ctx** scaler = ((struct scaler_ctx**)(ctx->scalers));
-    auto Res = NiFpga_WriteBool(NiFpga_Session(ctx->session), scaler[index]->reset_addr, true);
+    struct scaler_ctx* scaler = ((struct scaler_ctx*)(ctx->scalers));
+    auto Res = NiFpga_WriteBool(NiFpga_Session(ctx->session), scaler[index].reset_addr, true);
     if (NiFpga_IsError(Res)) throw (CrioLibException(E_VAR_ACCESS, "Cannot access address."));
-    Res = NiFpga_WriteBool(NiFpga_Session(ctx->session), scaler[index]->reset_addr, false);
+    Res = NiFpga_WriteBool(NiFpga_Session(ctx->session), scaler[index].reset_addr, false);
     if (NiFpga_IsError(Res)) throw (CrioLibException(E_VAR_ACCESS, "Cannot access address."));
     return 0;
 }
 
 int static __inline__ setGates(struct crio_context *ctx, uint32_t index, bool *gates){
-    struct scaler_ctx** scaler = ((struct scaler_ctx**)(ctx->scalers));
-    auto Res = NiFpga_WriteArrayBool(NiFpga_Session(ctx->session), scaler[index]->gate_array_addr, (NiFpga_Bool *) gates, scaler[index]->num_of_counters);
+    struct scaler_ctx* scaler = ((struct scaler_ctx*)(ctx->scalers));
+    auto Res = NiFpga_WriteArrayBool(NiFpga_Session(ctx->session), scaler[index].gate_array_addr, (NiFpga_Bool *) gates, scaler[index].num_of_counters);
     if (NiFpga_IsError(Res)) throw (CrioLibException(E_VAR_ACCESS, "Cannot access address."));
     return 0;
 }
 
 int static __inline__ setOneShot(struct crio_context *ctx, uint32_t index, bool value){
-    struct scaler_ctx** scaler = ((struct scaler_ctx**)(ctx->scalers));
-    auto Res = NiFpga_WriteBool(NiFpga_Session(ctx->session), scaler[index]->oneshot_addr, value);
+    struct scaler_ctx* scaler = ((struct scaler_ctx*)(ctx->scalers));
+    auto Res = NiFpga_WriteBool(NiFpga_Session(ctx->session), scaler[index].oneshot_addr, value);
     if (NiFpga_IsError(Res)) throw (CrioLibException(E_VAR_ACCESS, "Cannot access address."));
     return 0;
 }
 
 int static __inline__ getCounters(struct crio_context *ctx, uint32_t index, uint32_t *counters){
-    struct scaler_ctx* scaler = ((struct scaler_ctx**)(ctx->scalers))[index];
-    auto Res = NiFpga_ReadArrayU32(NiFpga_Session(ctx->session), scaler->counter_array_addr, counters, scaler->num_of_counters);
+    struct scaler_ctx* scaler = ((struct scaler_ctx*)(ctx->scalers));
+    auto Res = NiFpga_ReadArrayU32(NiFpga_Session(ctx->session), scaler->counter_array_addr, counters, scaler[index].num_of_counters);
     if (NiFpga_IsError(Res)) throw (CrioLibException(E_VAR_ACCESS, "Cannot access address."));
     return 0;
 }
 
 int static __inline__ setPRs(struct crio_context *ctx, uint32_t index, uint32_t *prs){
-    struct scaler_ctx* scaler = ((struct scaler_ctx**)(ctx->scalers))[index];
-    auto Res = NiFpga_WriteArrayU32(NiFpga_Session(ctx->session), scaler->pr_array_addr, prs, scaler->num_of_counters);
+    struct scaler_ctx* scaler = ((struct scaler_ctx*)(ctx->scalers));
+    auto Res = NiFpga_WriteArrayU32(NiFpga_Session(ctx->session), scaler[index].pr_array_addr, prs, scaler[index].num_of_counters);
     if (NiFpga_IsError(Res)) throw (CrioLibException(E_VAR_ACCESS, "Cannot access address."));
     return 0;
 }
@@ -114,8 +114,8 @@ int crioSetScalerPresets(struct crio_context *ctx, const char * name, uint32_t p
         throw (CrioLibException(E_SESSION_CLOSED , "[%s] Operation performed on closed session.", LIB_CRIO_LINUX ));
     try {
         uint32_t scaler_index = ((bm_address_type *)ctx->scaler_name_index_map)->left.at(name);
-        struct scaler_ctx* scaler = ((struct scaler_ctx**)(ctx->scalers))[scaler_index];
-        scaler->scaler_preset_cache[preset_index] = prs;
+        struct scaler_ctx* scaler = ((struct scaler_ctx*)(ctx->scalers));
+        scaler[scaler_index].scaler_preset_cache[preset_index] = prs;
     } catch (out_of_range) {
         throw (CrioLibException(E_OUT_OF_RANGE , "[%s] Property Scalers: Query returned null for name %s.", LIB_CRIO_LINUX , name ));
     }
@@ -127,8 +127,8 @@ int crioSetScalerGates(struct crio_context *ctx, const char * name, uint32_t gat
         throw (CrioLibException(E_SESSION_CLOSED , "[%s] Operation performed on closed session.", LIB_CRIO_LINUX ));
     try {
         uint32_t scaler_index = ((bm_address_type *)ctx->scaler_name_index_map)->left.at(name);
-        struct scaler_ctx* scaler = ((struct scaler_ctx**)(ctx->scalers))[scaler_index];
-        scaler->scaler_gate_cache[gate_index] = gate;
+        struct scaler_ctx* scaler = ((struct scaler_ctx*)(ctx->scalers));
+        scaler[scaler_index].scaler_gate_cache[gate_index] = gate;
     } catch (out_of_range) {
         throw (CrioLibException(E_OUT_OF_RANGE , "[%s] Property Scalers: Query returned null for name %s.", LIB_CRIO_LINUX , name ));
     }
