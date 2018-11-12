@@ -24,24 +24,23 @@
 /**
  * The signature of the FPGA bitfile.
  */
-static const char* const NiFpga_scaler_Signature = "2BFFA7116A1C06EF4760062F45B61CBB";
+static const char* const NiFpga_scaler_Signature = "474E64C23E3B176104E6C19046765F75";
 
 typedef enum
 {
    NiFpga_scaler_IndicatorBool_Mod2DIO0 = 0x18002,
-   NiFpga_scaler_IndicatorBool_Scaler0_Done = 0x18016,
+   NiFpga_scaler_IndicatorBool_Scaler0_Done = 0x18012,
 } NiFpga_scaler_IndicatorBool;
 
 typedef enum
 {
-   NiFpga_scaler_ControlBool_Scaler0_Enable = 0x1801A,
-   NiFpga_scaler_ControlBool_Scaler0_OneShot = 0x1801E,
-   NiFpga_scaler_ControlBool_Scaler0_Reset = 0x18006,
+   NiFpga_scaler_ControlBool_Scaler0_Enable = 0x18016,
+   NiFpga_scaler_ControlBool_Scaler0_OneShot = 0x1801A,
 } NiFpga_scaler_ControlBool;
 
 typedef enum
 {
-   NiFpga_scaler_IndicatorArrayU32_Scaler0_Counters = 0x1800C,
+   NiFpga_scaler_IndicatorArrayU32_Scaler0_Counters = 0x18008,
 } NiFpga_scaler_IndicatorArrayU32;
 
 typedef enum
@@ -51,7 +50,7 @@ typedef enum
 
 typedef enum
 {
-   NiFpga_scaler_ControlArrayBool_Scaler0_Gate = 0x18008,
+   NiFpga_scaler_ControlArrayBool_Scaler0_Gate = 0x18004,
 } NiFpga_scaler_ControlArrayBool;
 
 typedef enum
@@ -61,7 +60,7 @@ typedef enum
 
 typedef enum
 {
-   NiFpga_scaler_ControlArrayU32_Scaler0_PresetValues = 0x18010,
+   NiFpga_scaler_ControlArrayU32_Scaler0_PresetValues = 0x1800C,
 } NiFpga_scaler_ControlArrayU32;
 
 typedef enum
