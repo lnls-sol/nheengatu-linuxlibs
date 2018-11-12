@@ -371,6 +371,21 @@ int crioSetScalerReset(struct crio_context *ctx, const char *name);
 int crioGetScalerCounters(struct crio_context *ctx, const char * name, uint32_t *counters);
 
 /* Function Name  : crioSetScalerPresets
+ * Description    : set a single preset value in preset cache
+ * Parameters
+ * - crio_context : context for the open CRIO session*
+ * - name         : name of scaler defined in the configuration file
+ * - preset_index : Index of the preset to be set
+ * - prs          : value of the preset
+ * Return value   :
+ * - OK  = 0  (Success)
+ * otherwise an exception will be thrown with the
+ * one of the errorcodes defined in errorcodes.
+ */
+int crioSetScalerPresets(struct crio_context *ctx, const char * name, uint32_t preset_index, uint32_t prs);
+
+
+/* Function Name  : crioSetScalerPresetsGates
  * Description    : set a single preset value in preset cache and
  *                  sets associate gate value to 1.
  * Parameters
@@ -383,7 +398,8 @@ int crioGetScalerCounters(struct crio_context *ctx, const char * name, uint32_t 
  * otherwise an exception will be thrown with the
  * one of the errorcodes defined in errorcodes.
  */
-int crioSetScalerPresets(struct crio_context *ctx, const char * name, uint32_t preset_index, uint32_t prs);
+int crioSetScalerPresetsGates(struct crio_context *ctx, const char * name, uint32_t preset_index, uint32_t prs);
+
 
 /* Function Name  : crioGetScalerDone
  * Description    : checks if hardware is done

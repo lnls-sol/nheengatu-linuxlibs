@@ -14,8 +14,6 @@ int main(void) {
     bool done = false;
     TRY_SILENT(crioSetup(ctx, cfg));
     TRY_SILENT(crioSetScalerReset(ctx, name));
-    TRY_SILENT(crioSetScalerGates(ctx, name, 0, true));
-    TRY_SILENT(crioSetScalerGates(ctx, name, 1, true));
     TRY_SILENT(crioSetScalerPresets(ctx, name, 0, 100000));
     TRY_SILENT(crioSetScalerPresets(ctx, name, 1, 2500));
     TRY_SILENT(crioSetScalerArm(ctx, name, true, true));

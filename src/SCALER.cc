@@ -40,15 +40,6 @@ int static __inline__ disable(struct crio_context *ctx, uint32_t index){
     return 0;
 }
 
-int static __inline__ reset(struct crio_context *ctx, uint32_t index){
-    struct scaler_ctx* scaler = ((struct scaler_ctx*)(ctx->scalers));
-    auto Res = NiFpga_WriteBool(NiFpga_Session(ctx->session), scaler[index].reset_addr, true);
-    if (NiFpga_IsError(Res)) throw (CrioLibException(E_VAR_ACCESS, "Cannot access address."));
-    Res = NiFpga_WriteBool(NiFpga_Session(ctx->session), scaler[index].reset_addr, false);
-    if (NiFpga_IsError(Res)) throw (CrioLibException(E_VAR_ACCESS, "Cannot access address."));
-    return 0;
-}
-
 int static __inline__ setGates(struct crio_context *ctx, uint32_t index, bool *gates){
     struct scaler_ctx* scaler = ((struct scaler_ctx*)(ctx->scalers));
     auto Res = NiFpga_WriteArrayBool(NiFpga_Session(ctx->session), scaler[index].gate_array_addr, (NiFpga_Bool *) gates, scaler[index].num_of_counters);
@@ -85,7 +76,6 @@ int crioSetScalerReset(struct crio_context *ctx, const char * name){
         throw (CrioLibException(E_SESSION_CLOSED , "[%s] Operation performed on closed session.", LIB_CRIO_LINUX ));
     try {
         uint32_t scaler_index = ((bm_address_type *)ctx->scaler_name_index_map)->left.at(name);
-        reset(ctx, scaler_index);
         for (int gate_index = 0; gate_index < MAX_SCALER_CHANNELS; gate_index++)
         {
             crioSetScalerGates(ctx, name, gate_index, false);
@@ -116,6 +106,18 @@ int crioGetScalerCounters(struct crio_context *ctx, const char * name, uint32_t 
 }
 
 
+int crioSetScalerPresetsGates(struct crio_context *ctx, const char * name, uint32_t preset_index, uint32_t prs){
+    if (!ctx->session_open)
+        throw (CrioLibException(E_SESSION_CLOSED , "[%s] Operation performed on closed session.", LIB_CRIO_LINUX ));
+    try {
+        crioSetScalerPresets(ctx, name, preset_index, prs);
+        crioSetScalerGates(ctx,name, preset_index, true);
+    } catch (out_of_range) {
+        throw (CrioLibException(E_OUT_OF_RANGE , "[%s] Property Scalers: Query returned null for name %s.", LIB_CRIO_LINUX , name ));
+    }
+    return 0;
+}
+
 int crioSetScalerPresets(struct crio_context *ctx, const char * name, uint32_t preset_index, uint32_t prs){
     if (!ctx->session_open)
         throw (CrioLibException(E_SESSION_CLOSED , "[%s] Operation performed on closed session.", LIB_CRIO_LINUX ));
@@ -123,7 +125,6 @@ int crioSetScalerPresets(struct crio_context *ctx, const char * name, uint32_t p
         uint32_t scaler_index = ((bm_address_type *)ctx->scaler_name_index_map)->left.at(name);
         struct scaler_ctx* scaler = ((struct scaler_ctx*)(ctx->scalers));
         scaler[scaler_index].scaler_preset_cache[preset_index] = prs;
-        crioSetScalerGates(ctx,name, preset_index, true);
     } catch (out_of_range) {
         throw (CrioLibException(E_OUT_OF_RANGE , "[%s] Property Scalers: Query returned null for name %s.", LIB_CRIO_LINUX , name ));
     }

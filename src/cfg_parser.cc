@@ -194,7 +194,6 @@ int cfg_parser::get_scaler_data(bm_address_type * scaler_name_index_map, struct 
         {
             scaler_name_index_map->insert( bm_address_type::value_type( (address_tree.first.c_str()) , strtoul(address_tree.second.get_value<std::string>().c_str(), NULL, 16) ));
             scaler_ctx_local = scaler_ctx[ strtoul(address_tree.second.get_value<std::string>().c_str(), NULL, 16) ];
-            scaler_ctx_local->reset_addr = strtoul(tree.get <std::string>(address_tree.first + ".Reset").c_str(), NULL, 16);
             scaler_ctx_local->enable_addr = strtoul(tree.get <std::string>(address_tree.first + ".Enable").c_str(), NULL, 16);
             scaler_ctx_local->gate_array_addr = strtoul(tree.get <std::string>(address_tree.first + ".Gate").c_str(), NULL, 16);
             scaler_ctx_local->oneshot_addr = strtoul(tree.get <std::string>(address_tree.first + ".OneShot").c_str(), NULL, 16);
