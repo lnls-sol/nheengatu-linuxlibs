@@ -168,6 +168,7 @@ int crioSetScalerArm(struct crio_context *ctx, const char * name, bool arm, bool
             setGates(ctx, scaler_index, ((struct scaler_ctx*)ctx->scalers)[scaler_index].scaler_gate_cache);
             setPRs(ctx, scaler_index, ((struct scaler_ctx*)ctx->scalers)[scaler_index].scaler_preset_cache);
             setOneShot(ctx, scaler_index, oneshot);
+            disable(ctx, scaler_index);
             enable(ctx, scaler_index);
         } else {
             disable(ctx, scaler_index);
