@@ -9,7 +9,7 @@
 int main(void) {
     struct crio_context * ctx = new struct crio_context;
     char cfg[] = "cfg/scaler.ini";
-    char name[] = "SCALER0";
+    char name[] = "NI:SCALER0";
     uint32_t counters[64];
     bool done = false;
     TRY_SILENT(crioSetup(ctx, cfg));

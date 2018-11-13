@@ -444,6 +444,21 @@ int crioSetScalerGates(struct crio_context *ctx, const char * name, uint32_t gat
  */
 int crioSetScalerArm(struct crio_context *ctx, const char * name, bool arm, bool oneshot);
 
+
+/* Function Name  : crioGetNumOfCounters
+ * Description    : Get the number of implemented counters
+ * Parameters
+ * - crio_context : context for the open CRIO session*
+ * - name         : name of scaler defined in the configuration file
+ * - counters     : a pointer to a value that will be returned by the function
+ *                  (number of channels)
+ * Return value   :
+ * - OK  = 0  (Success)
+ * otherwise an exception will be thrown with the
+ * one of the errorcodes defined in errorcodes.
+ */
+int crioGetNumOfCounters(struct crio_context *ctx, const char * name, uint16_t *counters);
+
 #ifdef __cplusplus
 }
 #endif

@@ -40,6 +40,12 @@ int static __inline__ disable(struct crio_context *ctx, uint32_t index){
     return 0;
 }
 
+int static __inline__ getCounterNum(struct crio_context *ctx, uint32_t index, uint16_t *counters){
+    struct scaler_ctx* scaler = ((struct scaler_ctx*)(ctx->scalers));
+    *counters = scaler[index].num_of_counters;
+    return 0;
+}
+
 int static __inline__ setGates(struct crio_context *ctx, uint32_t index, bool *gates){
     struct scaler_ctx* scaler = ((struct scaler_ctx*)(ctx->scalers));
     auto Res = NiFpga_WriteArrayBool(NiFpga_Session(ctx->session), scaler[index].gate_array_addr, (NiFpga_Bool *) gates, scaler[index].num_of_counters);
@@ -83,6 +89,20 @@ int crioSetScalerReset(struct crio_context *ctx, const char * name){
         }
         setGates(ctx, scaler_index, ((struct scaler_ctx*)ctx->scalers)[scaler_index].scaler_gate_cache);
         setPRs(ctx, scaler_index, ((struct scaler_ctx*)ctx->scalers)[scaler_index].scaler_preset_cache);
+    } catch (out_of_range) {
+        throw (CrioLibException(E_OUT_OF_RANGE , "[%s] Property Scalers: Query returned null for name %s.", LIB_CRIO_LINUX , name ));
+    } catch(CrioLibException &e) {
+           throw (CrioLibException(e.errorcode, "[%s] Property [%s]:[%s] %s.", LIB_CRIO_LINUX , "Scalers", name, e.what()));
+    }
+    return 0;
+}
+
+int crioGetNumOfCounters(struct crio_context *ctx, const char * name, uint16_t *counters){
+    if (!ctx->session_open)
+        throw (CrioLibException(E_SESSION_CLOSED , "[%s] Operation performed on closed session.", LIB_CRIO_LINUX ));
+    try {
+        uint32_t scaler_index = ((bm_address_type *)ctx->scaler_name_index_map)->left.at(name);
+        getCounterNum(ctx, scaler_index, counters);
     } catch (out_of_range) {
         throw (CrioLibException(E_OUT_OF_RANGE , "[%s] Property Scalers: Query returned null for name %s.", LIB_CRIO_LINUX , name ));
     } catch(CrioLibException &e) {
