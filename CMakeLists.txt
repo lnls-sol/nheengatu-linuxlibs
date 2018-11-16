@@ -16,7 +16,7 @@ include(macros.cmake)
 #######################################
 # Global setup
 #######################################
-set_default_build_type(Debug)
+set_default_build_type(Release)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED YES)
 set(CMAKE_CXX_EXTENSIONS NO)

@@ -1,5 +1,6 @@
 #include "Common.h"
 #include "utils.h"
+#include "SCALER.h"
 
 #include <ctype.h>
 #include <errno.h>
@@ -62,7 +63,7 @@ int static __inline__ setOneShot(struct crio_context *ctx, uint32_t index, bool 
 
 int static __inline__ getCounters(struct crio_context *ctx, uint32_t index, uint32_t *counters){
     struct scaler_ctx* scaler = ((struct scaler_ctx*)(ctx->scalers));
-    auto Res = NiFpga_ReadArrayU32(NiFpga_Session(ctx->session), scaler->counter_array_addr, counters, scaler[index].num_of_counters);
+    auto Res = NiFpga_ReadArrayU32(NiFpga_Session(ctx->session), scaler[index].counter_array_addr, counters, scaler[index].num_of_counters);
     if (NiFpga_IsError(Res)) throw (CrioLibException(E_VAR_ACCESS, "Cannot access address."));
     return 0;
 }

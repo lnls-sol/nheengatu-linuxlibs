@@ -16,7 +16,7 @@
 
 #define LIB_CRIO_LINUX "LibCrioLinux"
 
-#define MAX_SCALER_CHANNELS 64
+
 
 #ifdef __cplusplus
 extern "C" {
@@ -117,8 +117,7 @@ struct crio_context {
     uint32_t             ao_count;
     uint32_t             bi_count;
     uint32_t             bo_count;
-    uint32_t              num_of_scalers;
-    void              *  scalers;
+    void               * scalers;
     void               * scaler_name_index_map;
 };
 

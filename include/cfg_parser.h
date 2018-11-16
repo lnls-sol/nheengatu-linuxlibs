@@ -3,8 +3,7 @@
 
 #include <boost/property_tree/ini_parser.hpp>
 #include <boost/bimap.hpp>
-#include "Common.h"
-
+#include "SCALER.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -39,7 +38,7 @@ class cfg_parser {
         /* Fills all indicated address binary maps */
         int get_address_maps(bool rt_support, uint32_t &count, bm_address_type * address_map, bm_address_type * rt_address_map, string alias);
 
-        int get_scaler_data(bm_address_type *scaler, scaler_ctx **scaler_addr, uint32_t *scaler_count);
+        int get_scaler_data(bm_address_type *scaler, struct scaler_ctx *scaler_ctx);
     private:
         std::string cfg_file;
         boost::property_tree::ptree tree;

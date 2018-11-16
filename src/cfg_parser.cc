@@ -2,6 +2,7 @@
 #include "rt_var_handler.h"
 #include "Common.h"
 #include "CrioLinux.h"
+#include "SCALER.h"
 
 cfg_parser::cfg_parser()
 {
@@ -178,29 +179,29 @@ int cfg_parser::get_address_maps(bool rt_support, uint32_t & count, bm_address_t
     return 0;
 }
 
-int cfg_parser::get_scaler_data(bm_address_type * scaler_name_index_map, struct scaler_ctx ** scaler_ctx, uint32_t  *scaler_count)
+int cfg_parser::get_scaler_data(bm_address_type * scaler_name_index_map, struct scaler_ctx * scaler_ctx)
 {
-    *scaler_count = tree.count(SCALER_ALIAS);
-    if (*scaler_count == 0)
+    if (tree.count(SCALER_ALIAS) == 0)
         return -1;
 
-    struct scaler_ctx *scaler_ctx_local;
+    struct scaler_ctx *scaler_ctx_local = NULL;
 
-    *scaler_ctx = new struct scaler_ctx [*scaler_count];
 
     try
     {
         for (const std::pair<std::string, boost::property_tree::ptree> &address_tree : tree.get_child(SCALER_ALIAS))
         {
-            scaler_name_index_map->insert( bm_address_type::value_type( (address_tree.first.c_str()) , strtoul(address_tree.second.get_value<std::string>().c_str(), NULL, 16) ));
-            scaler_ctx_local = scaler_ctx[ strtoul(address_tree.second.get_value<std::string>().c_str(), NULL, 16) ];
+            scaler_name_index_map->insert( bm_address_type::value_type( (address_tree.first.c_str()) , address_tree.second.get_value<unsigned>() ));
+            if (address_tree.second.get_value<unsigned>() >= MAX_SCALER_SUPPORTED_COUNT)
+                throw CrioLibException(E_INI, "[%s] Property [%s]:[%s] value of scaler is not in sequence. Should be less than %d.", LIB_CRIO_LINUX, SCALER_ALIAS, address_tree.first.c_str(), MAX_SCALER_SUPPORTED_COUNT );
+            scaler_ctx_local = &scaler_ctx[ address_tree.second.get_value<unsigned>() ];
             scaler_ctx_local->enable_addr = strtoul(tree.get <std::string>(address_tree.first + ".Enable").c_str(), NULL, 16);
             scaler_ctx_local->gate_array_addr = strtoul(tree.get <std::string>(address_tree.first + ".Gate").c_str(), NULL, 16);
             scaler_ctx_local->oneshot_addr = strtoul(tree.get <std::string>(address_tree.first + ".OneShot").c_str(), NULL, 16);
             scaler_ctx_local->counter_array_addr = strtoul(tree.get <std::string>(address_tree.first + ".Counters").c_str(), NULL, 16);
             scaler_ctx_local->pr_array_addr = strtoul(tree.get <std::string>(address_tree.first + ".Preset Values").c_str(), NULL, 16);
             try {
-            scaler_ctx_local->num_of_counters = tree.get <unsigned>(address_tree.first + ".Number of Counters");
+                scaler_ctx_local->num_of_counters = tree.get <unsigned>(address_tree.first + ".Number of Counters");
             } catch(const boost::property_tree::ptree_error &e) {
                 throw CrioLibException(E_INI, "[%s] Property [%s]:[Number of Counters] error:%s. Is this an integer?", LIB_CRIO_LINUX, address_tree.first.c_str(), e.what());
             }
