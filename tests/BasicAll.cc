@@ -10,7 +10,7 @@ int main(void) {
     struct crio_context * ctx = new struct crio_context;
     double ai_val;
     unsigned Size;
-    //char cfg[] = "cfg/cfg.ini";
+    char cfg[] = "cfg/cfg.ini";
     bool Item;
     double ao_val;
     srand(time(0));
@@ -83,7 +83,7 @@ int main(void) {
                    "RT_U16_AO9", "RT_U08_AO10"};
 
 
-    TRY_THROW(crioSetup(ctx, NULL));
+    TRY_THROW(crioSetup(ctx, cfg));
     /*bool x = false;
     while(1)
     {
@@ -162,6 +162,37 @@ int main(void) {
             cout << AIs[x].c_str() << "->" << ai_val << endl;
     }
 
+
+    char name_digital[] = "NI:SCALER_DIGITAL";
+    uint32_t counters[2];
+    bool done = false;
+    TRY_SILENT(crioSetScalerReset(ctx, name_digital));
+    TRY_SILENT(crioSetScalerPresetsGates(ctx, name_digital, 0, 100000));
+    TRY_SILENT(crioSetScalerPresetsGates(ctx, name_digital, 1, 2500));
+    TRY_SILENT(crioSetScalerArm(ctx, name_digital, true, true));
+    while(done == false)
+    {
+        crioGetScalerDone(ctx, name_digital, &done);
+        crioGetScalerCounters(ctx, name_digital, counters);
+        for (int i = 0 ; i < 2; i++)
+            cout << "Counter " << i << " : " << counters[i] << endl;
+    }
+    cout << "Done digital!\n";
+
+    char name_analog[] = "NI:SCALER_ANALOG";
+    done = false;
+    TRY_SILENT(crioSetScalerReset(ctx, name_analog));
+    TRY_SILENT(crioSetScalerPresetsGates(ctx, name_analog, 0, 100000));
+    TRY_SILENT(crioSetScalerPresetsGates(ctx, name_analog, 1, 25000));
+    TRY_SILENT(crioSetScalerArm(ctx, name_analog, true, true));
+    while(done == false)
+    {
+        crioGetScalerDone(ctx, name_analog, &done);
+        crioGetScalerCounters(ctx, name_analog, counters);
+        for (int i = 0 ; i < 2; i++)
+            cout << "Counter " << i << " : " << counters[i] << endl;
+    }
+    cout << "Done analog!\n";
     TRY_SILENT(crioCleanup(ctx));
     cout << "FINISHED.\n";
     delete(ctx);

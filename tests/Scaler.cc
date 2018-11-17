@@ -8,8 +8,8 @@
 
 int main(void) {
     struct crio_context * ctx = new struct crio_context;
-    char cfg[] = "cfg/scaler.ini";
-    char name_digital[] = "SCALER_DIGITAL";
+    char cfg[] = "cfg/cfg.ini";
+    char name_digital[] = "NI:SCALER_DIGITAL";
     uint32_t counters[2];
     bool done = false;
     TRY_SILENT(crioSetup(ctx, cfg));
@@ -26,7 +26,7 @@ int main(void) {
     }
     cout << "Done digital!\n";
 
-    char name_analog[] = "SCALER_ANALOG";
+    char name_analog[] = "NI:SCALER_ANALOG";
     done = false;
     TRY_SILENT(crioSetScalerReset(ctx, name_analog));
     TRY_SILENT(crioSetScalerPresetsGates(ctx, name_analog, 0, 100000));
