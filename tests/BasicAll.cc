@@ -163,7 +163,7 @@ int main(void) {
     }
 
 
-    char name_digital[] = "SCALER_DIGITAL";
+    char name_digital[] = "NI:SCALER_DIGITAL";
     uint32_t counters[2];
     bool done = false;
     TRY_SILENT(crioSetScalerReset(ctx, name_digital));
@@ -179,7 +179,7 @@ int main(void) {
     }
     cout << "Done digital!\n";
 
-    char name_analog[] = "SCALER_ANALOG";
+    char name_analog[] = "NI:SCALER_ANALOG";
     done = false;
     TRY_SILENT(crioSetScalerReset(ctx, name_analog));
     TRY_SILENT(crioSetScalerPresetsGates(ctx, name_analog, 0, 100000));
