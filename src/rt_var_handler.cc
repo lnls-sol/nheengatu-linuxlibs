@@ -103,37 +103,39 @@ int get_rt_val(uint8_t *shared_memory, uint64_t offset, double &value, std::stri
     switch (get_rt_var_size(name))
     {
         case DBL: dbl = *(double*)(shared_memory + offset);
-                  value = (double) dbl;
+                  value = static_cast<double>(dbl);
                   break;
         case SGL: flt = *(float*)(shared_memory + offset);
-                  value = (double) flt;
+                  value = static_cast<double>(flt);
                   break;
         case U64: u64 = *(uint64_t*)(shared_memory + offset);
-                  value = (double) u64;
+                  // This conversion is lossy. Double precision is less than u64.
+                  value = static_cast<double>(u64);
                   break;
         case U32: u32 = *(uint32_t*)(shared_memory + offset);
-                  value = (double) u32;
+                  value = static_cast<double>(u32);
                   break;
         case U16: u16 = *(uint16_t*)(shared_memory + offset);
-                  value = (double) u16;
+                  value = static_cast<double>(u16);
                   break;
         case U08: u08 = *(uint8_t*)(shared_memory + offset);
-                  value = (double) u08;
+                  value = static_cast<double>(u08);
                   break;
         case I64: i64 = *(int64_t*)(shared_memory + offset);
-                  value = (double) i64;
+                  // This conversion is lossy. Double precision is less than i64.
+                  value = static_cast<double>(i64);
                   break;
         case I32: i32 = *(int32_t*)(shared_memory + offset);
-                  value = (double) i32;
+                  value = static_cast<double>(i32);
                   break;
         case I16: i16 = *(int16_t*)(shared_memory + offset);
-                  value = (double) i16;
+                  value = static_cast<double>(i16);
                   break;
         case I08: i08 = *(int8_t*)(shared_memory + offset);
-                  value = (double) i08;
+                  value = static_cast<double>(i08);
                   break;
         case BOL: boolean = *(int8_t*)(shared_memory + offset);
-              value = (double) boolean;
+              value = static_cast<double>(boolean);
               break;
         default: value = 0; break;
     }

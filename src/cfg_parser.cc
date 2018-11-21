@@ -124,7 +124,7 @@ int cfg_parser::get_bi_maps(bool rt_support, uint32_t & count, bim_type *bi_map,
                 else
                 {
                     bi_rt_address_map->insert( bm_address_type::value_type( (bi_address_tree.first.c_str()) ,
-                                               strtoul(bi_address_tree.second.get_value<std::string>().c_str(), NULL, 10) ));
+                                               bi_address_tree.second.get_value<unsigned int>()));
                 }
                 count++;
             }
@@ -179,7 +179,7 @@ int cfg_parser::get_address_maps(bool rt_support, uint32_t & count, bm_address_t
                 }
                 else
                 {
-                    rt_address_map->insert( bm_address_type::value_type( (address_tree.first.c_str()) , strtoul(address_tree.second.get_value<std::string>().c_str(), NULL, 10) ));
+                    rt_address_map->insert( bm_address_type::value_type( (address_tree.first.c_str()) , address_tree.second.get_value<unsigned int>() ));
                 }
             }
             else
