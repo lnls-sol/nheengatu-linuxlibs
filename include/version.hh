@@ -7,7 +7,7 @@
 extern "C" {
 #endif
 
-void printVersion();
+void printVersion(void);
 
 struct Version
 {

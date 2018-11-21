@@ -82,7 +82,7 @@ int main(void) {
                    "RT_I16_AO5", "RT_I08_AO6", "RT_U64_AO7", "RT_U32_AO8",
                    "RT_U16_AO9", "RT_U08_AO10"};
 
-
+    printLibVersion();
     TRY_THROW(crioSetup(ctx, cfg));
     /*bool x = false;
     while(1)

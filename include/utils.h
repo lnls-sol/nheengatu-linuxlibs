@@ -13,8 +13,8 @@
 #include <errno.h>
 #include <sched.h>
 #include <time.h>
-
-
+#include <CrioLinux.h>
+#include "version.hh"
 
 typedef boost::bimap< std::string, unsigned > bm_address_type;
 

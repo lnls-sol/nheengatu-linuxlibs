@@ -36,3 +36,8 @@ void timespec_diff(struct timespec *start, struct timespec *stop, struct timespe
     }
     return;
 }
+
+void printLibVersion(void)
+{
+    printVersion();
+}

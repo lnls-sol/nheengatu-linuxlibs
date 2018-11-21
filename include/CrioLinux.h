@@ -339,7 +339,7 @@ bool is_rt_var(std::string name);
 /* This function prints build information
  * of the CrioLinux library.
  */
-void printVersion(void);
+void printLibVersion(void);
 
 
 /* ------------------------------------- Scaler functions ------------------------------------- */

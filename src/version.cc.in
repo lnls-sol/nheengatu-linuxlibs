@@ -7,9 +7,10 @@ const std::string Version::GIT_COMMIT_SUBJECT = "@GIT_COMMIT_SUBJECT@";
 
 void printVersion()
 {
-    std::cout << "\n--------------- LibCrioLinux version information -----------------\n";
-    std::cout << "      Git Hash       : " << Version::GIT_SHA1 << std::endl;
-    std::cout << "      Data           : " << Version::GIT_DATE << std::endl;
-    std::cout << "      Commit subject : " << Version::GIT_COMMIT_SUBJECT << std::endl;
-    std::cout << "------------------------------------------------------------------\n\n";        
+    std::cout << "############################################################################" << std::endl;
+    std::cout << "## LibCrioLinux build information"  << std::endl;
+    std::cout << "## Git Hash       : " << Version::GIT_SHA1 << std::endl;
+    std::cout << "## Data           : " << Version::GIT_DATE << std::endl;
+    std::cout << "## Commit subject : " << Version::GIT_COMMIT_SUBJECT << std::endl;
+    std::cout << "############################################################################" << std::endl;
 }
