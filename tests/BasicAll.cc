@@ -149,7 +149,8 @@ int main(void) {
     for (uint x = 0; x < Size; x++)
     {
         TRY_SILENT_CONT(crioGetAIItem(ctx, AIs[x].c_str(), ai_val));
-        if (true == is_rt_var(AIs[x].c_str())) {
+        /* If precision is necessary, a check for overflow needs to be implemented, coz double is larger that all.
+          if (true == is_rt_var(AIs[x].c_str())) {
             switch (get_rt_var_size(AIs[x].c_str()))
             {
                 case DBL: case SGL : cout << AIs[x].c_str() << "->" << ai_val << endl; break;
@@ -158,12 +159,12 @@ int main(void) {
             default: cout << "Found unknown RT variable size in AI\n";
             }
         }
-        else
+        else*/
             cout << AIs[x].c_str() << "->" << ai_val << endl;
     }
 
 
-    char name_digital[] = "NI:SCALER_DIGITAL";
+    char name_digital[] = "SCALER_DIGITAL";
     uint32_t counters[2];
     bool done = false;
     TRY_SILENT(crioSetScalerReset(ctx, name_digital));
@@ -179,7 +180,7 @@ int main(void) {
     }
     cout << "Done digital!\n";
 
-    char name_analog[] = "NI:SCALER_ANALOG";
+    char name_analog[] = "SCALER_ANALOG";
     done = false;
     TRY_SILENT(crioSetScalerReset(ctx, name_analog));
     TRY_SILENT(crioSetScalerPresetsGates(ctx, name_analog, 0, 100000));
