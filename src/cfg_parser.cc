@@ -107,7 +107,14 @@ int cfg_parser::get_bi_maps(bool rt_support, uint32_t & count, bim_type *bi_map,
                 if (UNKNOWN == get_rt_var_size(bi_address_tree.first))
                     throw CrioLibException(E_RESOURCE_ALLOC, "[%s] Item <%s:%s> size unknown. Must be of type BOL",
                                            LIB_CRIO_LINUX, BIADDR_ALIAS, bi_address_tree.first.c_str());
-                bm_address_type::right_const_iterator id_iter = bi_rt_address_map->right.find(strtoul(bi_address_tree.second.get_value<std::string>().c_str(), NULL, 10));
+
+                bm_address_type::right_const_iterator id_iter;
+                try {
+                   id_iter = bi_rt_address_map->right.find(bi_address_tree.second.get_value<unsigned int>());
+                } catch(const boost::property_tree::ptree_error &e) {
+                    throw CrioLibException(E_INI, "[%s] Property [%s]:[%s] error:%s. Is this an integer?", LIB_CRIO_LINUX, bi_address_tree.first.c_str(), bi_address_tree.second.get_value<std::string>().c_str(), e.what());
+                }
+
                 if( id_iter != bi_rt_address_map->right.end() )
                 {
                     throw CrioLibException(E_SAME_ADDRESS, "[%s] Found replicated index for items <%s:%s> and <%s:%s>.",
@@ -156,7 +163,15 @@ int cfg_parser::get_address_maps(bool rt_support, uint32_t & count, bm_address_t
                 if (UNKNOWN == get_rt_var_size(address_tree.first))
                     throw CrioLibException(E_RESOURCE_ALLOC, "[%s] Item <%s:%s> size unknown. Must be one of following:\nDBL, SGL, I64, I32, I16, I08, U64, U32, U16, U08, BOL",
                                            LIB_CRIO_LINUX, alias.c_str(), address_tree.first.c_str());
-                bm_address_type::right_const_iterator id_iter = rt_address_map->right.find(strtoul(address_tree.second.get_value<std::string>().c_str(), NULL, 10));
+
+                bm_address_type::right_const_iterator id_iter;
+                try {
+                   id_iter = rt_address_map->right.find(address_tree.second.get_value<unsigned int>());
+                } catch(const boost::property_tree::ptree_error &e) {
+                    throw CrioLibException(E_INI, "[%s] Property [%s]:[%s] error:%s. Is this an integer?", LIB_CRIO_LINUX, address_tree.first.c_str(), address_tree.second.get_value<std::string>().c_str(), e.what());
+                }
+
+
                 if( id_iter != rt_address_map->right.end() )
                 {
                     throw CrioLibException(E_SAME_ADDRESS, "[%s] Found replicated index for items [%s] and [%s].",
