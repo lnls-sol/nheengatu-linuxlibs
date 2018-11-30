@@ -13,6 +13,7 @@ int main(void) {
     char cfg[] = "cfg/cfg.ini";
     bool Item;
     double ao_val;
+    cout.precision(64);
     srand(time(0));
     string BIs[] = {"Mod3/DIO0",
                     "Mod3/DIO1",

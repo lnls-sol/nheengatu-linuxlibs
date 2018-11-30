@@ -120,3 +120,23 @@ Register Slices   11291 / 82000        13.8%
 LUT slices        11318 / 41000        27.6%
 RAM                3    / 135           2.2%
 DSP                4    / 240           1.7%
+
+
+Scaler64 :
+
+An IP for scaler was developed in VHDL. The IP footprint is really small ( 4% of 
+the total resources. ) The input of the IP will be arrays of controls and indicators. 
+The size of these arrays has a large foot print in the FPGA, that is why, it is 
+recommended to make the size of the arrays equal to the number of the number of 
+scaler counters necessary. To give an idea, sample device utilizations are shown
+below
+
+-------------------Scaler-----------------
+                64 counters    2 counters
+Slice total        43.2%         21.2% 
+Register Slices    16.7%          6.6%
+LUT slices         20.8%         11.4%
+RAM                 2.2%          2.2%
+DSP                 0.0%          0.0
+
+It can be noticed that the difference is up to 21% of the FPGA core.
