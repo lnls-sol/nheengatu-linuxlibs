@@ -1,5 +1,11 @@
 #!/bin/sh
 
+if [ "$EUID" -ne 0 ]
+	then echo "Please run as root"
+	exit
+fi
+
+
 cp -f build/libCrioLinux.so.0.1.0 /usr/local/lib/.
 ln -sf /usr/local/lib/libCrioLinux.so.0.1.0 /usr/local/lib/libCrioLinux.so.0
 ln -sf /usr/local/lib/libCrioLinux.so.0 /usr/local/lib/libCrioLinux.so
