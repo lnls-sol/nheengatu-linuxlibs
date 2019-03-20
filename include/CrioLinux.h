@@ -17,7 +17,7 @@
 #define LIB_CRIO_LINUX "LibCrioLinux"
 
 
-
+//TODO: resolve compilation from C code since we now use exceptions.
 #ifdef __cplusplus
 extern "C" {
 #endif
