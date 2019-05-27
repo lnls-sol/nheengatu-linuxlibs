@@ -16,6 +16,7 @@ int main(void) {
 
     cout.precision(64);
     srand(time(0));
+    uint32_t size;
     string waveforms[WF_SIZE] = {"WAVEFORM0",
                                  "WAVEFORM1",
                                  "WAVEFORM2"};
@@ -35,9 +36,9 @@ int main(void) {
     /* Waveform */
 
     //crioGetWaveformItem(struct crio_context *ctx, const char *name, void *array)
-    TRY_SILENT_CONT(crioGetWaveformItem(ctx, waveforms[0].c_str(), wf0));
-    TRY_SILENT_CONT(crioGetWaveformItem(ctx, waveforms[1].c_str(), wf1));
-    TRY_SILENT_CONT(crioGetWaveformItem(ctx, waveforms[2].c_str(), wf2));
+    TRY_SILENT_CONT(crioGetWaveformItem(ctx, waveforms[0].c_str(), wf0, &size));
+    TRY_SILENT_CONT(crioGetWaveformItem(ctx, waveforms[1].c_str(), wf1, &size));
+    TRY_SILENT_CONT(crioGetWaveformItem(ctx, waveforms[2].c_str(), wf2, &size));
 
     cout << waveforms[0].c_str() << "[0]: " << wf0[0]  << endl;
     cout << waveforms[0].c_str() << "[1]: " << wf0[1]  << endl;

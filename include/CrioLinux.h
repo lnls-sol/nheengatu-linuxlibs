@@ -467,6 +467,7 @@ int crioGetNumOfCounters(struct crio_context *ctx, const char * name, uint16_t *
  * - crio_context : context for the open CRIO session*
  * - name         : name of the waveform
  * - array        : a pointer to the array to be filled
+ * - size         : the number of variables read
  *
  * Return value   :
  * - OK  = 0  (Success)
@@ -474,7 +475,7 @@ int crioGetNumOfCounters(struct crio_context *ctx, const char * name, uint16_t *
  * one of the errorcodes defined in errorcodes.
  */
 
-int crioGetWaveformItem(struct crio_context *ctx, const char *name, void *array);
+int crioGetWaveformItem(struct crio_context *ctx, const char *name, void *array, uint32_t * size);
 #ifdef __cplusplus
 }
 #endif

@@ -17,12 +17,13 @@ typedef bimap< std::string, unsigned > bm_address_type;
 
 /* ------------ Helpers -------------- */
 
-static __inline__ int crioGetWaveform(struct crio_context *ctx, uint32_t address, void *array, uint32_t size, enum type_code type);
+static __inline__ uint32_t crioGetWaveform(struct crio_context *ctx, uint32_t address, void *array, uint32_t size, enum type_code type);
 
 
-static __inline__ int crioGetWaveform(struct crio_context *ctx, uint32_t address, void *array,
+static __inline__ uint32_t crioGetWaveform(struct crio_context *ctx, uint32_t address, void *array,
                                       uint32_t size, enum type_code type) {
     int Res = 0;
+
     switch (type)
     {
         case U08:
@@ -59,11 +60,20 @@ static __inline__ int crioGetWaveform(struct crio_context *ctx, uint32_t address
             Res = NiFpga_ReadArrayU64(NiFpga_Session(ctx->session), address, (uint64_t *)array, size);
             if (NiFpga_IsError(Res)) throw (CrioLibException(E_VAR_ACCESS, "Cannot access U64 waveform address at [%x].",
                                                              address));
+
+            /* Convert to double since epics does not support U64 */
+            for (uint i = 0; i < size; i++)
+                ((double *)array)[i] = (double)(((uint64_t *)array)[i]);
+
             break;
+
         case I64:
             Res = NiFpga_ReadArrayI64(NiFpga_Session(ctx->session), address, (int64_t *)array, size);
             if (NiFpga_IsError(Res)) throw (CrioLibException(E_VAR_ACCESS, "Cannot access U64 waveform address at [%x].",
                                                              address));
+            /* Convert to double since epics does not support I64 */
+            for (uint i = 0; i < size; i++)
+                ((double *)array)[i] = (double)(((int64_t *)array)[i]);
             break;
         case SGL:
             Res = NiFpga_ReadArraySgl(NiFpga_Session(ctx->session), address, (float *)array, size);
@@ -74,14 +84,14 @@ static __inline__ int crioGetWaveform(struct crio_context *ctx, uint32_t address
             throw (CrioLibException(E_NOT_FOUND, "Waveform array not known [%d].", type));
             break;
     }
-    return 0;
+    return size;
 }
 
 
 /* ------------ API FUNCTIONS -------------- */
 
 
-int crioGetWaveformItem(struct crio_context *ctx, const char *name, void *array) {
+int crioGetWaveformItem(struct crio_context *ctx, const char *name, void *array, uint32_t * size) {
     if (!ctx->session_open)
         throw (CrioLibException(E_SESSION_CLOSED , "[%s] Operation performed on closed session.", LIB_CRIO_LINUX ));
     try
@@ -92,10 +102,11 @@ int crioGetWaveformItem(struct crio_context *ctx, const char *name, void *array)
         else
         {
             uint32_t waveform_index = ((bm_address_type *)ctx->waveform_name_index_map)->left.at(name);
-            crioGetWaveform(ctx,       (((struct waveform_ctx*)ctx->waveforms)[waveform_index]).waveform_addr,
-                                        array,
-                                       (((struct waveform_ctx*)ctx->waveforms)[waveform_index]).waveform_size,
-                                       (((struct waveform_ctx*)ctx->waveforms)[waveform_index]).waveform_type);
+            *size = crioGetWaveform(ctx,       (((struct waveform_ctx*)ctx->waveforms)[waveform_index]).waveform_addr,
+                                                array,
+                                               (((struct waveform_ctx*)ctx->waveforms)[waveform_index]).waveform_size,
+                                               (((struct waveform_ctx*)ctx->waveforms)[waveform_index]).waveform_type);
+
         }
     } catch (out_of_range) {
         throw (CrioLibException(E_OUT_OF_RANGE , "[%s] Property [%s]: Query returned null.", LIB_CRIO_LINUX , name ));
