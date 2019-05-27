@@ -3,6 +3,28 @@
 #include "Common.h"
 #include "CrioLinux.h"
 #include "SCALER.h"
+#include "WAVEFORM.h"
+
+
+/************************* HELPER FUNCTIONS ***********************************/
+enum type_code get_wf_size(std::string name){
+
+    /* DBL and BOL not used here */
+    if (name.compare(0,3,"SGL") == 0) return SGL;
+    if (name.compare(0,3,"U64") == 0) return U64;
+    if (name.compare(0,3,"U32") == 0) return U32;
+    if (name.compare(0,3,"U16") == 0) return U16;
+    if (name.compare(0,3,"U08") == 0) return U08;
+    if (name.compare(0,3,"I64") == 0) return I64;
+    if (name.compare(0,3,"I32") == 0) return I32;
+    if (name.compare(0,3,"I16") == 0) return I16;
+    if (name.compare(0,3,"I08") == 0) return I08;
+
+    throw (CrioLibException(E_INI, "Unknown waveform type."));
+}
+
+/************************* HELPER FUNCTIONS END  ********************************/
+
 
 cfg_parser::cfg_parser()
 {
@@ -232,3 +254,41 @@ int cfg_parser::get_scaler_data(bm_address_type * scaler_name_index_map, struct 
     return 0;
 
 }
+
+
+int cfg_parser::get_waveform_data(bm_address_type * waveform_name_index_map, struct waveform_ctx * waveform_ctx)
+{
+    if (tree.count(WAVEFORM_ALIAS) == 0)
+        return -1;
+
+    struct waveform_ctx *waveform_ctx_local = NULL;
+
+
+    try
+    {
+        for (const std::pair<std::string, boost::property_tree::ptree> &address_tree : tree.get_child(WAVEFORM_ALIAS))
+        {
+            if (address_tree.second.get_value<unsigned>() >= MAX_WAVEFORM_SUPPORTED_COUNT)
+                throw CrioLibException(E_INI, "[%s] Property [%s]:[%s] Number of waveforms set in the configuration file larger than supported number (%d).", LIB_CRIO_LINUX, WAVEFORM_ALIAS, address_tree.first.c_str(), MAX_WAVEFORM_SUPPORTED_COUNT );
+            waveform_name_index_map->insert( bm_address_type::value_type( (address_tree.first.c_str()) , address_tree.second.get_value<unsigned>() ));
+            waveform_ctx_local = &waveform_ctx[ address_tree.second.get_value<unsigned>() ];
+            waveform_ctx_local->waveform_type = get_wf_size(tree.get <std::string>(address_tree.first + ".Type"));
+            waveform_ctx_local->waveform_addr = strtoul(tree.get <std::string>(address_tree.first + ".Address").c_str(), NULL, 16);
+
+            try {
+                waveform_ctx_local->waveform_size = tree.get <unsigned>(address_tree.first + ".Size");
+            } catch(const boost::property_tree::ptree_error &e) {
+                throw CrioLibException(E_INI, "[%s] Property [%s]:[Size of array] error:%s. Is this an integer?", LIB_CRIO_LINUX, address_tree.first.c_str(), e.what());
+            }
+        }
+    }
+    catch(const boost::property_tree::ptree_error &e)
+    {
+        throw CrioLibException(E_INI, "[%s] %s", LIB_CRIO_LINUX, e.what());
+    }
+    return 0;
+
+}
+
+
+

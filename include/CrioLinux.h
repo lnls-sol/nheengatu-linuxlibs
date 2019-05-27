@@ -119,6 +119,8 @@ struct crio_context {
     uint32_t             bo_count;
     void               * scalers;
     void               * scaler_name_index_map;
+    void               * waveforms;
+    void               * waveform_name_index_map;
 };
 
 
@@ -458,6 +460,7 @@ int crioSetScalerArm(struct crio_context *ctx, const char * name, bool arm, bool
  */
 int crioGetNumOfCounters(struct crio_context *ctx, const char * name, uint16_t *counters);
 
+int crioGetWaveformItem(struct crio_context *ctx, const char *name, void *array);
 #ifdef __cplusplus
 }
 #endif

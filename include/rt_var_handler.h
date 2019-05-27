@@ -11,22 +11,6 @@ extern "C" {
 #endif
 
 
-/* Moving to CrioLinux.h
-enum type_code{
-    DBL,
-    SGL,
-    U64,
-    U32,
-    U16,
-    U08,
-    I64,
-    I32,
-    I16,
-    I08,
-    BOL,
-    UNKNOWN
-};  */
-
 
 bool is_rt_var(std::string name);
 bool get_rt_var_sign(std::string name);

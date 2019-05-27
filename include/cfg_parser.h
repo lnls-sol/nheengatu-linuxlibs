@@ -17,6 +17,7 @@ typedef boost::bimap< std::string, unsigned > bm_address_type;
 #define AO_ALIAS         "AO"
 #define AI_ALIAS         "AI"
 #define SCALER_ALIAS     "SCALERS"
+#define WAVEFORM_ALIAS   "WAVEFORMS"
 
 /* This class processes an ini file, and imports it to a
  * boost property tree. It uses the formerly defined aliases
@@ -39,6 +40,8 @@ class cfg_parser {
         int get_address_maps(bool rt_support, uint32_t &count, bm_address_type * address_map, bm_address_type * rt_address_map, string alias);
 
         int get_scaler_data(bm_address_type *scaler, struct scaler_ctx *scaler_ctx);
+
+        int get_waveform_data(bm_address_type * waveform_name_index_map, struct waveform_ctx * waveform_ctx);
     private:
         std::string cfg_file;
         boost::property_tree::ptree tree;
