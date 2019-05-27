@@ -460,6 +460,20 @@ int crioSetScalerArm(struct crio_context *ctx, const char * name, bool arm, bool
  */
 int crioGetNumOfCounters(struct crio_context *ctx, const char * name, uint16_t *counters);
 
+
+/* Function Name  : crioGetWaveformItem
+ * Description    : read waveform
+ * Parameters
+ * - crio_context : context for the open CRIO session*
+ * - name         : name of the waveform
+ * - array        : a pointer to the array to be filled
+ *
+ * Return value   :
+ * - OK  = 0  (Success)
+ * otherwise an exception will be thrown with the
+ * one of the errorcodes defined in errorcodes.
+ */
+
 int crioGetWaveformItem(struct crio_context *ctx, const char *name, void *array);
 #ifdef __cplusplus
 }
