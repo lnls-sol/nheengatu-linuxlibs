@@ -24,7 +24,57 @@
 /**
  * The signature of the FPGA bitfile.
  */
-static const char* const NiFpga_waveform_Signature = "100FDCC718F323065590BB9FA972CA54";
+static const char* const NiFpga_waveform_Signature = "071ABA139A0C89D5C7E4051E2DB7F220";
+
+typedef enum
+{
+   NiFpga_waveform_IndicatorArrayI8_waveform_i8 = 0x18038,
+} NiFpga_waveform_IndicatorArrayI8;
+
+typedef enum
+{
+   NiFpga_waveform_IndicatorArrayI8Size_waveform_i8 = 3,
+} NiFpga_waveform_IndicatorArrayI8Size;
+
+typedef enum
+{
+   NiFpga_waveform_IndicatorArrayU8_waveform_u8 = 0x18020,
+} NiFpga_waveform_IndicatorArrayU8;
+
+typedef enum
+{
+   NiFpga_waveform_IndicatorArrayU8Size_waveform_u8 = 3,
+} NiFpga_waveform_IndicatorArrayU8Size;
+
+typedef enum
+{
+   NiFpga_waveform_IndicatorArrayI16_waveform_i16 = 0x18028,
+} NiFpga_waveform_IndicatorArrayI16;
+
+typedef enum
+{
+   NiFpga_waveform_IndicatorArrayI16Size_waveform_i16 = 3,
+} NiFpga_waveform_IndicatorArrayI16Size;
+
+typedef enum
+{
+   NiFpga_waveform_IndicatorArrayU16_waveform_u16 = 0x18018,
+} NiFpga_waveform_IndicatorArrayU16;
+
+typedef enum
+{
+   NiFpga_waveform_IndicatorArrayU16Size_waveform_u16 = 3,
+} NiFpga_waveform_IndicatorArrayU16Size;
+
+typedef enum
+{
+   NiFpga_waveform_IndicatorArrayI32_waveform_i32 = 0x18030,
+} NiFpga_waveform_IndicatorArrayI32;
+
+typedef enum
+{
+   NiFpga_waveform_IndicatorArrayI32Size_waveform_i32 = 3,
+} NiFpga_waveform_IndicatorArrayI32Size;
 
 typedef enum
 {
@@ -35,6 +85,16 @@ typedef enum
 {
    NiFpga_waveform_IndicatorArrayU32Size_waveform_u32 = 3,
 } NiFpga_waveform_IndicatorArrayU32Size;
+
+typedef enum
+{
+   NiFpga_waveform_IndicatorArrayI64_waveform_i64 = 0x18040,
+} NiFpga_waveform_IndicatorArrayI64;
+
+typedef enum
+{
+   NiFpga_waveform_IndicatorArrayI64Size_waveform_i64 = 3,
+} NiFpga_waveform_IndicatorArrayI64Size;
 
 typedef enum
 {
@@ -58,6 +118,56 @@ typedef enum
 
 typedef enum
 {
+   NiFpga_waveform_ControlArrayI8_waveform_i8 = 0x1803C,
+} NiFpga_waveform_ControlArrayI8;
+
+typedef enum
+{
+   NiFpga_waveform_ControlArrayI8Size_waveform_i8 = 3,
+} NiFpga_waveform_ControlArrayI8Size;
+
+typedef enum
+{
+   NiFpga_waveform_ControlArrayU8_waveform_u8 = 0x18024,
+} NiFpga_waveform_ControlArrayU8;
+
+typedef enum
+{
+   NiFpga_waveform_ControlArrayU8Size_waveform_u8 = 3,
+} NiFpga_waveform_ControlArrayU8Size;
+
+typedef enum
+{
+   NiFpga_waveform_ControlArrayI16_waveform_i16 = 0x1802C,
+} NiFpga_waveform_ControlArrayI16;
+
+typedef enum
+{
+   NiFpga_waveform_ControlArrayI16Size_waveform_i16 = 3,
+} NiFpga_waveform_ControlArrayI16Size;
+
+typedef enum
+{
+   NiFpga_waveform_ControlArrayU16_waveform_u16 = 0x1801C,
+} NiFpga_waveform_ControlArrayU16;
+
+typedef enum
+{
+   NiFpga_waveform_ControlArrayU16Size_waveform_u16 = 3,
+} NiFpga_waveform_ControlArrayU16Size;
+
+typedef enum
+{
+   NiFpga_waveform_ControlArrayI32_waveform_i32 = 0x18034,
+} NiFpga_waveform_ControlArrayI32;
+
+typedef enum
+{
+   NiFpga_waveform_ControlArrayI32Size_waveform_i32 = 3,
+} NiFpga_waveform_ControlArrayI32Size;
+
+typedef enum
+{
    NiFpga_waveform_ControlArrayU32_waveform_u32 = 0x18000,
 } NiFpga_waveform_ControlArrayU32;
 
@@ -65,6 +175,16 @@ typedef enum
 {
    NiFpga_waveform_ControlArrayU32Size_waveform_u32 = 3,
 } NiFpga_waveform_ControlArrayU32Size;
+
+typedef enum
+{
+   NiFpga_waveform_ControlArrayI64_waveform_i64 = 0x18044,
+} NiFpga_waveform_ControlArrayI64;
+
+typedef enum
+{
+   NiFpga_waveform_ControlArrayI64Size_waveform_i64 = 3,
+} NiFpga_waveform_ControlArrayI64Size;
 
 typedef enum
 {
