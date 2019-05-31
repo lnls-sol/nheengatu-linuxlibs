@@ -32,7 +32,7 @@ uint8_t decode_enum_size(enum type_code code){
         case I16: return 2;
         case I08: return 1;
         case BOL: return 1;
-        default: return 0;
+    default:throw CrioLibException(E_NOT_FOUND, "Unrecognized size <%x>", (uint8_t)code);
     }
 }
 
@@ -91,15 +91,23 @@ int set_rt_val(uint8_t * shared_memory, uint64_t offset, double value, std::stri
 
 int get_rt_arr(uint8_t *shared_memory, uint64_t offset, void * arr, uint32_t size_bytes, enum type_code type, uint32_t size_elements)
 {
-    if (type == U64 || type == I64)
+    if (type == U64)
     {
-        double * arr_src = (double *) (shared_memory+offset);
+        uint64_t * arr_src = (uint64_t *)(shared_memory+offset);
         double * arr_dst = (double *) arr;
         for (uint32_t  i =0; i < size_elements; i++)
-            arr_dst[i] = arr_src[i];
+            arr_dst[i] = (double)arr_src[i];
+    } else if (type == I64)
+    {
+        int64_t * arr_src = (int64_t *)(shared_memory+offset);
+        double * arr_dst = (double *) arr;
+        for (uint32_t  i =0; i < size_elements; i++)
+            arr_dst[i] = (double)arr_src[i];
     }
     else
+    {
         memcpy(arr, shared_memory+offset, size_bytes);
+    }
     return 0;
 }
 

@@ -80,15 +80,17 @@ static __inline__ uint32_t crioGetWaveform(struct crio_context *ctx, uint32_t ad
 }
 
 
-int populate_rt_offset_arr(void* waveform_name_index_map, uint8_t * rt_variable_offsets, int rt_var_size, void * rt_addresses, struct waveform_ctx *waveforms)
+int populate_rt_offset_arr(void* waveform_name_index_map, uint32_t * rt_variable_offsets, int rt_var_size, void * rt_addresses, struct waveform_ctx *waveforms)
 {
     const char *name;
+    uint32_t offset;
+    uint32_t waveform_index;
 
     /* Set first offset to 0 */
     rt_variable_offsets[0] = 0;
 
     /* Iterate on all items of map from 0 to size-1 and calculate offset of each */
-    uint8_t offset;
+
     for (int index = 0; index < rt_var_size-1; index ++)
     {
         try {
@@ -100,7 +102,10 @@ int populate_rt_offset_arr(void* waveform_name_index_map, uint8_t * rt_variable_
         offset = rt_variable_offsets[index];
 
         if (is_waveform((bm_address_type*)waveform_name_index_map, name))
-            rt_variable_offsets[index+1] = offset + waveforms[index].waveform_size_bytes;
+        {
+            waveform_index = ((bm_address_type *)waveform_name_index_map)->left.at(name);
+            rt_variable_offsets[index+1] = offset + waveforms[waveform_index].waveform_size_bytes;
+        }
         else
             rt_variable_offsets[index+1] = offset + decode_enum_size(get_rt_var_size(name));
     }

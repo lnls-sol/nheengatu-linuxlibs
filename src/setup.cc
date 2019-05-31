@@ -73,7 +73,7 @@ int crioSetup(struct crio_context *ctx, char *cfgfile) {
         /* Calculate offsets if shared memory is enabled */
         if (use_shared_memory == true) {
             int rt_var_size = ((bm_address_type *)ctx->rt_addresses)->size();
-            ctx->rt_variable_offsets = new uint8_t[rt_var_size];
+            ctx->rt_variable_offsets = new uint32_t[rt_var_size];
             TRY_THROW(populate_rt_offset_arr(ctx->waveform_name_index_map,
                                              ctx->rt_variable_offsets,
                                              rt_var_size,

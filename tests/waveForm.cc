@@ -17,13 +17,14 @@ int main(void) {
     cout.precision(64);
     srand(time(0));
     uint32_t size;
-    string waveforms[WF_SIZE] = {"WAVEFORM0",
-                                 "WAVEFORM1",
-                                 "WAVEFORM2"};
+    string waveforms[WF_SIZE] = {"RT_WF0",
+                                 "RT_WF1",
+                                 "RT_WF2"};
 
-    uint32_t wf0[3];
-    uint64_t wf1[3];
-    float    wf2[3];
+    float    wf0[5];
+    uint32_t wf1[113];
+    double   wf2[4];
+
 
     printLibVersion();
     TRY_THROW(crioSetup(ctx, cfg));
@@ -40,17 +41,15 @@ int main(void) {
     TRY_SILENT_CONT(crioGetWaveformItem(ctx, waveforms[1].c_str(), wf1, &size));
     TRY_SILENT_CONT(crioGetWaveformItem(ctx, waveforms[2].c_str(), wf2, &size));
 
-    cout << waveforms[0].c_str() << "[0]: " << wf0[0]  << endl;
-    cout << waveforms[0].c_str() << "[1]: " << wf0[1]  << endl;
-    cout << waveforms[0].c_str() << "[2]: " << wf0[2]  << endl;
+    for (uint i =0 ; i < 5; i++)
+        cout << waveforms[0].c_str() << "[" << i << "]: " << wf0[i]  << endl;
 
-    cout << waveforms[1].c_str() << "[0]: " << wf1[0]  << endl;
-    cout << waveforms[1].c_str() << "[1]: " << wf1[1]  << endl;
-    cout << waveforms[1].c_str() << "[2]: " << wf1[2]  << endl;
+    for (uint i =0 ; i < 113; i++)
+        cout << waveforms[1].c_str() << "[" << i << "]: " << wf1[i]  << endl;
 
-    cout << waveforms[2].c_str() << "[0]: " << wf2[0]  << endl;
-    cout << waveforms[2].c_str() << "[1]: " << wf2[1]  << endl;
-    cout << waveforms[2].c_str() << "[2]: " << wf2[2]  << endl;
+    for (uint i =0 ; i < 4; i++)
+        cout << waveforms[2].c_str() << "[" << i << "]: " << wf2[i]  << endl;
+
 
 
     TRY_SILENT(crioCleanup(ctx));

@@ -19,8 +19,11 @@ enum type_code get_wf_size(std::string name){
     if (name.compare(0,3,"I32") == 0) return I32;
     if (name.compare(0,3,"I16") == 0) return I16;
     if (name.compare(0,3,"I08") == 0) return I08;
+    if (name.compare(0,3,"DBL") == 0) return DBL;
+    if (name.compare(0,3,"BOL") == 0) return U08;
 
-    throw (CrioLibException(E_INI, "Unknown waveform type."));
+    throw (CrioLibException(E_INI, "Unknown waveform type <%s>.", name.c_str() ));
+
 }
 
 /************************* HELPER FUNCTIONS END  ********************************/
@@ -59,7 +62,6 @@ int cfg_parser::get_settings(std::string &ip, std::string &path, std::string &fi
     } catch(const boost::property_tree::ptree_error &e) {
         throw CrioLibException(E_INI,  "[%s] Property <Settings.Path Crio IP>: %s", LIB_CRIO_LINUX, e.what());
     }
-
     try {
         fileName = tree.get <std::string>("Settings.Bitfile Name");
     } catch(const boost::property_tree::ptree_error &e) {
@@ -281,6 +283,7 @@ int cfg_parser::get_waveform_data(bool rt_support, uint32_t & count, bm_address_
             waveform_ctx_local = &waveform_ctx[ count ];
             waveform_ctx_local->waveform_type = get_wf_size(tree.get <std::string>(address_tree.first + ".Type"));
             waveform_ctx_local->waveform_type_bytes = decode_enum_size(waveform_ctx_local->waveform_type);
+
 
             try {
                 waveform_ctx_local->waveform_size_elements = tree.get <unsigned>(address_tree.first + ".Size");
