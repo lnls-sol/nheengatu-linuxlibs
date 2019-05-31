@@ -120,6 +120,7 @@ struct crio_context {
     void               * scalers;
     void               * scaler_name_index_map;
     void               * waveforms;
+    uint32_t             waveform_fpga_count;
     void               * waveform_name_index_map;
 };
 

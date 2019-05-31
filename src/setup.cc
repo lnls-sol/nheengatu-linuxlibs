@@ -15,7 +15,7 @@ int crioSetup(struct crio_context *ctx, char *cfgfile) {
     string signature = "";
     bool use_shared_memory = false;
     string shared_memory_path = "";
-    const char *name;
+    uint32_t shared_memory_size = 0;
     cfg_parser * parser;
 
 
@@ -30,7 +30,7 @@ int crioSetup(struct crio_context *ctx, char *cfgfile) {
 
 
         /* Get settings from configuration file */
-        TRY_THROW(parser->get_settings(ip, path, fileName, signature, use_shared_memory, shared_memory_path));
+        TRY_THROW(parser->get_settings(ip, path, fileName, signature, use_shared_memory, shared_memory_path, shared_memory_size));
 
         url = "rio://" + ip + "/RIO0";
         bitfile = path + "/" + fileName;
@@ -68,32 +68,18 @@ int crioSetup(struct crio_context *ctx, char *cfgfile) {
         TRY_THROW(parser->get_address_maps(use_shared_memory, ctx->ao_count, (bm_address_type *)ctx->ao_addresses, (bm_address_type *)ctx->rt_addresses, AO_ALIAS));
         TRY_THROW(parser->get_address_maps(use_shared_memory, ctx->ai_count, (bm_address_type *)ctx->ai_addresses, (bm_address_type *)ctx->rt_addresses, AI_ALIAS));
         TRY_THROW(parser->get_scaler_data((bm_address_type*) ctx->scaler_name_index_map, (struct scaler_ctx *)ctx->scalers));
-        TRY_THROW(parser->get_waveform_data((bm_address_type*) ctx->waveform_name_index_map, (struct waveform_ctx *)ctx->waveforms));
+        TRY_THROW(parser->get_waveform_data(use_shared_memory, ctx->waveform_fpga_count, (bm_address_type*) ctx->waveform_name_index_map, (bm_address_type *)ctx->rt_addresses, (struct waveform_ctx *)ctx->waveforms));
 
         /* Calculate offsets if shared memory is enabled */
         if (use_shared_memory == true) {
             int rt_var_size = ((bm_address_type *)ctx->rt_addresses)->size();
             ctx->rt_variable_offsets = new uint8_t[rt_var_size];
-
-            /* Set first offset to 0 */
-            ctx->rt_variable_offsets[0] = 0;
-
-            /* Iterate on all items of map from 0 to size-1 and calculate offset of each */
-            uint8_t offset;
-            for (int index = 0; index < rt_var_size-1; index ++)
-            {
-                try {
-                    name = ((bm_address_type *)ctx->rt_addresses)->right.at(index).c_str();
-                }
-                catch (out_of_range) {
-                    throw (CrioLibException(E_OUT_OF_RANGE, "[%s] Cannot find RT item of index <%d>.", LIB_CRIO_LINUX, index));
-                }
-                offset = ctx->rt_variable_offsets[index];
-                ctx->rt_variable_offsets[index+1] = offset + decode_enum_size(get_rt_var_size(name));
-            }
-
-            /* open shared memory */
-            TRY_THROW(open_shared_memory(shared_memory_path, &ctx->shared_memory));
+            TRY_THROW(populate_rt_offset_arr(ctx->waveform_name_index_map,
+                                             ctx->rt_variable_offsets,
+                                             rt_var_size,
+                                             ctx->rt_addresses,
+                                             (struct waveform_ctx *)ctx->waveforms));
+            TRY_THROW(open_shared_memory(shared_memory_path, &ctx->shared_memory, shared_memory_size));
 
         }
 
@@ -124,7 +110,8 @@ void crioCleanup(struct crio_context *ctx) {
         delete((bm_address_type *)ctx->bi_addresses);
         delete((bm_address_type *)ctx->scaler_name_index_map);
         delete((struct scaler_ctx*)ctx->scalers);
-
+        delete((bm_address_type *)ctx->waveform_name_index_map);
+        delete((struct scaler_ctx*)ctx->waveforms);
         delete ctx->rt_variable_offsets;
         delete((bim_type * )ctx->bi_map);
         pthread_mutex_destroy(&ctx->bi_mutex);

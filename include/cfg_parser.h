@@ -31,7 +31,7 @@ class cfg_parser {
         ~cfg_parser();
 
         /* Gets settings key from the ini file */
-        int get_settings(std::string &ip, std::string &path, std::string &fileName, std::string &signature, bool &use_shared_memory, std::string &shared_memory_path);
+        int get_settings(std::string &ip, std::string &path, std::string &fileName, std::string &signature, bool &use_shared_memory, std::string &shared_memory_path, uint32_t &shared_memory_size);
 
         /* fills the binary input BI key maps */
         int get_bi_maps(bool rt_support, uint32_t &count, bim_type *bi, bm_address_type *bi_address_map, bm_address_type *bi_rt_address_map);
@@ -41,7 +41,7 @@ class cfg_parser {
 
         int get_scaler_data(bm_address_type *scaler, struct scaler_ctx *scaler_ctx);
 
-        int get_waveform_data(bm_address_type * waveform_name_index_map, struct waveform_ctx * waveform_ctx);
+        int get_waveform_data(bool rt_support, uint32_t & count, bm_address_type * waveform_name_index_map, bm_address_type *rt_address_map, struct waveform_ctx * waveform_ctx);
     private:
         std::string cfg_file;
         boost::property_tree::ptree tree;

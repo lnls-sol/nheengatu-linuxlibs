@@ -1,12 +1,4 @@
-#include "Common.h"
 
-#include <ctype.h>
-#include <errno.h>
-#include <stdexcept>
-#include <time.h>
-#include <boost/bimap.hpp>
-#include "rt_var_handler.h"
-#include "CrioLinux.h"
 #include "WAVEFORM.h"
 
 /* boost namespace */
@@ -88,6 +80,45 @@ static __inline__ uint32_t crioGetWaveform(struct crio_context *ctx, uint32_t ad
 }
 
 
+int populate_rt_offset_arr(void* waveform_name_index_map, uint8_t * rt_variable_offsets, int rt_var_size, void * rt_addresses, struct waveform_ctx *waveforms)
+{
+    const char *name;
+
+    /* Set first offset to 0 */
+    rt_variable_offsets[0] = 0;
+
+    /* Iterate on all items of map from 0 to size-1 and calculate offset of each */
+    uint8_t offset;
+    for (int index = 0; index < rt_var_size-1; index ++)
+    {
+        try {
+            name = ((bm_address_type *)rt_addresses)->right.at(index).c_str();
+        }
+        catch (out_of_range) {
+            throw (CrioLibException(E_OUT_OF_RANGE, "[%s] Cannot find RT item of index <%d>.", LIB_CRIO_LINUX, index));
+        }
+        offset = rt_variable_offsets[index];
+
+        if (is_waveform((bm_address_type*)waveform_name_index_map, name))
+            rt_variable_offsets[index+1] = offset + waveforms[index].waveform_size_bytes;
+        else
+            rt_variable_offsets[index+1] = offset + decode_enum_size(get_rt_var_size(name));
+    }
+    return 0;
+}
+
+bool is_waveform(void * waveform_name_index_map, const char *name)
+{
+    try {
+        ((bm_address_type*) waveform_name_index_map)->left.at(name);
+    } catch (out_of_range) {
+        return false;
+    }
+    return true;
+}
+
+
+
 /* ------------ API FUNCTIONS -------------- */
 
 
@@ -96,15 +127,25 @@ int crioGetWaveformItem(struct crio_context *ctx, const char *name, void *array,
         throw (CrioLibException(E_SESSION_CLOSED , "[%s] Operation performed on closed session.", LIB_CRIO_LINUX ));
     try
     {
+        uint32_t waveform_index = ((bm_address_type *)ctx->waveform_name_index_map)->left.at(name);
+
         if (is_rt_var(name) == true)
-            printf("TODO: Need to Build RT of arrays\n");
-            //get_rt_val(ctx->shared_memory, ctx->rt_variable_offsets[((bm_address_type *)ctx->rt_addresses)->left.at(name)], value, name);
+        {
+            get_rt_arr(ctx->shared_memory,
+                       ctx->rt_variable_offsets[((bm_address_type *)ctx->rt_addresses)->left.at(name)],
+                       array,
+                       ((struct waveform_ctx*)ctx->waveforms)[waveform_index].waveform_size_bytes,
+                       ((struct waveform_ctx*)ctx->waveforms)[waveform_index].waveform_type ,
+                       ((struct waveform_ctx*)ctx->waveforms)[waveform_index].waveform_size_elements);
+
+            *size = ((struct waveform_ctx*)ctx->waveforms)[waveform_index].waveform_size_elements;
+        }
         else
         {
-            uint32_t waveform_index = ((bm_address_type *)ctx->waveform_name_index_map)->left.at(name);
+
             *size = crioGetWaveform(ctx,       (((struct waveform_ctx*)ctx->waveforms)[waveform_index]).waveform_addr,
                                                 array,
-                                               (((struct waveform_ctx*)ctx->waveforms)[waveform_index]).waveform_size,
+                                               (((struct waveform_ctx*)ctx->waveforms)[waveform_index]).waveform_size_elements,
                                                (((struct waveform_ctx*)ctx->waveforms)[waveform_index]).waveform_type);
 
         }

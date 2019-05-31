@@ -46,7 +46,7 @@ cfg_parser::~cfg_parser()
 }
 
 int cfg_parser::get_settings(std::string &ip, std::string &path, std::string &fileName, std::string &signature,
-                             bool &use_shared_memory, std::string &shared_memory_path)
+                             bool &use_shared_memory, std::string &shared_memory_path, uint32_t &shared_memory_size)
 {
     try {
         ip = tree.get <std::string>("Settings.Destination Crio IP");
@@ -80,6 +80,12 @@ int cfg_parser::get_settings(std::string &ip, std::string &path, std::string &fi
 
     try {
         shared_memory_path = tree.get <std::string>("Settings.Shared Memory Path");
+    } catch(const boost::property_tree::ptree_error &e) {
+        throw CrioLibException(E_INI,  "[%s] Property <Settings.Shared Memory Path>: %s", LIB_CRIO_LINUX, e.what());
+    }
+
+    try {
+        shared_memory_size = tree.get <unsigned>("Settings.Shared Memory Size");
     } catch(const boost::property_tree::ptree_error &e) {
         throw CrioLibException(E_INI,  "[%s] Property <Settings.Shared Memory Path>: %s", LIB_CRIO_LINUX, e.what());
     }
@@ -256,11 +262,11 @@ int cfg_parser::get_scaler_data(bm_address_type * scaler_name_index_map, struct 
 }
 
 
-int cfg_parser::get_waveform_data(bm_address_type * waveform_name_index_map, struct waveform_ctx * waveform_ctx)
+int cfg_parser::get_waveform_data(bool rt_support, uint32_t & count, bm_address_type * waveform_name_index_map, bm_address_type * rt_address_map, struct waveform_ctx * waveform_ctx)
 {
     if (tree.count(WAVEFORM_ALIAS) == 0)
         return -1;
-
+    count = 0;
     struct waveform_ctx *waveform_ctx_local = NULL;
 
 
@@ -268,18 +274,52 @@ int cfg_parser::get_waveform_data(bm_address_type * waveform_name_index_map, str
     {
         for (const std::pair<std::string, boost::property_tree::ptree> &address_tree : tree.get_child(WAVEFORM_ALIAS))
         {
-            if (address_tree.second.get_value<unsigned>() >= MAX_WAVEFORM_SUPPORTED_COUNT)
-                throw CrioLibException(E_INI, "[%s] Property [%s]:[%s] Number of waveforms set in the configuration file larger than supported number (%d).", LIB_CRIO_LINUX, WAVEFORM_ALIAS, address_tree.first.c_str(), MAX_WAVEFORM_SUPPORTED_COUNT );
-            waveform_name_index_map->insert( bm_address_type::value_type( (address_tree.first.c_str()) , address_tree.second.get_value<unsigned>() ));
-            waveform_ctx_local = &waveform_ctx[ address_tree.second.get_value<unsigned>() ];
+            if (count >= MAX_WAVEFORM_SUPPORTED_COUNT)
+                throw CrioLibException(E_INI, "[%s] Property [%s]:Number of waveforms set in the configuration file larger than supported number (%d).", LIB_CRIO_LINUX, WAVEFORM_ALIAS, MAX_WAVEFORM_SUPPORTED_COUNT );
+
+            waveform_name_index_map->insert( bm_address_type::value_type( (address_tree.first.c_str()) , count ));
+            waveform_ctx_local = &waveform_ctx[ count ];
             waveform_ctx_local->waveform_type = get_wf_size(tree.get <std::string>(address_tree.first + ".Type"));
-            waveform_ctx_local->waveform_addr = strtoul(tree.get <std::string>(address_tree.first + ".Address").c_str(), NULL, 16);
+            waveform_ctx_local->waveform_type_bytes = decode_enum_size(waveform_ctx_local->waveform_type);
 
             try {
-                waveform_ctx_local->waveform_size = tree.get <unsigned>(address_tree.first + ".Size");
+                waveform_ctx_local->waveform_size_elements = tree.get <unsigned>(address_tree.first + ".Size");
+                waveform_ctx_local->waveform_size_bytes = waveform_ctx_local->waveform_size_elements * waveform_ctx_local->waveform_type_bytes;
             } catch(const boost::property_tree::ptree_error &e) {
                 throw CrioLibException(E_INI, "[%s] Property [%s]:[Size of array] error:%s. Is this an integer?", LIB_CRIO_LINUX, address_tree.first.c_str(), e.what());
             }
+            count++;
+            if (is_rt_var(address_tree.first) == false)
+            {
+                waveform_ctx_local->waveform_addr = strtoul(tree.get <std::string>(address_tree.first + ".Address").c_str(), NULL, 16);
+            }
+            else
+                if (rt_support == true)
+                {
+                    bm_address_type::right_const_iterator id_iter;
+                    try {
+                       id_iter = rt_address_map->right.find(tree.get <unsigned int>(address_tree.first + ".Address"));
+                    } catch(const boost::property_tree::ptree_error &e) {
+                        throw CrioLibException(E_INI, "[%s] Property [%s]:[%s] error:%s. Is this an integer?",
+                                               LIB_CRIO_LINUX, (address_tree.first + ".Address").c_str(), tree.get <std::string>(address_tree.first + ".Address").c_str(), e.what());
+                    }
+
+
+                    if( id_iter != rt_address_map->right.end() )
+                    {
+                        throw CrioLibException(E_SAME_ADDRESS, "[%s] Found replicated index (Address) for items [%s] and [%s].",
+                                               LIB_CRIO_LINUX, address_tree.first.c_str(), id_iter->second.c_str() );
+                    }
+                    else
+                    {
+                        rt_address_map->insert( bm_address_type::value_type( (address_tree.first.c_str()) , tree.get <unsigned int>(address_tree.first + ".Address") ));
+                    }
+                }
+            else
+                continue;
+
+
+
         }
     }
     catch(const boost::property_tree::ptree_error &e)

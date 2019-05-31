@@ -15,12 +15,17 @@ extern "C" {
 bool is_rt_var(std::string name);
 bool get_rt_var_sign(std::string name);
 type_code get_rt_var_size(std::string name);
-int open_shared_memory(std::string shm_name, uint8_t **memory_ptr);
+int open_shared_memory(std::string shm_name, uint8_t **memory_ptr, uint32_t shared_memory_size);
 uint8_t decode_enum_size(enum type_code code);
 int get_rt_val(uint8_t *shared_memory, uint64_t offset, double &value, std::string name);
 int set_rt_val(uint8_t * shared_memory, uint64_t offset, double value, std::string name);
+int get_rt_arr(uint8_t *shared_memory, uint64_t offset, void * arr, uint32_t size_bytes, enum type_code type, uint32_t size_elements);
+
+
 #ifdef __cplusplus
 }
 #endif
+
+
 
 #endif

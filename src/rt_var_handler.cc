@@ -87,6 +87,23 @@ int set_rt_val(uint8_t * shared_memory, uint64_t offset, double value, std::stri
     return 0;
 }
 
+
+
+int get_rt_arr(uint8_t *shared_memory, uint64_t offset, void * arr, uint32_t size_bytes, enum type_code type, uint32_t size_elements)
+{
+    if (type == U64 || type == I64)
+    {
+        double * arr_src = (double *) (shared_memory+offset);
+        double * arr_dst = (double *) arr;
+        for (uint32_t  i =0; i < size_elements; i++)
+            arr_dst[i] = arr_src[i];
+    }
+    else
+        memcpy(arr, shared_memory+offset, size_bytes);
+    return 0;
+}
+
+
 int get_rt_val(uint8_t *shared_memory, uint64_t offset, double &value, std::string name)
 {
     double dbl;
@@ -142,6 +159,7 @@ int get_rt_val(uint8_t *shared_memory, uint64_t offset, double &value, std::stri
     return 0;
 }
 
+
 enum type_code get_rt_var_size(std::string name){
 
     if (name.compare(3,3,"DBL") == 0) return DBL;
@@ -166,7 +184,7 @@ bool get_rt_var_sign(std::string name){
         return true;
 }
 
-int open_shared_memory(std::string shm_name, uint8_t **memory_ptr)
+int open_shared_memory(std::string shm_name, uint8_t **memory_ptr, uint32_t shared_memory_size)
 {
     if (access((SHM_PATH+shm_name).c_str(), F_OK) != 0) throw (CrioLibException(E_SHARED_MEM, "Cannot find shared memory file <%s>.", shm_name.c_str()));
 
@@ -175,7 +193,9 @@ int open_shared_memory(std::string shm_name, uint8_t **memory_ptr)
     if (fd < 0) throw (CrioLibException(E_SHARED_MEM, "Cannot open shared memory file <%s>.", shm_name.c_str()));
 
     // Map memory from shared memory to application memory.
-    void *mmapPointer = mmap(NULL, 4096, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+    if ((shared_memory_size % 4096) != 0)
+        throw (CrioLibException(E_SHARED_MEM, "Shared memory size is not a multiple of 4096 <%u>.", shared_memory_size));
+    void *mmapPointer = mmap(NULL, shared_memory_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
     if (mmapPointer == MAP_FAILED) throw (CrioLibException(E_SHARED_MEM, "Cannot map shared memory file."));
 
     // Since file descriptor is no longer needed after mmap, close it.
