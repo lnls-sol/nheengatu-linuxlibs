@@ -469,6 +469,7 @@ int crioGetNumOfCounters(struct crio_context *ctx, const char * name, uint16_t *
  * - name         : name of the waveform
  * - array        : a pointer to the array to be filled
  * - size         : the number of variables read
+ * - max_size     : Epics defined array size (used for safety check).
  *
  * Return value   :
  * - OK  = 0  (Success)
@@ -476,7 +477,7 @@ int crioGetNumOfCounters(struct crio_context *ctx, const char * name, uint16_t *
  * one of the errorcodes defined in errorcodes.
  */
 
-int crioGetWaveformItem(struct crio_context *ctx, const char *name, void *array, uint32_t * size);
+int crioGetWaveformItem(struct crio_context *ctx, const char *name, void *array, uint32_t *size, uint64_t max_size);
 #ifdef __cplusplus
 }
 #endif

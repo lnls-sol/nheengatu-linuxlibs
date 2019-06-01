@@ -37,9 +37,9 @@ int main(void) {
     /* Waveform */
 
     //crioGetWaveformItem(struct crio_context *ctx, const char *name, void *array)
-    TRY_SILENT_CONT(crioGetWaveformItem(ctx, waveforms[0].c_str(), wf0, &size));
-    TRY_SILENT_CONT(crioGetWaveformItem(ctx, waveforms[1].c_str(), wf1, &size));
-    TRY_SILENT_CONT(crioGetWaveformItem(ctx, waveforms[2].c_str(), wf2, &size));
+    TRY_SILENT_CONT(crioGetWaveformItem(ctx, waveforms[0].c_str(), wf0, &size, sizeof(wf0)) );
+    TRY_SILENT_CONT(crioGetWaveformItem(ctx, waveforms[1].c_str(), wf1, &size, sizeof(wf1)) );
+    TRY_SILENT_CONT(crioGetWaveformItem(ctx, waveforms[2].c_str(), wf2, &size, sizeof(wf2)) );
 
     for (uint i =0 ; i < 5; i++)
         cout << waveforms[0].c_str() << "[" << i << "]: " << wf0[i]  << endl;
