@@ -89,7 +89,7 @@ int cfg_parser::get_settings(std::string &ip, std::string &path, std::string &fi
     try {
         shared_memory_size = tree.get <unsigned>("Settings.Shared Memory Size");
     } catch(const boost::property_tree::ptree_error &e) {
-        throw CrioLibException(E_INI,  "[%s] Property <Settings.Shared Memory Path>: %s", LIB_CRIO_LINUX, e.what());
+        throw CrioLibException(E_INI,  "[%s] Property <Settings.Shared Memory Size>: %s", LIB_CRIO_LINUX, e.what());
     }
 
     return 0;
