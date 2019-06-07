@@ -4,7 +4,7 @@
 #include "CrioLinux.h"
 #include "SCALER.h"
 #include "WAVEFORM.h"
-
+#include "utils.h"
 
 /************************* HELPER FUNCTIONS ***********************************/
 enum type_code get_wf_size(std::string name){
@@ -167,7 +167,8 @@ int cfg_parser::get_bi_maps(bool rt_support, uint32_t & count, bim_type *bi_map,
     return 0;
 }
 
-int cfg_parser::get_address_maps(bool rt_support, uint32_t & count, bm_address_type * address_map, bm_address_type * rt_address_map, string alias)
+int cfg_parser::get_address_maps(bool rt_support, uint32_t & count, uint32_t & fxp_count, struct fxp_ctx * fxp_ctx,
+                                 bm_address_type * address_map, bm_address_type * rt_address_map, string alias)
 {
     if (tree.count(alias) == 0)
         return 0;
@@ -180,32 +181,49 @@ int cfg_parser::get_address_maps(bool rt_support, uint32_t & count, bm_address_t
                 bm_address_type::right_const_iterator id_iter = address_map->right.find(strtoul(address_tree.second.get_value<std::string>().c_str(), NULL, 16));
                 if( id_iter != address_map->right.end() )
                 {
-                    throw CrioLibException(E_SAME_ADDRESS, "[%s] Found replicated index for items [%s] and [%s].",
-                                           LIB_CRIO_LINUX, address_tree.first.c_str(), id_iter->second.c_str() );
+                    throw CrioLibException(E_SAME_ADDRESS, "Found replicated index for items [%s] and [%s]",
+                                           address_tree.first.c_str(), id_iter->second.c_str() );
                 }
                 else
                 {
-                    address_map->insert( bm_address_type::value_type( (address_tree.first.c_str()) , strtoul(address_tree.second.get_value<std::string>().c_str(), NULL, 16) ));
+                    if (is_fixed_point(address_tree.first.c_str()) && (alias == AI_ALIAS || alias == AO_ALIAS))
+                    {
+                       try {
+                            address_map->insert( bm_address_type::value_type( (address_tree.first.c_str()) , fxp_count ));
+                            fxp_ctx[fxp_count].address = strtoul(address_tree.second.get_value<std::string>().c_str(), NULL, 16);
+                            fxp_ctx[fxp_count].sign = tree.get <bool>(address_tree.first + ".Sign");
+                            fxp_ctx[fxp_count].word_length = tree.get <unsigned int>(address_tree.first + ".Word Length");
+                            fxp_ctx[fxp_count].int_word_length = tree.get <unsigned int>(address_tree.first + ".Integer Word Length");
+                        } catch (const boost::property_tree::ptree_error &e) {
+                            throw CrioLibException(E_INI, "Property [%s]:[%s] error:%s", address_tree.first.c_str(), address_tree.second.get_value<std::string>().c_str(), e.what());
+                        }
+                            if (fxp_ctx[fxp_count].int_word_length > fxp_ctx[fxp_count].word_length)
+                                throw CrioLibException(E_INI, "Property [%s]:[%s] Integer word length (%u) cannot be larger than word length (%u)", address_tree.first.c_str(), address_tree.second.get_value<std::string>().c_str(), fxp_ctx[fxp_count].int_word_length, fxp_ctx[fxp_count].word_length);
+                            fxp_count++;
+                    }
+                    else
+                        address_map->insert( bm_address_type::value_type( (address_tree.first.c_str()) , strtoul(address_tree.second.get_value<std::string>().c_str(), NULL, 16) ));
+                    
                 }
             }
             else if (rt_support == true)
             {
                 if (UNKNOWN == get_rt_var_size(address_tree.first))
-                    throw CrioLibException(E_RESOURCE_ALLOC, "[%s] Item <%s:%s> size unknown. Must be one of following:\nDBL, SGL, I64, I32, I16, I08, U64, U32, U16, U08, BOL",
-                                           LIB_CRIO_LINUX, alias.c_str(), address_tree.first.c_str());
+                    throw CrioLibException(E_RESOURCE_ALLOC, "Item <%s:%s> size unknown. Must be one of following:\nDBL, SGL, I64, I32, I16, I08, U64, U32, U16, U08, BOL",
+                                           alias.c_str(), address_tree.first.c_str());
 
                 bm_address_type::right_const_iterator id_iter;
                 try {
                    id_iter = rt_address_map->right.find(address_tree.second.get_value<unsigned int>());
                 } catch(const boost::property_tree::ptree_error &e) {
-                    throw CrioLibException(E_INI, "[%s] Property [%s]:[%s] error:%s. Is this an integer?", LIB_CRIO_LINUX, address_tree.first.c_str(), address_tree.second.get_value<std::string>().c_str(), e.what());
+                    throw CrioLibException(E_INI, "Property [%s]:[%s] error:%s. Is this an integer?", address_tree.first.c_str(), address_tree.second.get_value<std::string>().c_str(), e.what());
                 }
 
 
                 if( id_iter != rt_address_map->right.end() )
                 {
-                    throw CrioLibException(E_SAME_ADDRESS, "[%s] Found replicated index for items [%s] and [%s].",
-                                           LIB_CRIO_LINUX, address_tree.first.c_str(), id_iter->second.c_str() );
+                    throw CrioLibException(E_SAME_ADDRESS, "Found replicated index for items [%s] and [%s].",
+                                           address_tree.first.c_str(), id_iter->second.c_str() );
                 }
                 else
                 {
@@ -332,6 +350,3 @@ int cfg_parser::get_waveform_data(bool rt_support, uint32_t & count, bm_address_
     return 0;
 
 }
-
-
-

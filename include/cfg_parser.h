@@ -4,6 +4,7 @@
 #include <boost/property_tree/ini_parser.hpp>
 #include <boost/bimap.hpp>
 #include "SCALER.h"
+#include "ANALOG.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -37,7 +38,7 @@ class cfg_parser {
         int get_bi_maps(bool rt_support, uint32_t &count, bim_type *bi, bm_address_type *bi_address_map, bm_address_type *bi_rt_address_map);
 
         /* Fills all indicated address binary maps */
-        int get_address_maps(bool rt_support, uint32_t &count, bm_address_type * address_map, bm_address_type * rt_address_map, string alias);
+        int get_address_maps(bool rt_support, uint32_t & count, uint32_t & fxp_count, struct fxp_ctx * fxp_ctx, bm_address_type * address_map, bm_address_type * rt_address_map, string alias);
 
         int get_scaler_data(bm_address_type *scaler, struct scaler_ctx *scaler_ctx);
 

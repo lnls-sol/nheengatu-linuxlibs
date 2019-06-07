@@ -1,5 +1,27 @@
-#include "utils.h"
+#undef NDEBUG
+#include <assert.h>
+#include <iostream>
+#include <stdint.h>
+#include <stdlib.h>
+ #include<unistd.h>
+#include<string.h>
+#include <ctime>    // For time()
+#include <cstdlib>
 
+#include <math.h>
+using namespace std;
+
+#define U64LEN 64UL
+
+double fxp_to_dbl(uint64_t value, struct fxp_ctx * fxp_data);
+uint64_t dbl_to_fxp(double value, struct fxp_ctx * fxp_data);
+
+struct fxp_ctx{
+    bool           sign;
+    uint32_t       word_length;
+    uint32_t       int_word_length;
+    uint32_t       address;
+};
 
 
 uint64_t dbl_to_fxp(double value, struct fxp_ctx * fxp_data)
@@ -62,49 +84,23 @@ double fxp_to_dbl(uint64_t value, struct fxp_ctx * fxp_data)
     return value_double;
 }
 
-bool is_fixed_point(std::string name){
-    if (name.compare(0,3,"FXP") == 0)
-        return true;
-    return false;
-}
 
-void print_bmap(bm_address_type * bmap)
+int main()
 {
-    for( bm_address_type::const_iterator iter = bmap->begin(), iend = bmap->end(); iter != iend; ++iter )
-        std::cout << iter->left << " <--> " << iter->right << std::endl;
-}
+    uint64_t fxp = 9223372036854775808ULL;
+    uint64_t fxp_ret = 0;
+    struct fxp_ctx fxp_data = {
+        .sign = true,
+        .word_length  = 64,
+        .int_word_length = 0,
+        .address = 1234
+    };
+    cout << fxp << endl;
+    double ret = fxp_to_dbl(fxp, &fxp_data);
+    cout.precision(64);
+    cout << ret << endl;
+    fxp_ret = dbl_to_fxp(ret, &fxp_data);
+    cout << fxp_ret << endl;
+    return 0;
 
-void set_cpu(uint cpu)
-{
-    //cpu_set_t cpu;
-    //CPU_ZERO(&cpu);
-    //CPU_SET(cpu, &cpu);
-    //printf("Setting CPU Affinity to CPU%d... ", 1);
-    //ret = sched_setaffinity(0, sizeof(cpu_set_t), &cpu);
-    //printWithStatus("", ret);
-
-    // Elevate this process to highest priority.
-    //struct sched_param params;
-    //params.sched_priority = 99;
-    //printf("Setting thread priority to %d... ", 99);
-    //ret = pthread_setschedparam(pthread_self(), SCHED_FIFO, &params);
-    //printWithStatus("", ret);
-}
-
-
-void timespec_diff(struct timespec *start, struct timespec *stop, struct timespec *result)
-{
-    if ((stop->tv_nsec - start->tv_nsec) < 0) {
-        result->tv_sec = stop->tv_sec - start->tv_sec - 1;
-        result->tv_nsec = stop->tv_nsec - start->tv_nsec + 1000000000;
-    } else {
-        result->tv_sec = stop->tv_sec - start->tv_sec;
-        result->tv_nsec = stop->tv_nsec - start->tv_nsec;
-    }
-    return;
-}
-
-void printLibVersion(void)
-{
-    printVersion();
 }

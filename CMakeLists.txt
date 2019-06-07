@@ -94,6 +94,7 @@ install(FILES include/CrioLinux.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 add_simple_test(TestBasicAll tests/BasicAll.cc)
 add_simple_test(TestWaveform tests/waveForm.cc)
+add_simple_test(TestFixedPoint tests/fixedPoint.cc)
 #add_simple_test(TestBasicAI tests/BasicAI.cc)
 #add_simple_test(TestBasicAO tests/BasicAO.cc)
 #add_simple_test(TestBasicBO tests/BasicBO.cc)

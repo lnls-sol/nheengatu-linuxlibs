@@ -5,6 +5,7 @@
 #include "rt_var_handler.h"
 #include "SCALER.h"
 #include "WAVEFORM.h"
+#include "ANALOG.h"
 
 int crioSetup(struct crio_context *ctx, char *cfgfile) {
     string ip = "";
@@ -51,6 +52,7 @@ int crioSetup(struct crio_context *ctx, char *cfgfile) {
         ctx->bi_count = 0;
         ctx->ao_count = 0;
         ctx->bo_count = 0;
+        ctx->fxp_count = 0;
 
         /* Fill in binary maps from the configuration file */
         ctx->bi_map = (void *) new bim_type;
@@ -63,10 +65,11 @@ int crioSetup(struct crio_context *ctx, char *cfgfile) {
         ctx->scalers = (void *) new struct scaler_ctx[MAX_SCALER_SUPPORTED_COUNT];
         ctx->waveform_name_index_map   = (void *) new bm_address_type;
         ctx->waveforms = (void *) new struct waveform_ctx[MAX_WAVEFORM_SUPPORTED_COUNT];
+        ctx->fxps = (void *) new struct fxp_ctx[MAX_FXP_SUPPORTED_COUNT];
         TRY_THROW(parser->get_bi_maps(use_shared_memory, ctx->bi_count, (bim_type*) ctx->bi_map, (bm_address_type *)ctx->bi_addresses, (bm_address_type *)ctx->rt_addresses));
-        TRY_THROW(parser->get_address_maps(use_shared_memory, ctx->bo_count, (bm_address_type *)ctx->bo_addresses, (bm_address_type *)ctx->rt_addresses, BO_ALIAS));
-        TRY_THROW(parser->get_address_maps(use_shared_memory, ctx->ao_count, (bm_address_type *)ctx->ao_addresses, (bm_address_type *)ctx->rt_addresses, AO_ALIAS));
-        TRY_THROW(parser->get_address_maps(use_shared_memory, ctx->ai_count, (bm_address_type *)ctx->ai_addresses, (bm_address_type *)ctx->rt_addresses, AI_ALIAS));
+        TRY_THROW(parser->get_address_maps(use_shared_memory, ctx->bo_count, ctx->fxp_count, NULL, (bm_address_type *)ctx->bo_addresses, (bm_address_type *)ctx->rt_addresses, BO_ALIAS));
+        TRY_THROW(parser->get_address_maps(use_shared_memory, ctx->ao_count, ctx->fxp_count, (struct fxp_ctx *) ctx->fxps, (bm_address_type *)ctx->ao_addresses, (bm_address_type *)ctx->rt_addresses, AO_ALIAS));
+        TRY_THROW(parser->get_address_maps(use_shared_memory, ctx->ai_count, ctx->fxp_count, (struct fxp_ctx *) ctx->fxps, (bm_address_type *)ctx->ai_addresses, (bm_address_type *)ctx->rt_addresses, AI_ALIAS));
         TRY_THROW(parser->get_scaler_data((bm_address_type*) ctx->scaler_name_index_map, (struct scaler_ctx *)ctx->scalers));
         TRY_THROW(parser->get_waveform_data(use_shared_memory, ctx->waveform_fpga_count, (bm_address_type*) ctx->waveform_name_index_map, (bm_address_type *)ctx->rt_addresses, (struct waveform_ctx *)ctx->waveforms));
 
