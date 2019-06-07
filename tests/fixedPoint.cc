@@ -87,7 +87,7 @@ double fxp_to_dbl(uint64_t value, struct fxp_ctx * fxp_data)
 
 int main()
 {
-    uint64_t fxp = 9223372036854775808ULL;
+    uint64_t fxp = 8307674973655721984ULL;
     uint64_t fxp_ret = 0;
     struct fxp_ctx fxp_data = {
         .sign = true,

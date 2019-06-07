@@ -57,7 +57,7 @@ int crioSetAOItem(struct crio_context *ctx, const char *name, double value) {
         {
             if (is_fixed_point(name) == true)
             {
-                local_fxp_data = &(((struct fxp_ctx * )ctx->fxps)[((bm_address_type *)ctx->ai_addresses)->left.at(name)]);
+                local_fxp_data = &(((struct fxp_ctx * )ctx->fxps)[((bm_address_type *)ctx->ao_addresses)->left.at(name)]);
                 crioSetAOFixedPoint(ctx, value, local_fxp_data);
             }
             else

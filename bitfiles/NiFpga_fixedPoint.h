@@ -24,16 +24,26 @@
 /**
  * The signature of the FPGA bitfile.
  */
-static const char* const NiFpga_fixedPoint_Signature = "33FC6997A031AB500A28CAD692C12B86";
+static const char* const NiFpga_fixedPoint_Signature = "FAC823B8F3E033E6495A2A3F08A15476";
 
 typedef enum
 {
-   NiFpga_fixedPoint_IndicatorU64_aifxp = 0x18004,
+   NiFpga_fixedPoint_IndicatorU64_aifxp1 = 0x18004,
    NiFpga_fixedPoint_IndicatorU64_aifxp2 = 0x1800C,
    NiFpga_fixedPoint_IndicatorU64_aifxp3 = 0x18014,
    NiFpga_fixedPoint_IndicatorU64_aifxp4 = 0x1801C,
    NiFpga_fixedPoint_IndicatorU64_aifxp5 = 0x18024,
    NiFpga_fixedPoint_IndicatorU64_aifxp6 = 0x1802C,
 } NiFpga_fixedPoint_IndicatorU64;
+
+typedef enum
+{
+   NiFpga_fixedPoint_ControlU64_u641 = 0x18030,
+   NiFpga_fixedPoint_ControlU64_u642 = 0x18034,
+   NiFpga_fixedPoint_ControlU64_u643 = 0x18038,
+   NiFpga_fixedPoint_ControlU64_u644 = 0x1803C,
+   NiFpga_fixedPoint_ControlU64_u645 = 0x18040,
+   NiFpga_fixedPoint_ControlU64_u646 = 0x18044,
+} NiFpga_fixedPoint_ControlU64;
 
 #endif

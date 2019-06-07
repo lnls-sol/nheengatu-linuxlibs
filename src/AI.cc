@@ -70,6 +70,5 @@ int crioGetAIItem(struct crio_context *ctx, const char *name, double &value) {
         throw (CrioLibException(e.errorcode, "[%s] Property [%s]: %s.", LIB_CRIO_LINUX , name, e.what()));
     }
     return 0;
-
 }
 
