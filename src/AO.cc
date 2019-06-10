@@ -24,13 +24,13 @@ static __inline__ int crioSetAOFixedPoint(struct crio_context *ctx, double value
 static __inline__ int crioSetAOFixedPoint(struct crio_context *ctx, double value, struct fxp_ctx *fxp_data) {
     uint64_t value_u64 = dbl_to_fxp(value, fxp_data);
     auto Res = NiFpga_WriteU64(NiFpga_Session(ctx->session), fxp_data->address, value_u64);
-    if (NiFpga_IsError(Res)) throw (CrioLibException(E_VAR_ACCESS, "Cannot access address."));
+    if (NiFpga_IsError(Res)) throw (CrioLibException(E_VAR_ACCESS, "Cannot access address"));
     return 0;
 }
 
 static __inline__ int crioSetAO(struct crio_context *ctx, uint32_t address, float value) {
     auto Res = NiFpga_WriteSgl(NiFpga_Session(ctx->session), address, value);
-    if (NiFpga_IsError(Res)) throw (CrioLibException(E_VAR_ACCESS, "Cannot access address."));
+    if (NiFpga_IsError(Res)) throw (CrioLibException(E_VAR_ACCESS, "Cannot access address"));
     return 0;
 }
 

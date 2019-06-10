@@ -20,7 +20,7 @@ static __inline__ int crioSetBO(struct crio_context *ctx, uint32_t address, bool
 
 static __inline__ int crioSetBO(struct crio_context *ctx, uint32_t address, bool value) {
     auto Res = NiFpga_WriteBool(NiFpga_Session(ctx->session), address, value);
-    if (NiFpga_IsError(Res)) throw (CrioLibException(E_VAR_ACCESS, "Cannot access address."));
+    if (NiFpga_IsError(Res)) throw (CrioLibException(E_VAR_ACCESS, "Cannot access address"));
     return 0;
 }
 

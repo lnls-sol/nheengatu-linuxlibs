@@ -23,21 +23,21 @@ typedef bimap< std::string, unsigned > bm_address_type;
 int static __inline__ getDone(struct crio_context *ctx, uint32_t index, bool *value){
     struct scaler_ctx* scaler = ((struct scaler_ctx*)(ctx->scalers));
     auto Res = NiFpga_ReadBool(NiFpga_Session(ctx->session), scaler[index].done_addr, (NiFpga_Bool *) value);
-    if (NiFpga_IsError(Res)) throw (CrioLibException(E_VAR_ACCESS, "Cannot access address."));
+    if (NiFpga_IsError(Res)) throw (CrioLibException(E_VAR_ACCESS, "Cannot access address"));
     return 0;
 }
 
 int static __inline__ enable(struct crio_context *ctx, uint32_t index){
     struct scaler_ctx* scaler = ((struct scaler_ctx*)(ctx->scalers));
     auto Res = NiFpga_WriteBool(NiFpga_Session(ctx->session), scaler[index].enable_addr, true);
-    if (NiFpga_IsError(Res)) throw (CrioLibException(E_VAR_ACCESS, "Cannot access address."));
+    if (NiFpga_IsError(Res)) throw (CrioLibException(E_VAR_ACCESS, "Cannot access address"));
     return 0;
 }
 
 int static __inline__ disable(struct crio_context *ctx, uint32_t index){
     struct scaler_ctx* scaler = ((struct scaler_ctx*)(ctx->scalers));
     auto Res = NiFpga_WriteBool(NiFpga_Session(ctx->session), scaler[index].enable_addr, false);
-    if (NiFpga_IsError(Res)) throw (CrioLibException(E_VAR_ACCESS, "Cannot access address."));
+    if (NiFpga_IsError(Res)) throw (CrioLibException(E_VAR_ACCESS, "Cannot access address"));
     return 0;
 }
 
@@ -50,28 +50,28 @@ int static __inline__ getCounterNum(struct crio_context *ctx, uint32_t index, ui
 int static __inline__ setGates(struct crio_context *ctx, uint32_t index, bool *gates){
     struct scaler_ctx* scaler = ((struct scaler_ctx*)(ctx->scalers));
     auto Res = NiFpga_WriteArrayBool(NiFpga_Session(ctx->session), scaler[index].gate_array_addr, (NiFpga_Bool *) gates, scaler[index].num_of_counters);
-    if (NiFpga_IsError(Res)) throw (CrioLibException(E_VAR_ACCESS, "Cannot access address."));
+    if (NiFpga_IsError(Res)) throw (CrioLibException(E_VAR_ACCESS, "Cannot access address"));
     return 0;
 }
 
 int static __inline__ setOneShot(struct crio_context *ctx, uint32_t index, bool value){
     struct scaler_ctx* scaler = ((struct scaler_ctx*)(ctx->scalers));
     auto Res = NiFpga_WriteBool(NiFpga_Session(ctx->session), scaler[index].oneshot_addr, value);
-    if (NiFpga_IsError(Res)) throw (CrioLibException(E_VAR_ACCESS, "Cannot access address."));
+    if (NiFpga_IsError(Res)) throw (CrioLibException(E_VAR_ACCESS, "Cannot access address"));
     return 0;
 }
 
 int static __inline__ getCounters(struct crio_context *ctx, uint32_t index, uint32_t *counters){
     struct scaler_ctx* scaler = ((struct scaler_ctx*)(ctx->scalers));
     auto Res = NiFpga_ReadArrayU32(NiFpga_Session(ctx->session), scaler[index].counter_array_addr, counters, scaler[index].num_of_counters);
-    if (NiFpga_IsError(Res)) throw (CrioLibException(E_VAR_ACCESS, "Cannot access address."));
+    if (NiFpga_IsError(Res)) throw (CrioLibException(E_VAR_ACCESS, "Cannot access address"));
     return 0;
 }
 
 int static __inline__ setPRs(struct crio_context *ctx, uint32_t index, uint32_t *prs){
     struct scaler_ctx* scaler = ((struct scaler_ctx*)(ctx->scalers));
     auto Res = NiFpga_WriteArrayU32(NiFpga_Session(ctx->session), scaler[index].pr_array_addr, prs, scaler[index].num_of_counters);
-    if (NiFpga_IsError(Res)) throw (CrioLibException(E_VAR_ACCESS, "Cannot access address."));
+    if (NiFpga_IsError(Res)) throw (CrioLibException(E_VAR_ACCESS, "Cannot access address"));
     return 0;
 }
 

@@ -23,36 +23,8 @@ typedef bimap< std::string, unsigned > bm_address_type;
 /* prototypes */
 static __inline__ bool getBI(struct crio_context *ctx, uint32_t index, uint64_t address);
 static __inline__ int crioReadBIArray(struct crio_context *ctx, uint64_t *output, uint64_t address);
-static __inline__ int ParseNumberStrict(const char *Text, unsigned *Value);
 
 /* --------------- HELPERS --------------- */
-static __inline__ int ParseNumberStrict(const char *Text, unsigned *Value) {
-    char *End;
-    long long Val;
-
-    /* Blank string returns error */
-    while (*Text != '\0' && isspace(*Text)) Text++;
-    if (*Text == '\0') return -1;
-
-    /* Use signed parsing to avoid implicit modular conversion */
-    errno = 0;
-    Val = strtoll(Text, &End, 0);
-    if (errno != 0) return -1;
-
-    /* Trailing text returns error */
-    while (*End != '\0' && isspace(*End)) End++;
-    if (*End != '\0') return -1;
-
-    /* Handle unsigned range errors */
-    if (Val < 0) return -1;
-    if (Val > (long long)UINT_MAX) return -1;
-
-    *Value = Val;
-
-    return 0;
-}
-
-
 
 
 static __inline__ int crioReadBIArray(struct crio_context *ctx, uint64_t *output, uint64_t address) {
@@ -70,7 +42,7 @@ static __inline__ int crioReadBIArray(struct crio_context *ctx, uint64_t *output
     else
     {
         auto Res = NiFpga_ReadU64(NiFpga_Session(ctx->session), address, output);
-        if (NiFpga_IsError(Res)) throw (CrioLibException(E_VAR_ACCESS, "Cannot access address."));
+        if (NiFpga_IsError(Res)) throw (CrioLibException(E_VAR_ACCESS, "Cannot access address"));
         ctx->bi_cache = *output;
         memcpy(&ctx->bi_sample_time, &current, sizeof (struct timespec));
         ctx->bi_cache_valid = true;
