@@ -53,6 +53,7 @@ int crioSetup(struct crio_context *ctx, char *cfgfile) {
         ctx->ao_count = 0;
         ctx->bo_count = 0;
         ctx->fxp_count = 0;
+        ctx->scaler_count = 0;
 
         /* Fill in binary maps from the configuration file */
         ctx->bi_map = (void *) new bim_type;
@@ -115,6 +116,8 @@ void crioCleanup(struct crio_context *ctx) {
         delete((struct scaler_ctx*)ctx->scalers);
         delete((bm_address_type *)ctx->waveform_name_index_map);
         delete((struct scaler_ctx*)ctx->waveforms);
+        delete((struct fxp_ctx *)ctx->fxps);
+        delete((struct waveform_ctx *)ctx->waveforms);
         delete ctx->rt_variable_offsets;
         delete((bim_type * )ctx->bi_map);
         pthread_mutex_destroy(&ctx->bi_mutex);

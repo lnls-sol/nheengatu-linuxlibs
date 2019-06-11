@@ -98,6 +98,7 @@ typedef	unsigned int CrioSession;
 
 /* Structures */
 struct crio_context {
+    void               * waveform_name_index_map;
     CrioSession          session;
     bool                 session_open;
     struct timespec      bi_sample_time;
@@ -124,7 +125,6 @@ struct crio_context {
     void               * scaler_name_index_map;
     void               * waveforms;
     void               * fxps;
-    void               * waveform_name_index_map;
 };
 
 
