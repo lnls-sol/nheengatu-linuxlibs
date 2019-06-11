@@ -70,7 +70,7 @@ int crioSetup(struct crio_context *ctx, char *cfgfile) {
         TRY_THROW(parser->get_address_maps(use_shared_memory, ctx->bo_count, ctx->fxp_count, NULL, (bm_address_type *)ctx->bo_addresses, (bm_address_type *)ctx->rt_addresses, BO_ALIAS));
         TRY_THROW(parser->get_address_maps(use_shared_memory, ctx->ao_count, ctx->fxp_count, (struct fxp_ctx *) ctx->fxps, (bm_address_type *)ctx->ao_addresses, (bm_address_type *)ctx->rt_addresses, AO_ALIAS));
         TRY_THROW(parser->get_address_maps(use_shared_memory, ctx->ai_count, ctx->fxp_count, (struct fxp_ctx *) ctx->fxps, (bm_address_type *)ctx->ai_addresses, (bm_address_type *)ctx->rt_addresses, AI_ALIAS));
-        TRY_THROW(parser->get_scaler_data((bm_address_type*) ctx->scaler_name_index_map, (struct scaler_ctx *)ctx->scalers));
+        TRY_THROW(parser->get_scaler_data(ctx->scaler_count, (bm_address_type*) ctx->scaler_name_index_map, (struct scaler_ctx *)ctx->scalers));
         TRY_THROW(parser->get_waveform_data(use_shared_memory, ctx->waveform_fpga_count, (bm_address_type*) ctx->waveform_name_index_map, (bm_address_type *)ctx->rt_addresses, (struct waveform_ctx *)ctx->waveforms));
 
         /* Calculate offsets if shared memory is enabled */

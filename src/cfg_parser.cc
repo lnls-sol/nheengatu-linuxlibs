@@ -246,11 +246,11 @@ int cfg_parser::get_address_maps(bool rt_support, uint32_t & count, uint32_t & f
     return 0;
 }
 
-int cfg_parser::get_scaler_data(bm_address_type * scaler_name_index_map, struct scaler_ctx * scaler_ctx)
+int cfg_parser::get_scaler_data(uint32_t &count, bm_address_type * scaler_name_index_map, struct scaler_ctx * scaler_ctx)
 {
     if (tree.count(SCALER_ALIAS) == 0)
         return -1;
-
+    count = 0;
     struct scaler_ctx *scaler_ctx_local = NULL;
 
 
@@ -258,10 +258,10 @@ int cfg_parser::get_scaler_data(bm_address_type * scaler_name_index_map, struct 
     {
         for (const std::pair<std::string, boost::property_tree::ptree> &address_tree : tree.get_child(SCALER_ALIAS))
         {
-            scaler_name_index_map->insert( bm_address_type::value_type( (address_tree.first.c_str()) , address_tree.second.get_value<unsigned>() ));
+            scaler_name_index_map->insert( bm_address_type::value_type( (address_tree.first.c_str()) , count));
             if (address_tree.second.get_value<unsigned>() >= MAX_SCALER_SUPPORTED_COUNT)
                 throw CrioLibException(E_INI, "Property [%s]:[%s] value of scaler is not in sequence. Should be less than %d", SCALER_ALIAS, address_tree.first.c_str(), MAX_SCALER_SUPPORTED_COUNT );
-            scaler_ctx_local = &scaler_ctx[ address_tree.second.get_value<unsigned>() ];
+            scaler_ctx_local = &scaler_ctx[ count ];
             scaler_ctx_local->enable_addr = strtoul(tree.get <std::string>(address_tree.first + ".Enable").c_str(), NULL, 16);
             scaler_ctx_local->gate_array_addr = strtoul(tree.get <std::string>(address_tree.first + ".Gate").c_str(), NULL, 16);
             scaler_ctx_local->oneshot_addr = strtoul(tree.get <std::string>(address_tree.first + ".OneShot").c_str(), NULL, 16);
@@ -275,6 +275,7 @@ int cfg_parser::get_scaler_data(bm_address_type * scaler_name_index_map, struct 
             if (scaler_ctx_local->num_of_counters > MAX_SCALER_CHANNELS)
                 throw CrioLibException(E_INI, "Property [%s]:[%s] Number of scaler channels larger than defined maximum (%u)", SCALER_ALIAS, address_tree.first.c_str(), MAX_SCALER_CHANNELS );
             scaler_ctx_local->done_addr = strtoul(tree.get <std::string>(address_tree.first + ".Done").c_str(), NULL, 16);
+            count++;
         }
     }
     catch(const boost::property_tree::ptree_error &e)

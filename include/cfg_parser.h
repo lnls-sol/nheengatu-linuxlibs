@@ -40,8 +40,10 @@ class cfg_parser {
         /* Fills all indicated address binary maps */
         int get_address_maps(bool rt_support, uint32_t & count, uint32_t & fxp_count, struct fxp_ctx * fxp_ctx, bm_address_type * address_map, bm_address_type * rt_address_map, string alias);
 
-        int get_scaler_data(bm_address_type *scaler, struct scaler_ctx *scaler_ctx);
+        /* Fills all indicated address scaler maps and structures */
+        int get_scaler_data(uint32_t &count, bm_address_type * scaler_name_index_map, struct scaler_ctx * scaler_ctx);
 
+        /* Fills all waveform data */
         int get_waveform_data(bool rt_support, uint32_t & count, bm_address_type * waveform_name_index_map, bm_address_type *rt_address_map, struct waveform_ctx * waveform_ctx);
     private:
         std::string cfg_file;
