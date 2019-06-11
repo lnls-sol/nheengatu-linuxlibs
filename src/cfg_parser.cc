@@ -95,7 +95,7 @@ int cfg_parser::get_settings(std::string &ip, std::string &path, std::string &fi
     return 0;
 }
 
-int cfg_parser::get_bi_maps(bool rt_support, uint32_t & count, bim_type *bi_map, bm_address_type * bi_address_map, bm_address_type * bi_rt_address_map )
+int cfg_parser::get_bi_maps(bool rt_support, uint16_t & count, bim_type *bi_map, bm_address_type * bi_address_map, bm_address_type * bi_rt_address_map )
 {
     if (tree.count(BIADDR_ALIAS) == 0)
         return 0;
@@ -169,7 +169,7 @@ int cfg_parser::get_bi_maps(bool rt_support, uint32_t & count, bim_type *bi_map,
     return 0;
 }
 
-int cfg_parser::get_address_maps(bool rt_support, uint32_t & count, uint32_t & fxp_count, struct fxp_ctx * fxp_ctx,
+int cfg_parser::get_address_maps(bool rt_support, uint16_t & count, uint16_t & fxp_count, struct fxp_ctx * fxp_ctx,
                                  bm_address_type * address_map, bm_address_type * rt_address_map, string alias)
 {
     if (tree.count(alias) == 0)
@@ -246,22 +246,23 @@ int cfg_parser::get_address_maps(bool rt_support, uint32_t & count, uint32_t & f
     return 0;
 }
 
-int cfg_parser::get_scaler_data(uint32_t &count, bm_address_type * scaler_name_index_map, struct scaler_ctx * scaler_ctx)
+int cfg_parser::get_scaler_data(bm_address_type * scaler_name_index_map, struct scaler_ctx * scaler_ctx)
 {
     if (tree.count(SCALER_ALIAS) == 0)
         return -1;
-    count = 0;
+    uint32_t count = 0;
     struct scaler_ctx *scaler_ctx_local = NULL;
 
 
     try
     {
-        for (const std::pair<std::string, boost::property_tree::ptree> &address_tree : tree.get_child(SCALER_ALIAS))
+       for (const std::pair<std::string, boost::property_tree::ptree> &address_tree : tree.get_child(SCALER_ALIAS))
         {
             scaler_name_index_map->insert( bm_address_type::value_type( (address_tree.first.c_str()) , count));
-            if (address_tree.second.get_value<unsigned>() >= MAX_SCALER_SUPPORTED_COUNT)
+            if (count >= MAX_SCALER_SUPPORTED_COUNT)
                 throw CrioLibException(E_INI, "Property [%s]:[%s] value of scaler is not in sequence. Should be less than %d", SCALER_ALIAS, address_tree.first.c_str(), MAX_SCALER_SUPPORTED_COUNT );
             scaler_ctx_local = &scaler_ctx[ count ];
+
             scaler_ctx_local->enable_addr = strtoul(tree.get <std::string>(address_tree.first + ".Enable").c_str(), NULL, 16);
             scaler_ctx_local->gate_array_addr = strtoul(tree.get <std::string>(address_tree.first + ".Gate").c_str(), NULL, 16);
             scaler_ctx_local->oneshot_addr = strtoul(tree.get <std::string>(address_tree.first + ".OneShot").c_str(), NULL, 16);
@@ -289,7 +290,7 @@ int cfg_parser::get_scaler_data(uint32_t &count, bm_address_type * scaler_name_i
 }
 
 
-int cfg_parser::get_waveform_data(bool rt_support, uint32_t & count, bm_address_type * waveform_name_index_map, bm_address_type * rt_address_map, struct waveform_ctx * waveform_ctx)
+int cfg_parser::get_waveform_data(bool rt_support, uint16_t & count, bm_address_type * waveform_name_index_map, bm_address_type * rt_address_map, struct waveform_ctx * waveform_ctx)
 {
     if (tree.count(WAVEFORM_ALIAS) == 0)
         return -1;
