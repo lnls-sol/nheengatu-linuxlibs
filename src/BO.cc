@@ -44,7 +44,7 @@ int crioSetBOItem(struct crio_context *ctx, const char *name, bool value) {
             if (ctx->debugCRIO)
             {
                 printf ("RT BO name=%s, Value=%d, Offset=0x%08x\n" , name, value, offset);
-                fprintf (ctx->log, "RT BI name=%s, Value=%d, Offset=0x%08x\n" , name, value, offset);
+                fprintf (ctx->log, "RT BO name=%s, Value=%d, Offset=0x%08x\n" , name, value, offset);
             }
             return 0;
         }
@@ -54,7 +54,7 @@ int crioSetBOItem(struct crio_context *ctx, const char *name, bool value) {
             if (ctx->debugCRIO)
             {
                 printf ("FPGA BO name=%s, Value=%d, Address=0x%08x\n" , name, value, address);
-                fprintf (ctx->log, "RT BI name=%s, Value=%d, Address=0x%08x\n" , name, value, address);
+                fprintf (ctx->log, "FPGA BO name=%s, Value=%d, Address=0x%08x\n" , name, value, address);
             }
             return crioSetBO(ctx, address, value);
         }

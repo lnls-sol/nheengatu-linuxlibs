@@ -117,7 +117,7 @@ int crioGetBIArrayItemByName(struct crio_context *ctx, bool *item, const char *n
             if (ctx->debugCRIO)
             {
                 printf ("FPGA BI name=%s, Value=%d, Address=0x%08x, Index=%lu\n" , name, *item, address, index);
-                fprintf (ctx->log, "RT BI name=%s, Value=%d, Address=0x%08x, Index=%lu\n" , name, *item, address, index);
+                fprintf (ctx->log, "FPGA BI name=%s, Value=%d, Address=0x%08x, Index=%lu\n" , name, *item, address, index);
             }
         }
         return 0;
