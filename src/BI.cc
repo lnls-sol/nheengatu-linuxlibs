@@ -104,8 +104,8 @@ int crioGetBIArrayItemByName(struct crio_context *ctx, bool *item, const char *n
             *item = static_cast<bool>(value);
             if (ctx->debugCRIO)
             {
-                printf ("RT BI name=%s, Value=%d, Offset=0x%08x\n" , name, *item, address);
-                fprintf (ctx->log, "RT BI name=%s, Value=%d, Offset=0x%08x\n" , name, *item, address);
+                printf ("RT BI name=%s, Value=%d, Offset=0x%05x\n" , name, *item, address);
+                fprintf (ctx->log, "RT BI name=%s, Value=%d, Offset=0x%05x\n" , name, *item, address);
             }
         }
         else
@@ -116,8 +116,8 @@ int crioGetBIArrayItemByName(struct crio_context *ctx, bool *item, const char *n
             *item = getBI(ctx, index, address);
             if (ctx->debugCRIO)
             {
-                printf ("FPGA BI name=%s, Value=%d, Address=0x%08x, Index=%lu\n" , name, *item, address, index);
-                fprintf (ctx->log, "FPGA BI name=%s, Value=%d, Address=0x%08x, Index=%lu\n" , name, *item, address, index);
+                printf ("FPGA BI name=%s, Value=%d, Address=0x%05x, Index=%lu\n" , name, *item, address, index);
+                fprintf (ctx->log, "FPGA BI name=%s, Value=%d, Address=0x%05x, Index=%lu\n" , name, *item, address, index);
             }
         }
         return 0;

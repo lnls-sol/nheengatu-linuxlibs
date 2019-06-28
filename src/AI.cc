@@ -68,8 +68,8 @@ int crioGetAIItem(struct crio_context *ctx, const char *name, double &value) {
             crioGetAIFixedPoint(ctx, value, local_fxp_data);
             if (ctx->debugCRIO)
             {
-                printf ("FPGA FXP AI name=%s, Value=%f, Address=0x%08x, Integer word Length=%u, Word Length=%u, Sign=%d\n" , name, value, local_fxp_data->address, local_fxp_data->int_word_length, local_fxp_data->word_length, local_fxp_data->sign);
-                fprintf (ctx->log, "FPGA FXP AI name=%s, Value=%f, Address=0x%08x, Integer word Length=%u, Word Length=%u, Sign=%d\n" , name, value, local_fxp_data->address, local_fxp_data->int_word_length, local_fxp_data->word_length, local_fxp_data->sign);
+                printf ("FPGA FXP AI name=%s, Value=%f, Address=0x%05x, Integer word Length=%u, Word Length=%u, Sign=%d\n" , name, value, local_fxp_data->address, local_fxp_data->int_word_length, local_fxp_data->word_length, local_fxp_data->sign);
+                fprintf (ctx->log, "FPGA FXP AI name=%s, Value=%f, Address=0x%05x, Integer word Length=%u, Word Length=%u, Sign=%d\n" , name, value, local_fxp_data->address, local_fxp_data->int_word_length, local_fxp_data->word_length, local_fxp_data->sign);
             }
         }
         else
@@ -79,8 +79,8 @@ int crioGetAIItem(struct crio_context *ctx, const char *name, double &value) {
             value = (double)(flt);
             if (ctx->debugCRIO)
             {
-                printf ("FPGA SGL AI name=%s, Value=%f, Address=0x%08x\n" , name, value, address);
-                fprintf (ctx->log, "FPGA SGL AI name=%s, Value=%f, Address=0x%08x\n" , name, value, address);
+                printf ("FPGA SGL AI name=%s, Value=%f, Address=0x%05x\n" , name, value, address);
+                fprintf (ctx->log, "FPGA SGL AI name=%s, Value=%f, Address=0x%05x\n" , name, value, address);
             }
         }
     } catch (out_of_range) {
