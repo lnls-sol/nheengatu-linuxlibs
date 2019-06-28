@@ -51,7 +51,13 @@ int crioSetAOItem(struct crio_context *ctx, const char *name, double value) {
     try {
         if (is_rt_var(name) == true)
         {
-            set_rt_val(ctx->shared_memory, ctx->rt_variable_offsets[((bm_address_type *)ctx->rt_addresses)->left.at(name)], value, name);
+            unsigned address = ctx->rt_variable_offsets[((bm_address_type *)ctx->rt_addresses)->left.at(name)];
+            set_rt_val(ctx->shared_memory, address, value, name);
+            if (ctx->debugCRIO)
+            {
+                printf ("RT AO name=%s, Value=%f, Index=%d\n" , name, value, address);
+                fprintf (ctx->log, "RT AO name=%s, Value=%f, Index=%d\n" , name, value, address);
+            }
         }
         else
         {
@@ -59,10 +65,21 @@ int crioSetAOItem(struct crio_context *ctx, const char *name, double value) {
             {
                 local_fxp_data = &(((struct fxp_ctx * )ctx->fxps)[((bm_address_type *)ctx->ao_addresses)->left.at(name)]);
                 crioSetAOFixedPoint(ctx, value, local_fxp_data);
+                if (ctx->debugCRIO)
+                {
+                    printf ("FPGA FXP AO name=%s, Value=%f, Address=0x%08x, Integer word Length=%u, Word Length=%u, Sign=%d\n" , name, value, local_fxp_data->address, local_fxp_data->int_word_length, local_fxp_data->word_length, local_fxp_data->sign);
+                    fprintf (ctx->log, "FXP AO name=%s, Value=%f, Address=0x%08x, Integer word Length=%u, Word Length=%u, Sign=%d\n" , name, value, local_fxp_data->address, local_fxp_data->int_word_length, local_fxp_data->word_length, local_fxp_data->sign);
+                }
             }
             else
             {
-                return crioSetAO(ctx, ((bm_address_type *)ctx->ao_addresses)->left.at(name), (float)value);
+                unsigned address = ((bm_address_type *)ctx->ao_addresses)->left.at(name);
+                return crioSetAO(ctx, address, (float)value);
+                if (ctx->debugCRIO)
+                {
+                    printf ("FPGA SGL AO name=%s, Value=%f, Address=0x%08x\n" , name, value, address);
+                    fprintf (ctx->log, "SGL AO name=%s, Value=%f, Address=0x%08x\n" , name, value, address);
+                }
             }
         }
     } catch (out_of_range) {

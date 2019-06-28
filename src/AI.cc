@@ -53,16 +53,35 @@ int crioGetAIItem(struct crio_context *ctx, const char *name, double &value) {
     try
     {
         if (is_rt_var(name) == true)
-            get_rt_val(ctx->shared_memory, ctx->rt_variable_offsets[((bm_address_type *)ctx->rt_addresses)->left.at(name)], value, name);
+        {
+            unsigned address = ctx->rt_variable_offsets[((bm_address_type *)ctx->rt_addresses)->left.at(name)];
+            get_rt_val(ctx->shared_memory, address, value, name);
+            if (ctx->debugCRIO)
+            {
+                printf ("RT AI name=%s, Value=%f, Index=%d\n" , name, value, address);
+                fprintf (ctx->log, "RT AI name=%s, Value=%f, Index=%d\n" , name, value, address);
+            }
+        }
         else if (is_fixed_point(name) == true)
         {
             local_fxp_data = &(((struct fxp_ctx * )ctx->fxps)[((bm_address_type *)ctx->ai_addresses)->left.at(name)]);
             crioGetAIFixedPoint(ctx, value, local_fxp_data);
+            if (ctx->debugCRIO)
+            {
+                printf ("FPGA FXP AI name=%s, Value=%f, Address=0x%08x, Integer word Length=%u, Word Length=%u, Sign=%d\n" , name, value, local_fxp_data->address, local_fxp_data->int_word_length, local_fxp_data->word_length, local_fxp_data->sign);
+                fprintf (ctx->log, "FXP AI name=%s, Value=%f, Address=0x%08x, Integer word Length=%u, Word Length=%u, Sign=%d\n" , name, value, local_fxp_data->address, local_fxp_data->int_word_length, local_fxp_data->word_length, local_fxp_data->sign);
+            }
         }
         else
         {
-            crioGetAISingle(ctx, ((bm_address_type *)ctx->ai_addresses)->left.at(name), flt);
+            unsigned address = ((bm_address_type *)ctx->ai_addresses)->left.at(name);
+            crioGetAISingle(ctx, address, flt);
             value = (double)(flt);
+            if (ctx->debugCRIO)
+            {
+                printf ("FPGA SGL AI name=%s, Value=%f, Address=0x%08x\n" , name, value, address);
+                fprintf (ctx->log, "SGL AI name=%s, Value=%f, Address=0x%08x\n" , name, value, address);
+            }
         }
     } catch (out_of_range) {
         throw (CrioLibException(E_OUT_OF_RANGE , "[%s] Property [%s]: Query returned null.", LIB_CRIO_LINUX , name ));

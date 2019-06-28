@@ -2,6 +2,29 @@
 
 
 
+void debug(struct crio_context * ctx, int enable)
+{
+    if (enable == 1)
+    {
+        ctx->log = fopen("/opt/autosave/debug_log.txt", "w");
+        if (ctx->log == NULL)
+        {
+            throw (CrioLibException(E_RESOURCE_ALLOC , "[%s] Could not open log file for writing\n", LIB_CRIO_LINUX  ));
+            return;
+        }
+        ctx->debugCRIO = true;
+    }
+    else
+    {
+        ctx->debugCRIO = false;
+        if (ctx->log != NULL)
+        {
+            fclose(ctx->log);
+            ctx->log = NULL;
+        }
+    }
+}
+
 uint64_t dbl_to_fxp(double value, struct fxp_ctx * fxp_data)
 {
     double sign_masked = value;

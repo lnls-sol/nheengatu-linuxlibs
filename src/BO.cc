@@ -39,11 +39,25 @@ int crioSetBOItem(struct crio_context *ctx, const char *name, bool value) {
     try {
         if (is_rt_var(name) == true)
         {
-            set_rt_val(ctx->shared_memory, ctx->rt_variable_offsets[((bm_address_type *)ctx->rt_addresses)->left.at(name)], static_cast<double>(value), name);
+            uint32_t offset = ctx->rt_variable_offsets[((bm_address_type *)ctx->rt_addresses)->left.at(name)];
+            set_rt_val(ctx->shared_memory, offset, static_cast<double>(value), name);
+            if (ctx->debugCRIO)
+            {
+                printf ("RT BO name=%s, Value=%d, Offset=0x%08x\n" , name, value, offset);
+                fprintf (ctx->log, "RT BI name=%s, Value=%d, Offset=0x%08x\n" , name, value, offset);
+            }
             return 0;
         }
         else
-            return crioSetBO(ctx, ((bm_address_type *)ctx->bo_addresses)->left.at(name), value);
+        {
+            uint32_t address = ((bm_address_type *)ctx->bo_addresses)->left.at(name);
+            if (ctx->debugCRIO)
+            {
+                printf ("FPGA BO name=%s, Value=%d, Address=0x%08x\n" , name, value, address);
+                fprintf (ctx->log, "RT BI name=%s, Value=%d, Address=0x%08x\n" , name, value, address);
+            }
+            return crioSetBO(ctx, address, value);
+        }
     } catch (out_of_range) {
         throw (CrioLibException(E_OUT_OF_RANGE , "[%s] Property [%s]: Query returned null.", LIB_CRIO_LINUX , name ));
     } catch(CrioLibException &e) {

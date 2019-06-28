@@ -5,6 +5,8 @@
 #include <exception>
 #include<string.h>
 #include <stdarg.h>
+#include <stdlib.h>
+
 #if __GNUC__ >= 4
 #pragma GCC visibility push(default)
 #endif
@@ -15,7 +17,6 @@
 #define TCYAN "\x1B[36m"
 
 #define LIB_CRIO_LINUX "LibCrioLinux"
-
 
 //TODO: resolve compilation from C code since we now use exceptions.
 #ifdef __cplusplus
@@ -125,6 +126,8 @@ struct crio_context {
     void               * scaler_name_index_map;
     void               * waveforms;
     void               * fxps;
+    bool                 debugCRIO;
+    FILE               * log;
 };
 
 
@@ -481,6 +484,13 @@ int crioGetNumOfCounters(struct crio_context *ctx, const char * name, uint16_t *
  */
 
 int crioGetWaveformItem(struct crio_context *ctx, const char *name, void *array, uint32_t *size, uint64_t max_size);
+
+
+/* Function to set debug on */
+void debug(crio_context *ctx, int enable);
+
+
+
 #ifdef __cplusplus
 }
 #endif

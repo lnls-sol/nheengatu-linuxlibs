@@ -99,14 +99,26 @@ int crioGetBIArrayItemByName(struct crio_context *ctx, bool *item, const char *n
     try {
         if (is_rt_var(name) == true)
         {
-            get_rt_val(ctx->shared_memory, ctx->rt_variable_offsets[((bm_address_type *)ctx->rt_addresses)->left.at(name)], value, name);
+            uint32_t address =  ctx->rt_variable_offsets[((bm_address_type *)ctx->rt_addresses)->left.at(name)];
+            get_rt_val(ctx->shared_memory, address, value, name);
             *item = static_cast<bool>(value);
+            if (ctx->debugCRIO)
+            {
+                printf ("RT BI name=%s, Value=%d, Offset=0x%08x\n" , name, *item, address);
+                fprintf (ctx->log, "RT BI name=%s, Value=%d, Offset=0x%08x\n" , name, *item, address);
+            }
         }
         else
         {
 
             index = ((bim_type *)ctx->bi_map)->right.at(name);
-            *item = getBI(ctx, index, ((bm_address_type *)ctx->bi_addresses)->left.at("BI0"));
+            unsigned address = ((bm_address_type *)ctx->bi_addresses)->left.at("BI0");
+            *item = getBI(ctx, index, address);
+            if (ctx->debugCRIO)
+            {
+                printf ("FPGA BI name=%s, Value=%d, Address=0x%08x, Index=%lu\n" , name, *item, address, index);
+                fprintf (ctx->log, "RT BI name=%s, Value=%d, Address=0x%08x, Index=%lu\n" , name, *item, address, index);
+            }
         }
         return 0;
     } catch (out_of_range) {

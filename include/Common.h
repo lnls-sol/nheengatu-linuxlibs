@@ -12,5 +12,4 @@ using namespace std;
 
 #define CFG_FILE "/usr/local/epics/config/cfg.ini"
 
-
 #endif /* COMMON_H */
