@@ -211,7 +211,7 @@ int cfg_parser::get_address_maps(bool rt_support, uint16_t & count, uint16_t & f
             else if (rt_support == true)
             {
                 if (UNKNOWN == get_rt_var_size(address_tree.first))
-                    throw CrioLibException(E_RESOURCE_ALLOC, "Item <%s:%s> size unknown. Must be one of following:\nDBL, SGL, I64, I32, I16, I08, U64, U32, U16, U08, BOL",
+                    throw CrioLibException(E_RESOURCE_ALLOC, "Item <%s:%s> size unknown. Must be one of following:\nDBL, SGL, I64, I32, I16, I08, U64, U32, U16, U08, BOL, MBO, MBI",
                                            alias.c_str(), address_tree.first.c_str());
 
                 bm_address_type::right_const_iterator id_iter;

@@ -181,6 +181,8 @@ enum type_code get_rt_var_size(std::string name){
     if (name.compare(3,3,"I16") == 0) return I16;
     if (name.compare(3,3,"I08") == 0) return I08;
     if (name.compare(3,3,"BOL") == 0) return BOL;
+    if (name.compare(3,3,"MBI") == 0) return U16;
+    if (name.compare(3,3,"MBO") == 0) return U16;
 
     return UNKNOWN;
 }

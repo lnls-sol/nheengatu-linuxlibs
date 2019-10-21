@@ -112,11 +112,15 @@ struct crio_context {
     void               * bo_addresses;
     void               * ao_addresses;
     void               * ai_addresses;
+    void               * mbbi_addresses;
+    void               * mbbo_addresses;
     void               * rt_addresses;
     uint32_t           * rt_variable_offsets;
     uint8_t            * shared_memory;
     uint16_t             ai_count;
     uint16_t             ao_count;
+    uint16_t             mbbo_count;
+    uint16_t             mbbi_count;
     uint16_t             bi_count;
     uint16_t             bo_count;
     uint16_t             fxp_count;
@@ -266,6 +270,7 @@ int crioGetBOArraySize(struct crio_context *ctx, unsigned *size);
 int crioSetBOItem(struct crio_context *ctx, const char *name, bool value);
 
 
+/* ------------------------------------- AO functions ------------------------------------- */
 
 /* Function Name  : crioSetAOItem
  * Description    : Sets the AO that is associated with the name
@@ -296,6 +301,8 @@ int crioGetAOArraySize(struct crio_context *ctx, unsigned *size);
 
 
 
+/* ------------------------------------- AI functions ------------------------------------- */
+
 /* Function Name  : crioGetAIArraySize
  * Description    : Gets the number of AIs registered by the cfg file
  * Parameters
@@ -322,6 +329,8 @@ int crioGetAIArraySize(struct crio_context *ctx, unsigned *size);
  */
 int crioGetAIItem(struct crio_context *ctx, const char *name, double &value);
 
+
+/* ------------------------------------- RT functions ------------------------------------- */
 
 /* Function Name  : get_rt_var_size
  * Description    : Gets the RT variable size
@@ -468,6 +477,10 @@ int crioSetScalerArm(struct crio_context *ctx, const char * name, bool arm, bool
 int crioGetNumOfCounters(struct crio_context *ctx, const char * name, uint16_t *counters);
 
 
+
+/* ------------------------------------- Waveform functions ------------------------------------- */
+
+
 /* Function Name  : crioGetWaveformItem
  * Description    : read waveform
  * Parameters
@@ -485,6 +498,66 @@ int crioGetNumOfCounters(struct crio_context *ctx, const char * name, uint16_t *
 
 int crioGetWaveformItem(struct crio_context *ctx, const char *name, void *array, uint32_t *size, uint64_t max_size);
 
+
+/* ------------------------------------- MBBI functions ------------------------------------- */
+
+
+/* Function Name  : crioGetMBBIItem
+ * Description    : read MBBI
+ * Parameters
+ * - crio_context : context for the open CRIO session*
+ * - name         : name of the MBBI
+ * - value        : readback value of MBBI
+ *
+ * Return value   :
+ * - OK  = 0  (Success)
+ * otherwise an exception will be thrown with the
+ * one of the errorcodes defined in errorcodes.
+ */
+int crioGetMBBIItem(struct crio_context *ctx, const char *name, double &value);
+
+
+/* Function Name  : crioGetMBBIArraySize
+ * Description    : Gets the number of MBBIs registered by the cfg file
+ * Parameters
+ * - crio_context : context for the open CRIO session
+ * - size         : (Return value) number of the registered MBBIs
+ * Return value   :
+ * - OK  = 0
+ * otherwise an exception will be thrown with the
+ * one of the errorcodes defined in errorcodes.
+ */
+int crioGetMBBIArraySize(struct crio_context *ctx, unsigned *size);
+
+/* ------------------------------------- MBBO functions ------------------------------------- */
+
+
+/* Function Name  : crioGetMBBOItem
+ * Description    : read MBBO
+ * Parameters
+ * - crio_context : context for the open CRIO session*
+ * - name         : name of the MBBO
+ * - value        : readback value of MBBO
+ *
+ * Return value   :
+ * - OK  = 0  (Success)
+ * otherwise an exception will be thrown with the
+ * one of the errorcodes defined in errorcodes.
+ */
+int crioSetMBBOItem(struct crio_context *ctx, const char *name, double value);
+
+
+/* Function Name  : crioGetMBBOArraySize
+ * Description    : Gets the number of MBBOs registered by the cfg file
+ * Parameters
+ * - crio_context : context for the open CRIO session
+ * - size         : (Return value) number of the registered MBBOs
+ * Return value   :
+ * - OK  = 0
+ * otherwise an exception will be thrown with the
+ * one of the errorcodes defined in errorcodes.
+ */
+int crioGetMBBOArraySize(struct crio_context *ctx, unsigned *size);
 
 /* Function to set debug on */
 void debug(crio_context *ctx, int enable);

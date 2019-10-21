@@ -19,6 +19,8 @@ typedef boost::bimap< std::string, unsigned > bm_address_type;
 #define AI_ALIAS         "AI"
 #define SCALER_ALIAS     "SCALERS"
 #define WAVEFORM_ALIAS   "WAVEFORMS"
+#define MBBO_ALIAS         "MBBO"
+#define MBBI_ALIAS         "MBBI"
 
 /* This class processes an ini file, and imports it to a
  * boost property tree. It uses the formerly defined aliases
