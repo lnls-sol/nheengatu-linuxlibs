@@ -15,10 +15,10 @@ int main(void) {
     srand(time(0));
 
 
-    string MBBIs[] = {"mbbi_ind"};
+    string MBBIs[] = {"mbbi_ind", "RT_MBI"};
 
 
-    string MBBOs[] = {"mbbo_ctl"};
+    string MBBOs[] = {"mbbo_ctl", "RT_MBO"};
 
     printLibVersion();
     TRY_THROW(crioSetup(ctx, cfg));
@@ -42,12 +42,14 @@ int main(void) {
     TRY_SILENT(crioGetMBBOArraySize(ctx, &Size));
     cout << "MBBOs found:" << Size << endl;
 
-    for (unsigned I = 0; I < 3; I++) {
-        TRY_SILENT_CONT(crioSetMBBOItem(ctx, MBBOs[0].c_str(), I));
-        cout << MBBOs[0].c_str() << "->" << I << endl;
-        TRY_SILENT_CONT(crioGetMBBIItem(ctx, MBBIs[0].c_str(), Item));
-        cout << MBBIs[0].c_str() << "->" << Item  << endl;
-
+    for (unsigned X = 0; X < 2; X++) {
+        for (unsigned I = 0; I < 3; I++) {
+            TRY_SILENT_CONT(crioSetMBBOItem(ctx, MBBOs[X].c_str(), I));
+            cout << MBBOs[X].c_str() << "->" << I << endl;
+            TRY_SILENT_CONT(crioGetMBBIItem(ctx, MBBIs[X].c_str(), Item));
+            cout << MBBIs[X].c_str() << "->" << Item  << endl;
+            sleep(1);
+        }
     }
     cout << endl;
 
