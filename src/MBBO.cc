@@ -53,7 +53,7 @@ int crioSetMBBOItem(struct crio_context *ctx, const char *name, double value) {
         else
         {
             unsigned address = ((bm_address_type *)ctx->mbbo_addresses)->left.at(name);
-            return crioSetMBBO(ctx, address, (uint16_t)value);
+            crioSetMBBO(ctx, address, (uint16_t)value);
             if (ctx->debugCRIO)
             {
                 printf ("FPGA MBBO name=%s, Value=%f, Address=0x%05x\n" , name, value, address);

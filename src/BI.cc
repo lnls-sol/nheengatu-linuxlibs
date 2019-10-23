@@ -75,12 +75,12 @@ int crioGetBIArrayItemByIndex(struct crio_context *ctx, bool *item, uint32_t ind
     try {
         ((bim_type *)ctx->bi_map)->left.at(index).c_str();
         *item = getBI(ctx, index, ((bm_address_type *)ctx->bi_addresses)->left.at("BI0") );
-        return 0;
     } catch (out_of_range) {
         throw (CrioLibException(E_OUT_OF_RANGE , "[%s] Property <BI0>: Query returned null for index %d.", LIB_CRIO_LINUX , index ));
     } catch(CrioLibException &e) {
         throw (CrioLibException(e.errorcode, "[%s] Property [%s]: %s.", LIB_CRIO_LINUX , "BI0", e.what()));
     }
+    return 0;
 }
 
 int crioGetBIArraySize(struct crio_context *ctx, unsigned *size) {
@@ -120,12 +120,12 @@ int crioGetBIArrayItemByName(struct crio_context *ctx, bool *item, const char *n
                 fprintf (ctx->log, "FPGA BI name=%s, Value=%d, Address=0x%05x, Index=%lu\n" , name, *item, address, index);
             }
         }
-        return 0;
     } catch (out_of_range) {
         throw (CrioLibException(E_OUT_OF_RANGE , "[%s] Property [%s]: Query returned null.", LIB_CRIO_LINUX , name ));
     } catch(CrioLibException &e) {
         throw (CrioLibException(e.errorcode, "[%s] Property [%s]: %s.", LIB_CRIO_LINUX , name, e.what()));
     }
+    return 0;
 }
 
 int crioGetBIArrayItemName(struct crio_context *ctx, unsigned index, const char **name) {
@@ -133,8 +133,8 @@ int crioGetBIArrayItemName(struct crio_context *ctx, unsigned index, const char 
         throw (CrioLibException(E_SESSION_CLOSED , "[%s] Operation performed on closed session.", LIB_CRIO_LINUX ));
     try {
         *name = ((bim_type *)ctx->bi_map)->left.at(index).c_str();
-        return 0;
     } catch (out_of_range) {
         throw (CrioLibException(E_OUT_OF_RANGE , "[%s] Property [%s]: Query returned null.", LIB_CRIO_LINUX , *name ));
     }
+    return 0;
 }

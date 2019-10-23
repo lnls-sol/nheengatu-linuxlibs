@@ -117,6 +117,7 @@ struct crio_context {
     void               * rt_addresses;
     uint32_t           * rt_variable_offsets;
     uint8_t            * shared_memory;
+    bool                 use_shared_memory;
     uint16_t             ai_count;
     uint16_t             ao_count;
     uint16_t             mbbo_count;

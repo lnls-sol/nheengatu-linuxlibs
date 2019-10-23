@@ -13,6 +13,7 @@ void debug(struct crio_context * ctx, int enable)
             return;
         }
         ctx->debugCRIO = true;
+        printf("CRIO debug enabled\n");
     }
     else
     {
@@ -22,6 +23,7 @@ void debug(struct crio_context * ctx, int enable)
             fclose(ctx->log);
             ctx->log = NULL;
         }
+        printf("CRIO debug disabled\n");
     }
 }
 

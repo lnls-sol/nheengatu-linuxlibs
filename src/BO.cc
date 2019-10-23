@@ -46,7 +46,6 @@ int crioSetBOItem(struct crio_context *ctx, const char *name, bool value) {
                 printf ("RT BO name=%s, Value=%d, Offset=0x%05x\n" , name, value, offset);
                 fprintf (ctx->log, "RT BO name=%s, Value=%d, Offset=0x%05x\n" , name, value, offset);
             }
-            return 0;
         }
         else
         {
@@ -56,11 +55,12 @@ int crioSetBOItem(struct crio_context *ctx, const char *name, bool value) {
                 printf ("FPGA BO name=%s, Value=%d, Address=0x%05x\n" , name, value, address);
                 fprintf (ctx->log, "FPGA BO name=%s, Value=%d, Address=%05x\n" , name, value, address);
             }
-            return crioSetBO(ctx, address, value);
+            crioSetBO(ctx, address, value);
         }
     } catch (out_of_range) {
         throw (CrioLibException(E_OUT_OF_RANGE , "[%s] Property [%s]: Query returned null.", LIB_CRIO_LINUX , name ));
     } catch(CrioLibException &e) {
         throw (CrioLibException(e.errorcode, "[%s] Property [%s]: %s.", LIB_CRIO_LINUX , name, e.what()));
     }
+    return 0;
 }

@@ -74,7 +74,7 @@ int crioSetAOItem(struct crio_context *ctx, const char *name, double value) {
             else
             {
                 unsigned address = ((bm_address_type *)ctx->ao_addresses)->left.at(name);
-                return crioSetAO(ctx, address, (float)value);
+                crioSetAO(ctx, address, (float)value);
                 if (ctx->debugCRIO)
                 {
                     printf ("FPGA SGL AO name=%s, Value=%f, Address=0x%05x\n" , name, value, address);
