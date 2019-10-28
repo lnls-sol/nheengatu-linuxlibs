@@ -108,23 +108,26 @@ int crioSetup(struct crio_context *ctx, char *cfgfile) {
 
 
 void crioCleanup(struct crio_context *ctx) {
-    ctx->session_open = false;
-    NiFpga_Close(ctx->session, NiFpga_CloseAttribute_NoResetIfLastSession);
-    NiFpga_Finalize();
-    delete((bm_address_type *)ctx->ai_addresses);
-    delete((bm_address_type *)ctx->rt_addresses);
-    delete((bm_address_type *)ctx->ao_addresses);
-    delete((bm_address_type *)ctx->mbbi_addresses);
-    delete((bm_address_type *)ctx->mbbo_addresses);
-    delete((bm_address_type *)ctx->bo_addresses);
-    delete((bm_address_type *)ctx->bi_addresses);
-    delete((bm_address_type *)ctx->scaler_name_index_map);
-    delete []((struct scaler_ctx*)ctx->scalers);
-    delete((bm_address_type *)ctx->waveform_name_index_map);
-    delete []((struct fxp_ctx *)ctx->fxps);
-    delete []((struct waveform_ctx *)ctx->waveforms);
-    if (ctx->use_shared_memory)
-        delete[] ctx->rt_variable_offsets;
-    delete((bim_type * )ctx->bi_map);
-    pthread_mutex_destroy(&ctx->bi_mutex);
+    if (ctx->session_open == true)
+    {
+        NiFpga_Close(ctx->session, NiFpga_CloseAttribute_NoResetIfLastSession);
+        NiFpga_Finalize();
+        ctx->session_open = false;
+        delete((bm_address_type *)ctx->ai_addresses);
+        delete((bm_address_type *)ctx->rt_addresses);
+        delete((bm_address_type *)ctx->ao_addresses);
+        delete((bm_address_type *)ctx->mbbi_addresses);
+        delete((bm_address_type *)ctx->mbbo_addresses);
+        delete((bm_address_type *)ctx->bo_addresses);
+        delete((bm_address_type *)ctx->bi_addresses);
+        delete((bm_address_type *)ctx->scaler_name_index_map);
+        delete []((struct scaler_ctx*)ctx->scalers);
+        delete((bm_address_type *)ctx->waveform_name_index_map);
+        delete []((struct fxp_ctx *)ctx->fxps);
+        delete []((struct waveform_ctx *)ctx->waveforms);
+        if (ctx->use_shared_memory)
+            delete[] ctx->rt_variable_offsets;
+        delete((bim_type * )ctx->bi_map);
+        pthread_mutex_destroy(&ctx->bi_mutex);
+    }
 }
