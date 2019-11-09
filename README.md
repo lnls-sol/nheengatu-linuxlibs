@@ -19,3 +19,7 @@ link time and run time search directories).
 ## Install:
 
 	$ sudo ./install.sh
+
+## Debugging with GDB
+
+Edit the CMakeLists.txt, and exchange Release with Debug, and compile again.
