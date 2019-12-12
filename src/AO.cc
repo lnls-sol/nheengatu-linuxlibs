@@ -1,3 +1,27 @@
+/*###############################################################################
+#
+# This software is distributed under the following ISC license:
+#
+# Copyright © 2017 BRAZILIAN SYNCHROTRON LIGHT SOURCE <sol@lnls.br>
+#   Dawood Alnajjar <dawood.alnajjar@lnls.br>
+#
+# Permission to use, copy, modify, and/or distribute this software for any
+# purpose with or without fee is hereby granted, provided that the above
+# copyright notice and this permission notice appear in all copies.
+#
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS.  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+# ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION
+# OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
+# CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+#
+# Description:
+# Analog output functions
+#
+###############################################################################*/
+
 #include "Common.h"
 
 #include <ctype.h>
@@ -49,6 +73,7 @@ int crioSetAOItem(struct crio_context *ctx, const char *name, double value) {
     if (!ctx->session_open)
         throw (CrioLibException(E_SESSION_CLOSED , "[%s] Operation performed on closed session.", LIB_CRIO_LINUX ));
     try {
+        /* Check if variable is an RT variable */
         if (is_rt_var(name) == true)
         {
             unsigned address = ctx->rt_variable_offsets[((bm_address_type *)ctx->rt_addresses)->left.at(name)];
@@ -61,6 +86,7 @@ int crioSetAOItem(struct crio_context *ctx, const char *name, double value) {
         }
         else
         {
+            /* Check if variable is an FPGA fixedpoint variable */
             if (is_fixed_point(name) == true)
             {
                 local_fxp_data = &(((struct fxp_ctx * )ctx->fxps)[((bm_address_type *)ctx->ao_addresses)->left.at(name)]);
@@ -71,6 +97,7 @@ int crioSetAOItem(struct crio_context *ctx, const char *name, double value) {
                     fprintf (ctx->log, "FPGA FXP AO name=%s, Value=%f, Address=0x%05x, Integer word Length=%u, Word Length=%u, Sign=%d\n" , name, value, local_fxp_data->address, local_fxp_data->int_word_length, local_fxp_data->word_length, local_fxp_data->sign);
                 }
             }
+            /* FPGA floating-point variable */
             else
             {
                 unsigned address = ((bm_address_type *)ctx->ao_addresses)->left.at(name);

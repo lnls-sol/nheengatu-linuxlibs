@@ -1,3 +1,27 @@
+/*###############################################################################
+#
+# This software is distributed under the following ISC license:
+#
+# Copyright © 2017 BRAZILIAN SYNCHROTRON LIGHT SOURCE <sol@lnls.br>
+#   Dawood Alnajjar <dawood.alnajjar@lnls.br>
+#
+# Permission to use, copy, modify, and/or distribute this software for any
+# purpose with or without fee is hereby granted, provided that the above
+# copyright notice and this permission notice appear in all copies.
+#
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS.  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+# ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION
+# OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
+# CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+#
+# Description:
+# Binary output functions
+#
+###############################################################################*/
+
 #include "Common.h"
 
 #include <ctype.h>
@@ -37,6 +61,7 @@ int crioSetBOItem(struct crio_context *ctx, const char *name, bool value) {
     if (!ctx->session_open)
         throw (CrioLibException(E_SESSION_CLOSED , "[%s] Operation performed on closed session.", LIB_CRIO_LINUX ));
     try {
+        /* See if RT variable is an RT variable */
         if (is_rt_var(name) == true)
         {
             uint32_t offset = ctx->rt_variable_offsets[((bm_address_type *)ctx->rt_addresses)->left.at(name)];
@@ -47,6 +72,7 @@ int crioSetBOItem(struct crio_context *ctx, const char *name, bool value) {
                 fprintf (ctx->log, "RT BO name=%s, Value=%d, Offset=0x%05x\n" , name, value, offset);
             }
         }
+        /* FPGA variable */
         else
         {
             uint32_t address = ((bm_address_type *)ctx->bo_addresses)->left.at(name);
