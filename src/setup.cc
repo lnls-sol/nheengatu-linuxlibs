@@ -7,6 +7,9 @@
 #include "WAVEFORM.h"
 #include "ANALOG.h"
 
+
+
+
 int crioSetup(struct crio_context *ctx, char *cfgfile) {
     string ip = "";
     string path = "";
@@ -37,14 +40,21 @@ int crioSetup(struct crio_context *ctx, char *cfgfile) {
 
     /* Setting up CRIO */
     auto Res = NiFpga_Initialize();
-    if (NiFpga_IsError(Res))
-        throw (CrioLibException(E_FPGA_INIT, "[%s] Failed to initialize FPGA.", LIB_CRIO_LINUX));
+    try{
+        throwCRIOError(Res);
+    }  catch(CrioLibException &e) {
+        throw (CrioLibException(e.errorcode, "[%s] Failed to initialize FPGA with error:\n%s", LIB_CRIO_LINUX , e.what()));
+    }
 
     NiFpga_Session NiSession;
     Res = NiFpga_Open(bitfile.c_str(), signature.c_str(), url.c_str(), 0, &NiSession);
     if (NiFpga_IsError(Res)) {
         NiFpga_Finalize();
-        throw (CrioLibException(E_FPGA_INIT, "[%s] Failed to write bitstream. Check path, signature and IP.", LIB_CRIO_LINUX));
+        try{
+            throwCRIOError(Res);
+        }  catch(CrioLibException &e) {
+            throw (CrioLibException(e.errorcode, "[%s] Failed to Open NI session with error:\n%s", LIB_CRIO_LINUX , e.what()));
+        }
     }
 
     ctx->ai_count = 0;

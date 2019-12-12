@@ -103,41 +103,59 @@ int cfg_parser::get_bi_maps(bool rt_support, uint16_t & count, bim_type *bi_map,
     {
         for (const std::pair<std::string, boost::property_tree::ptree> &bi_address_tree : tree.get_child(BIADDR_ALIAS))
         {
+            /* See if the selected item is not an RT variable */
             if (is_rt_var(bi_address_tree.first) == false)
             {
+
+                /* Look for replicas in the Addresses in the bi_address_map */
                 bm_address_type::right_const_iterator id_iter = bi_address_map->right.find(strtoul(bi_address_tree.second.get_value<std::string>().c_str(), NULL, 16));
                 if( id_iter != bi_address_map->right.end() )
                 {
+                    /* Replica found; error in configuration file detected. */
                     throw CrioLibException(E_SAME_ADDRESS, "Found replicated address for items [%s] and [%s]",
                                            bi_address_tree.first.c_str(), id_iter->second.c_str() );
                 }
                 else {
+                    /* Insert new item to the bi_address_map [name:Address] */
                     bi_address_map->insert( bm_address_type::value_type( (bi_address_tree.first.c_str()) ,
                                                                           strtoul(bi_address_tree.second.get_value<std::string>().c_str(), NULL, 16) ));
                 }
-
-                for (const std::pair<std::string, boost::property_tree::ptree> &bi : tree.get_child(bi_address_tree.first))
+                /* Check if BI_VECTOR is available amongst the BIs */
+                std::string BI_VEC = bi_address_tree.first.c_str();
+                if (BI_VEC.compare(BI_VECTOR) == 0)
                 {
-                    bim_type::right_const_iterator id_iter = bi_map->right.find(bi.second.get_value<std::string>());
+                    /* Check if BI_VECTOR found. Look for the BI Vector subkey in INI */
+                    for (const std::pair<std::string, boost::property_tree::ptree> &bi : tree.get_child(bi_address_tree.first))
+                    {
 
-                    if( id_iter != bi_map->right.end() )
-                    {
-                        throw CrioLibException(E_SAME_ADDRESS, "Found distinct index assignments for item <%s:%s>",
-                                               bi_address_tree.first.c_str(),
-                                               bi.second.get_value<std::string>().c_str() );
-                    }
-                    else
-                    {
-                       bi_map->insert( bim_type::value_type( atol(bi.first.c_str()) , bi.second.get_value<std::string>() ));
-                        count++;
+                        bim_type::right_const_iterator id_iter = bi_map->right.find(bi.second.get_value<std::string>());
+
+                        /* Check sanity of BI vector bit assignment */
+                        if( id_iter != bi_map->right.end() )
+                        {
+                            throw CrioLibException(E_SAME_ADDRESS, "Found distinct index assignments for item <%s:%s>",
+                                                   bi_address_tree.first.c_str(),
+                                                   bi.second.get_value<std::string>().c_str() );
+                        }
+                        else
+                        {
+                           /* Passed sanity check. Add to BI map */
+                           bi_map->insert( bim_type::value_type( atol(bi.first.c_str()) , bi.second.get_value<std::string>() ));
+                            count++;
+                        }
                     }
                 }
+                else{
+                    count++;
+                }
             }
+            /* Check if RT is enabled */
             else if (rt_support == true){
                 if (UNKNOWN == get_rt_var_size(bi_address_tree.first))
                     throw CrioLibException(E_RESOURCE_ALLOC, "Item <%s:%s> size unknown. Must be of type BOL",
                                            BIADDR_ALIAS, bi_address_tree.first.c_str());
 
+                /* Check sanity of RT BIs */
                 bm_address_type::right_const_iterator id_iter;
                 try {
                    id_iter = bi_rt_address_map->right.find(bi_address_tree.second.get_value<unsigned int>());
@@ -153,6 +171,7 @@ int cfg_parser::get_bi_maps(bool rt_support, uint16_t & count, bim_type *bi_map,
                 }
                 else
                 {
+                    /* Passed sanity check. Add to RT BI map */
                     bi_rt_address_map->insert( bm_address_type::value_type( (bi_address_tree.first.c_str()) ,
                                                bi_address_tree.second.get_value<unsigned int>()));
                 }

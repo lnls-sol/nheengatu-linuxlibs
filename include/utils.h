@@ -32,6 +32,7 @@ void timespec_diff(struct timespec *start, struct timespec *stop, struct timespe
 bool is_fixed_point(std::string name);
 uint64_t dbl_to_fxp(double value, struct fxp_ctx * fxp_data);
 double fxp_to_dbl(uint64_t value, struct fxp_ctx * fxp_data);
+int throwCRIOError(int error);
 
 #ifdef __cplusplus
 }

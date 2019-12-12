@@ -10,6 +10,7 @@
 #include "CrioLinux.h"
 #include <sys/types.h>
 #include <sys/syscall.h>
+#include "cfg_parser.h"
 
 #define CACHE_TIMEOUT_US 1000
 
@@ -21,8 +22,9 @@ typedef bimap< unsigned, std::string > bim_type;
 typedef bimap< std::string, unsigned > bm_address_type;
 
 /* prototypes */
-static __inline__ bool getBI(struct crio_context *ctx, uint32_t index, uint64_t address);
+static __inline__ bool getBIVectorItem(struct crio_context *ctx, uint32_t index, uint64_t address);
 static __inline__ int crioReadBIArray(struct crio_context *ctx, uint64_t *output, uint64_t address);
+
 
 /* --------------- HELPERS --------------- */
 
@@ -51,7 +53,7 @@ static __inline__ int crioReadBIArray(struct crio_context *ctx, uint64_t *output
     return 0;
 }
 
-static __inline__ bool getBI(struct crio_context *ctx, uint32_t index, uint64_t address){
+static __inline__ bool getBIVectorItem(struct crio_context *ctx, uint32_t index, uint64_t address){
     uint64_t output;
     try{
         crioReadBIArray(ctx, &output, address);
@@ -62,25 +64,18 @@ static __inline__ bool getBI(struct crio_context *ctx, uint32_t index, uint64_t 
     return (bool) (output & (0x1UL << index));
 }
 
+static __inline__ bool getBIScalar(struct crio_context *ctx, uint64_t address){
+    bool ret;
+    auto Res = NiFpga_ReadBool(NiFpga_Session(ctx->session), address, (NiFpga_Bool*)&ret);
+    if (NiFpga_IsError(Res)) throw (CrioLibException(E_VAR_ACCESS, "Cannot access address"));
+    return ret;
+}
+
 /* ---------------- API FUNCTIONS ---------------- */
 
 void setBICacheTimeout(struct crio_context *ctx, double timeout)
 {
     ctx->bi_cache_timeout = timeout;
-}
-
-int crioGetBIArrayItemByIndex(struct crio_context *ctx, bool *item, uint32_t index) {
-    if (!ctx->session_open)
-        throw (CrioLibException(E_SESSION_CLOSED , "[%s] Operation performed on closed session.", LIB_CRIO_LINUX ));
-    try {
-        ((bim_type *)ctx->bi_map)->left.at(index).c_str();
-        *item = getBI(ctx, index, ((bm_address_type *)ctx->bi_addresses)->left.at("BI0") );
-    } catch (out_of_range) {
-        throw (CrioLibException(E_OUT_OF_RANGE , "[%s] Property <BI0>: Query returned null for index %d.", LIB_CRIO_LINUX , index ));
-    } catch(CrioLibException &e) {
-        throw (CrioLibException(e.errorcode, "[%s] Property [%s]: %s.", LIB_CRIO_LINUX , "BI0", e.what()));
-    }
-    return 0;
 }
 
 int crioGetBIArraySize(struct crio_context *ctx, unsigned *size) {
@@ -92,6 +87,7 @@ int crioGetBIArraySize(struct crio_context *ctx, unsigned *size) {
 
 int crioGetBIArrayItemByName(struct crio_context *ctx, bool *item, const char *name) {
     double value;
+    unsigned address ;
     if (!ctx->session_open)
         throw (CrioLibException(E_SESSION_CLOSED , "[%s] Operation performed on closed session.", LIB_CRIO_LINUX ));
 
@@ -111,9 +107,23 @@ int crioGetBIArrayItemByName(struct crio_context *ctx, bool *item, const char *n
         else
         {
 
-            index = ((bim_type *)ctx->bi_map)->right.at(name);
-            unsigned address = ((bm_address_type *)ctx->bi_addresses)->left.at("BI0");
-            *item = getBI(ctx, index, address);
+
+            try{
+
+                index = ((bim_type *)ctx->bi_map)->right.at(name);
+                address = ((bm_address_type *)ctx->bi_addresses)->left.at(BI_VECTOR);
+                *item = getBIVectorItem(ctx, index, address);
+
+            } catch (out_of_range) {
+                try{
+                    address = ((bm_address_type *)ctx->bi_addresses)->left.at(name);
+                    *item = getBIScalar(ctx, address);
+                } catch (out_of_range) {
+                    throw (CrioLibException(E_OUT_OF_RANGE , "[%s] Property [%s]: Query returned null.", LIB_CRIO_LINUX , name ));
+                } catch(CrioLibException &e) {
+                    throw (CrioLibException(e.errorcode, "[%s] Property [%s]: %s.", LIB_CRIO_LINUX , name, e.what()));
+                }
+            }
             if (ctx->debugCRIO)
             {
                 printf ("FPGA BI name=%s, Value=%d, Address=0x%05x, Index=%lu\n" , name, *item, address, index);
