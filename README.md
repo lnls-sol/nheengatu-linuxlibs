@@ -1,7 +1,10 @@
-# crio-linux-libs: Configurable wrapper for National Instruments C API library
+# Nheengatu Linux Libraries: Configurable wrapper for National Instruments C API library
 
-This project packages functions for configuring the FPGA CRIO, reading and 
-writing binary and analog variables from and to the FPGA and the labview RT.
+This project provides a layer of communication between the NI FPGA functions/LabviewVI
+and the EPICS device support. It abstracts all complexities generated from identifying 
+whether the variable accessed is from the LabviewRT or the FPGA through a configuration
+file that is provided upon initialization. More information can be found [here](https://github.com/lnls-sol/project-nheengatu/tree/master/docs).
+
 
 ## Usage:
 
