@@ -56,10 +56,25 @@ uint8_t decode_enum_size(enum type_code code){
         case I16: return 2;
         case I08: return 1;
         case BOL: return 1;
+        case STO: return 40;
+        case STI: return 40;
     default:throw CrioLibException(E_NOT_FOUND, "Unrecognized size <%x>", (uint8_t)code);
     }
 }
 
+
+
+int set_rt_str(uint8_t * shared_memory, uint64_t offset, char str[40])
+{
+    memcpy((char *)(shared_memory + offset), str, 40);
+    return 0;
+}
+
+int get_rt_str(uint8_t * shared_memory, uint64_t offset, char str[40])
+{
+    memcpy(str, (char *)(shared_memory + offset), 40);
+    return 0;
+}
 
 int set_rt_val(uint8_t * shared_memory, uint64_t offset, double value, std::string name)
 {
@@ -207,6 +222,8 @@ enum type_code get_rt_var_size(std::string name){
     if (name.compare(3,3,"BOL") == 0) return BOL;
     if (name.compare(3,3,"MBI") == 0) return U16;
     if (name.compare(3,3,"MBO") == 0) return U16;
+    if (name.compare(3,3,"STO") == 0) return STO;
+    if (name.compare(3,3,"STI") == 0) return STI;
 
     return UNKNOWN;
 }

@@ -45,6 +45,7 @@ enum type_code get_wf_size(std::string name){
     if (name.compare(0,3,"I08") == 0) return I08;
     if (name.compare(0,3,"DBL") == 0) return DBL;
     if (name.compare(0,3,"BOL") == 0) return U08;
+    if (name.compare(0,3,"STO") == 0) return STO;
 
     throw (CrioLibException(E_INI, "Unknown waveform type <%s>", name.c_str() ));
 

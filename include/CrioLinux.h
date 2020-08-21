@@ -98,6 +98,8 @@ enum type_code{
     I16,
     I08,
     BOL,
+    STO,
+    STI,
     UNKNOWN
 };
 
@@ -147,6 +149,8 @@ struct crio_context {
     uint16_t             ao_count;
     uint16_t             mbbo_count;
     uint16_t             mbbi_count;
+    uint16_t             stringout_count;
+    uint16_t             stringin_count;
     uint16_t             bi_count;
     uint16_t             bo_count;
     uint16_t             fxp_count;
@@ -584,6 +588,64 @@ int crioSetMBBOItem(struct crio_context *ctx, const char *name, double value);
  * one of the errorcodes defined in errorcodes.
  */
 int crioGetMBBOArraySize(struct crio_context *ctx, unsigned *size);
+
+
+/* ------------------------------------- STRINGIN functions ------------------------------------- */
+/* Function Name  : crioGetSTRINGINItem
+ * Description    : read STRINGIN
+ * Parameters
+ * - crio_context : context for the open CRIO session*
+ * - name         : name of the STRINGIN
+ * - value        : readback value of STRINGIN
+ *
+ * Return value   :
+ * - OK  = 0  (Success)
+ * otherwise an exception will be thrown with the
+ * one of the errorcodes defined in errorcodes.
+ */
+int crioGetSTRINGINItem(struct crio_context *ctx, const char *name, char value[40]);
+
+
+/* Function Name  : crioGetSTRINGINArraySize
+ * Description    : Gets the number of STRINGINs registered by the cfg file
+ * Parameters
+ * - crio_context : context for the open CRIO session
+ * - size         : (Return value) number of the registered STRINGINs
+ * Return value   :
+ * - OK  = 0
+ * otherwise an exception will be thrown with the
+ * one of the errorcodes defined in errorcodes.
+ */
+int crioGetSTRINGINArraySize(struct crio_context *ctx, unsigned *size);
+
+/* ------------------------------------- STRINGOUT functions ------------------------------------- */
+/* Function Name  : crioSetSTRINGOUTItem
+ * Description    : write STRINGOUT
+ * Parameters
+ * - crio_context : context for the open CRIO session*
+ * - name         : name of the STRINGOUT
+ * - value        : STRINGOUT to write
+ *
+ * Return value   :
+ * - OK  = 0  (Success)
+ * otherwise an exception will be thrown with the
+ * one of the errorcodes defined in errorcodes.
+ */
+int crioSetSTRINGOUTItem(struct crio_context *ctx, const char *name, char value[40]);
+
+
+/* Function Name  : crioGetSTRINGOUTArraySize
+ * Description    : Gets the number of STRINGOUTs registered by the cfg file
+ * Parameters
+ * - crio_context : context for the open CRIO session
+ * - size         : (Return value) number of the registered STRINGOUTs
+ * Return value   :
+ * - OK  = 0
+ * otherwise an exception will be thrown with the
+ * one of the errorcodes defined in errorcodes.
+ */
+int crioGetSTRINGOUTArraySize(struct crio_context *ctx, unsigned *size);
+
 
 /* Function to set debug on */
 void debug(crio_context *ctx, int enable);

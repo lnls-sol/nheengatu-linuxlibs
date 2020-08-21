@@ -44,8 +44,8 @@ uint8_t decode_enum_size(enum type_code code);
 int get_rt_val(uint8_t *shared_memory, uint64_t offset, double &value, std::string name);
 int set_rt_val(uint8_t * shared_memory, uint64_t offset, double value, std::string name);
 int get_rt_arr(uint8_t *shared_memory, uint64_t offset, void * arr, uint32_t size_bytes, enum type_code type, uint32_t size_elements);
-
-
+int get_rt_str(uint8_t * shared_memory, uint64_t offset, char str[40]);
+int set_rt_str(uint8_t * shared_memory, uint64_t offset, char str[40]);
 #ifdef __cplusplus
 }
 #endif

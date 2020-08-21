@@ -89,6 +89,8 @@ int crioSetup(struct crio_context *ctx, char *cfgfile) {
     ctx->mbbi_count = 0;
     ctx->fxp_count = 0;
     ctx->scaler_count = 0;
+    ctx->stringout_count = 0;
+    ctx->stringin_count = 0;
 
     /* Fill in binary maps from the configuration file */
     ctx->bi_map = (void *) new bim_type;
@@ -106,6 +108,8 @@ int crioSetup(struct crio_context *ctx, char *cfgfile) {
     ctx->fxps = (void *) new struct fxp_ctx[MAX_FXP_SUPPORTED_COUNT];
     TRY_THROW(parser->get_bi_maps(ctx->use_shared_memory, ctx->bi_count, (bim_type*) ctx->bi_map, (bm_address_type *)ctx->bi_addresses, (bm_address_type *)ctx->rt_addresses));
     TRY_THROW(parser->get_address_maps(ctx->use_shared_memory, ctx->bo_count, ctx->fxp_count, NULL, (bm_address_type *)ctx->bo_addresses, (bm_address_type *)ctx->rt_addresses, BO_ALIAS));
+    TRY_THROW(parser->get_address_maps(ctx->use_shared_memory, ctx->stringout_count, ctx->fxp_count, NULL, NULL, (bm_address_type *)ctx->rt_addresses, STRINGOUT_ALIAS));
+    TRY_THROW(parser->get_address_maps(ctx->use_shared_memory, ctx->stringin_count, ctx->fxp_count, NULL, NULL, (bm_address_type *)ctx->rt_addresses, STRINGIN_ALIAS));
     TRY_THROW(parser->get_address_maps(ctx->use_shared_memory, ctx->ao_count, ctx->fxp_count, (struct fxp_ctx *) ctx->fxps, (bm_address_type *)ctx->ao_addresses, (bm_address_type *)ctx->rt_addresses, AO_ALIAS));
     TRY_THROW(parser->get_address_maps(ctx->use_shared_memory, ctx->mbbo_count, ctx->fxp_count, (struct fxp_ctx *) ctx->fxps, (bm_address_type *)ctx->mbbo_addresses, (bm_address_type *)ctx->rt_addresses, MBBO_ALIAS));
     TRY_THROW(parser->get_address_maps(ctx->use_shared_memory, ctx->mbbi_count, ctx->fxp_count, (struct fxp_ctx *) ctx->fxps, (bm_address_type *)ctx->mbbi_addresses, (bm_address_type *)ctx->rt_addresses, MBBI_ALIAS));
